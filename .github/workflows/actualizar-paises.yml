@@ -1,0 +1,42 @@
+name: Actualizar países (Turismo Costa del Sol)
+
+# Refresca el desglose por país de residencia embebido en el HTML del
+# Observatorio Turístico de Marbella. La fuente (Power BI de Turismo Costa del
+# Sol) no admite CORS, por eso los datos se embeben en vez de leerse en vivo.
+
+on:
+  schedule:
+    # Dia 8 de cada mes a las 06:00 UTC. La EOH del INE, de la que bebe la
+    # fuente, publica con ~1 mes de retraso; el dia 8 da margen a que cargue.
+    - cron: "0 6 8 * *"
+  workflow_dispatch: {}   # permite lanzarlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Extraer datos y embeber en el HTML
+        run: |
+          python "fetch_paises_cds.py" "data/paises_marbella.json" \
+            --html="Observatorio Turístico Marbella.html"
+
+      - name: Commit si hay cambios
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "Observatorio Turístico Marbella.html" "data/paises_marbella.json"
+          if git diff --cached --quiet; then
+            echo "Sin cambios en los datos."
+          else
+            git commit -m "Actualiza países (Turismo Costa del Sol) $(date +%Y-%m-%d)"
+            git push
+          fi

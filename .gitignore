@@ -1,0 +1,11 @@
+# Copias de seguridad locales del HTML
+*.BACKUP-*.html
+
+# Temporales de Python
+__pycache__/
+*.pyc
+
+# Sistema
+Thumbs.db
+.DS_Store
+desktop.ini

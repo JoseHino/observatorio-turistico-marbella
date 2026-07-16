@@ -1,0 +1,6 @@
+# Forzar saltos de línea LF en ficheros que se ejecutan en Linux (GitHub Actions),
+# para que el bash del runner no falle por los \r de Windows (CRLF).
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.py    text eol=lf
+*.sh    text eol=lf
