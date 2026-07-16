@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mapa VUT Marbella — Viviendas de Uso Turístico (RTA)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<meta name="description" content="Mapa interactivo de las viviendas de uso turístico (VUT) de Marbella según el Registro de Turismo de Andalucía. Filtros por plazas, habitaciones, año de alta, modalidad y código postal; ficha individual de cada vivienda.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23d7191c'/%3E%3Ctext x='50' y='72' font-size='60' font-family='sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/proj4@2.11.0/dist/proj4.js"></script>
+
+<style>
+  :root {
+    --c-primary: #0d6efd; --c-dark: #0a0e27; --c-ok: #1e8e3e;
+    --c-warn: #d35400;    --c-err: #c0392b;  --c-accent: #d7191c;
+    --c-bg-panel: rgba(255,255,255,0.96);
+    --shadow: 0 2px 8px rgba(0,0,0,.18);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
+  #map { width: 100%; height: 100dvh; }
+  button { font-family: inherit; }
+
+  /* ---------- Loader ---------- */
+  #loader {
+    position: fixed; inset: 0; background: var(--c-dark); color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 99999; transition: opacity .6s ease; padding: 20px; text-align: center;
+  }
+  #loader h1 { font-size: clamp(15px,4vw,18px); font-weight: 600; margin: 0 0 6px; }
+  #loader .sub { font-size: clamp(11px,3vw,13px); opacity: .7; margin-bottom: 28px; }
+  #loader .bar { width: min(320px, 80vw); height: 10px; background: #1c2747; border-radius: 6px; overflow: hidden; }
+  #loader .bar > div {
+    height: 100%; width: 0%; background: linear-gradient(90deg,#0033ff,#00ffff,#ffff00,#ff0033);
+    transition: width .4s ease;
+  }
+  #loader .status { font-size: clamp(10px,3vw,12px); opacity: .85; margin-top: 12px; min-height: 18px; }
+  #loader .err { color: #ff8a8a; }
+
+  /* ---------- Cabecera plegable ---------- */
+  #info {
+    position: absolute; top: 10px; left: 50px; z-index: 500;
+    background: var(--c-bg-panel); border: 1px solid #888;
+    border-radius: 20px; box-shadow: var(--shadow);
+    font-size: 12px; max-width: calc(100vw - 110px);
+    transition: all .25s ease; overflow: hidden;
+  }
+  #info.collapsed { padding: 6px 14px; cursor: pointer; }
+  #info.collapsed .full { display: none; }
+  #info.collapsed .pill { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+  #info.expanded { padding: 12px 16px; border-radius: 10px; max-width: min(460px, calc(100vw - 110px)); }
+  #info.expanded .pill { display: none; }
+  #info.expanded .full { display: block; }
+  #info .close-x {
+    float: right; cursor: pointer; color: #888; font-size: 18px; line-height: 1;
+    margin: -2px -4px 0 8px; padding: 4px 8px;
+  }
+  #info .close-x:hover { color: #222; }
+  #info .t1 { font-size: 13px; font-weight: bold; color: #222; }
+  #info .t2 { font-size: 11.5px; color: #555; margin-top: 4px; line-height: 1.4; }
+  #info .t3 { font-size: 10.5px; color: #888; margin-top: 4px; line-height: 1.4; }
+  #info .t3 a { color: var(--c-primary); }
+  #info .fresh {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--c-ok); box-shadow: 0 0 6px var(--c-ok); flex-shrink: 0;
+  }
+
+  /* ---------- Badge de calidad del dato ---------- */
+  .quality {
+    margin-top: 8px; padding: 6px 8px; background: #fff8e1;
+    border-left: 3px solid #ffb74d; border-radius: 3px;
+    font-size: 10.5px; color: #5d4037; line-height: 1.5;
+  }
+  .quality b { color: #3e2723; }
+  .quality .ok { color: var(--c-ok); }
+  .quality .warn { color: var(--c-warn); }
+
+  /* ---------- Leyenda mini ---------- */
+  #leyenda {
+    position: absolute; bottom: 14px; left: 10px; z-index: 500;
+    background: rgba(255,255,255,0.92); padding: 5px 9px;
+    border: 1px solid #888; border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.12);
+    font-size: 10px; color: #555;
+    display: flex; align-items: center; gap: 6px;
+  }
+  #leyenda .grad {
+    width: 90px; height: 8px; border: 1px solid #888;
+    background: linear-gradient(to right,#000033,#0033ff,#00ffff,#00ff00,#ffff00,#ff6600,#ff0033);
+  }
+
+  /* ---------- Popup VUT ---------- */
+  .vut-pop { font-size: 12px; line-height: 1.45; width: min(280px, 78vw); }
+  .vut-pop .head { background: var(--c-accent); color:#fff; padding:6px 10px;
+                   border-radius:4px 4px 0 0; margin:-9px -9px 8px;
+                   font-weight:bold; font-size:13px; }
+  .vut-pop table { width:100%; border-collapse:collapse; }
+  .vut-pop td { padding:2px 4px 2px 0; vertical-align:top; font-size: 11px; }
+  .vut-pop td.k { color:#666; white-space: nowrap; }
+  .vut-pop td.v { font-weight: 600; }
+  .vut-pop .mono { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 10px; font-weight: normal; }
+  .vut-pop .actions { margin-top:8px; padding-top:6px; border-top:1px solid #eee;
+                      display:flex; gap:6px; flex-wrap:wrap; }
+  .vut-pop .actions a { color:#fff; padding:6px 10px; border-radius:4px;
+                        text-decoration:none; font-size:11px; }
+  .a-gm { background:#1a73e8; } .a-sv { background:#34a853; } .a-cat { background:#444; }
+
+  /* ---------- Botones flotantes (toolbar) ---------- */
+  #toolbar {
+    position: absolute; top: 10px; right: 50px; z-index: 500;
+    display: flex; gap: 6px;
+  }
+  #toolbar button {
+    background: var(--c-bg-panel); border: 1px solid #888;
+    border-radius: 6px; box-shadow: var(--shadow);
+    padding: 8px 12px; font-size: 13px; font-weight: 600; color: #222;
+    cursor: pointer; min-height: 36px; min-width: 36px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  #toolbar button:hover { background: #fff; }
+  #toolbar button.active { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+
+  /* ---------- Panel de filtros (sidebar / bottom-sheet) ---------- */
+  #filters {
+    position: absolute; top: 0; right: 0; bottom: 0; width: 320px; z-index: 1000;
+    background: #fff; border-left: 1px solid #ccc; box-shadow: -4px 0 14px rgba(0,0,0,.18);
+    transform: translateX(100%); transition: transform .28s ease;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  #filters.open { transform: translateX(0); }
+  #filters header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-bottom: 1px solid #eee;
+  }
+  #filters header h3 { margin: 0; font-size: 15px; color: #222; }
+  #filters .close-filters {
+    background: transparent; border: 0; font-size: 24px; color: #666;
+    cursor: pointer; padding: 4px 10px; line-height: 1; min-height: 36px;
+  }
+  #filters .body { padding: 14px; overflow-y: auto; flex: 1; }
+  #filters .group { margin-bottom: 14px; }
+  #filters label.lbl {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px;
+  }
+  #filters label.lbl .val { font-weight: 400; color: var(--c-primary); font-size: 11.5px; }
+  #filters .range-pair { display: flex; gap: 8px; align-items: center; }
+  #filters .range-pair input[type=range] { flex: 1; min-width: 0; height: 28px; }
+  #filters select, #filters input[type=text] {
+    width: 100%; padding: 7px 9px; font-size: 13px; font-family: inherit;
+    border: 1px solid #ccc; border-radius: 5px; background: #fff;
+  }
+  #filters .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  #filters .chip {
+    background: #f1f3f5; border: 1px solid #d0d7de; color: #333;
+    padding: 5px 10px; border-radius: 14px; font-size: 11.5px;
+    cursor: pointer; user-select: none; min-height: 28px;
+  }
+  #filters .chip.active { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+  #filters footer {
+    padding: 10px 14px; border-top: 1px solid #eee; background: #fafafa;
+    display: flex; gap: 8px; flex-direction: column;
+  }
+  #filters .summary { font-size: 12px; color: #444; text-align: center; }
+  #filters .summary b { color: var(--c-primary); }
+  #filters .btn-row { display: flex; gap: 8px; }
+  #filters footer button {
+    flex: 1; padding: 10px; font-size: 13px; font-weight: 600;
+    border-radius: 6px; cursor: pointer; border: 1px solid transparent; min-height: 42px;
+  }
+  #btn-reset { background: #f1f3f5; color: #333; border-color: #ccc; }
+  #btn-export { background: var(--c-primary); color: #fff; }
+  #btn-export:hover { background: #0b5ed7; }
+
+  /* ---------- Backdrop móvil ---------- */
+  #backdrop {
+    position: absolute; inset: 0; background: rgba(0,0,0,.35); z-index: 999;
+    display: none; opacity: 0; transition: opacity .25s ease;
+  }
+  #backdrop.show { display: block; opacity: 1; }
+
+  /* ---------- Responsive: tablet ---------- */
+  @media (max-width: 900px) {
+    #toolbar { right: 12px; }
+    #filters { width: 300px; }
+  }
+
+  /* ---------- Responsive: móvil ---------- */
+  @media (max-width: 600px) {
+    #info { left: 56px; top: 8px; max-width: calc(100vw - 110px); }
+    #info.expanded { max-width: calc(100vw - 70px); padding: 10px 12px; }
+    #info .t1 { font-size: 12px; }
+    #info .t2 { font-size: 11px; }
+    #info .t3 { font-size: 10px; }
+
+    #toolbar { top: auto; bottom: 14px; right: 10px; left: 10px;
+               justify-content: center; gap: 8px; }
+    #toolbar button { flex: 1; max-width: 160px; justify-content: center; min-height: 44px; }
+
+    #leyenda { bottom: 70px; }
+
+    /* Panel de filtros como bottom-sheet a pantalla completa */
+    #filters {
+      width: 100%; top: auto; bottom: 0; height: 88dvh;
+      border-left: 0; border-top: 1px solid #ccc;
+      border-radius: 16px 16px 0 0;
+      transform: translateY(100%);
+      box-shadow: 0 -4px 14px rgba(0,0,0,.18);
+    }
+    #filters.open { transform: translateY(0); }
+    #filters header { padding: 14px; }
+    #filters header h3 { font-size: 16px; }
+    #filters footer button { min-height: 48px; font-size: 14px; }
+    #filters select, #filters input[type=text] { font-size: 14px; padding: 9px 10px; min-height: 40px; }
+    #filters .chip { min-height: 32px; padding: 6px 12px; }
+  }
+
+  /* ---------- Pantallas muy pequeñas ---------- */
+  @media (max-width: 360px) {
+    #info.expanded { max-width: calc(100vw - 60px); }
+    #toolbar button { padding: 8px; font-size: 12px; }
+    #leyenda .grad { width: 60px; }
+  }
+
+  /* ---------- Modo paisaje móvil ---------- */
+  @media (max-height: 500px) and (orientation: landscape) {
+    #filters { height: 100dvh; max-width: 360px; top: 0; bottom: 0;
+               border-radius: 0; transform: translateX(100%); }
+    #filters.open { transform: translateX(0); }
+    #toolbar { top: 8px; bottom: auto; right: 56px; left: auto; }
+  }
+
+  /* ---------- Hi-DPI / soporte safe-area (notch iPhone) ---------- */
+  @supports (padding: max(0px)) {
+    #toolbar { right: max(50px, env(safe-area-inset-right)); }
+    #leyenda { left: max(10px, env(safe-area-inset-left));
+               bottom: max(14px, env(safe-area-inset-bottom)); }
+    @media (max-width: 600px) {
+      #toolbar { bottom: max(14px, env(safe-area-inset-bottom));
+                 left: max(10px, env(safe-area-inset-left));
+                 right: max(10px, env(safe-area-inset-right)); }
+      #leyenda { bottom: max(70px, calc(env(safe-area-inset-bottom) + 56px)); }
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <h1>Cargando viviendas de uso turístico de Marbella</h1>
+  <div class="sub">Registro de Turismo de Andalucía (RTA) · snapshot oficial actualizado a diario</div>
+  <div class="bar"><div id="bar-fill"></div></div>
+  <div class="status" id="status">Descargando datos…</div>
+</div>
+
+<div id="map"></div>
+
+<div id="info" class="collapsed" style="display:none">
+  <!-- Vista plegada: pill compacto -->
+  <div class="pill">
+    <span class="fresh"></span>
+    <b id="p-count">—</b><span style="color:#888"> VUT</span>
+    <span style="color:#888">·</span>
+    <span id="p-fecha" style="font-weight:600;color:#1e8e3e">—</span>
+    <span style="color:#bbb;margin-left:4px">ⓘ</span>
+  </div>
+  <!-- Vista expandida: ficha completa -->
+  <div class="full">
+    <span class="close-x" title="Plegar">×</span>
+    <div class="t1"><span class="fresh"></span> Viviendas de Uso Turístico de Marbella</div>
+    <div class="t2" id="t-counts">—</div>
+    <div class="t3" id="t-fuentes">—</div>
+    <div class="t3">Los datos se regeneran automáticamente cada madrugada a partir del volcado oficial del RTA (Junta de Andalucía).</div>
+    <div class="t3">📊 Ver también el <a href="../" target="_blank" rel="noopener">Observatorio Turístico de Marbella</a></div>
+    <div class="quality" id="t-quality"></div>
+  </div>
+</div>
+
+<div id="leyenda" style="display:none">
+  <span>VUT</span>
+  <div class="grad"></div>
+</div>
+
+<!-- Toolbar (filtros + export) -->
+<div id="toolbar" style="display:none">
+  <button id="btn-open-filters" title="Filtros">⚙ <span class="lbl-txt">Filtros</span></button>
+  <button id="btn-quick-export" title="Exportar visibles a CSV">⬇ <span class="lbl-txt">CSV</span></button>
+</div>
+
+<!-- Backdrop para cerrar filtros en móvil -->
+<div id="backdrop"></div>
+
+<!-- Panel de filtros (drawer derecha en desktop, bottom-sheet en móvil) -->
+<aside id="filters" role="dialog" aria-modal="true" aria-labelledby="filters-title">
+  <header>
+    <h3 id="filters-title">Filtros</h3>
+    <button class="close-filters" aria-label="Cerrar filtros">×</button>
+  </header>
+  <div class="body">
+
+    <div class="group">
+      <label class="lbl">Plazas <span class="val" id="f-plazas-val">0 – 99</span></label>
+      <div class="range-pair">
+        <input type="range" id="f-plazas-min" min="0" max="99" value="0" step="1" aria-label="Plazas mínimo">
+        <input type="range" id="f-plazas-max" min="0" max="99" value="99" step="1" aria-label="Plazas máximo">
+      </div>
+    </div>
+
+    <div class="group">
+      <label class="lbl">Habitaciones <span class="val" id="f-habs-val">0 – 30</span></label>
+      <div class="range-pair">
+        <input type="range" id="f-habs-min" min="0" max="30" value="0" step="1" aria-label="Habitaciones mínimo">
+        <input type="range" id="f-habs-max" min="0" max="30" value="30" step="1" aria-label="Habitaciones máximo">
+      </div>
+    </div>
+
+    <div class="group">
+      <label class="lbl">Año de alta <span class="val" id="f-year-val">— a —</span></label>
+      <div class="range-pair">
+        <select id="f-year-min" aria-label="Año mínimo"></select>
+        <select id="f-year-max" aria-label="Año máximo"></select>
+      </div>
+    </div>
+
+    <div class="group">
+      <label class="lbl">Modalidad de alquiler</label>
+      <div class="chips" id="f-modalidad"></div>
+    </div>
+
+    <div class="group">
+      <label class="lbl">Código postal</label>
+      <input type="text" id="f-cp" inputmode="numeric" placeholder="Ej. 29600, 29602 (vacío = todos)">
+      <div style="font-size: 10.5px; color: #888; margin-top: 4px;">Separa varios CP por coma.</div>
+    </div>
+
+    <div class="group">
+      <label class="lbl">Barrio / núcleo</label>
+      <select id="f-locality" aria-label="Barrio o núcleo">
+        <option value="">Todos</option>
+      </select>
+    </div>
+
+  </div>
+  <footer>
+    <div class="summary"><b id="f-count">—</b> de <span id="f-total">—</span> VUTs visibles</div>
+    <div class="btn-row">
+      <button id="btn-reset">Limpiar</button>
+      <button id="btn-export">⬇ Exportar CSV</button>
+    </div>
+  </footer>
+</aside>
+
+<script>
+// ============================================================
+// Configuración — fuente de datos
+// ------------------------------------------------------------
+// La API de búsqueda de OpenRTA dejó de admitir filtros por municipio
+// (HTTP 422), así que el mapa carga el snapshot pre-filtrado que un
+// workflow de GitHub Actions regenera cada madrugada a partir del
+// volcado oficial diario del RTA. Ver scripts/build_rta_snapshot.mjs.
+// ============================================================
+const SNAPSHOT_URLS = [
+  "../data/rta_vut_marbella.json",  // mismo repo (GitHub Pages)
+  "https://josehino.github.io/observatorio-turistico-marbella/data/rta_vut_marbella.json", // por si se abre el HTML en local
+];
+
+proj4.defs("EPSG:25830",
+  "+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+
+// ============================================================
+// Helpers
+// ============================================================
+const $ = id => document.getElementById(id);
+const setStatus = (txt, isErr=false) => {
+  const s = $("status"); s.textContent = txt;
+  s.classList.toggle("err", isErr);
+};
+const setProgress = pct => { $("bar-fill").style.width = pct + "%"; };
+const escapeHTML = s => String(s ?? "").replace(/[&<>"]/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtFecha = s => {
+  s = String(s ?? "");
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return `${s.slice(8,10)}/${s.slice(5,7)}/${s.slice(0,4)}`;
+  if (/^\d{8}$/.test(s)) return `${s.slice(6,8)}/${s.slice(4,6)}/${s.slice(0,4)}`;
+  return s || "—";
+};
+// useGrouping:"always": es-ES no separa millares en números de 4 cifras por defecto
+const _nf = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0, useGrouping: "always" });
+const fmtN = n => _nf.format(Number(n || 0));
+
+// ============================================================
+// Estado
+// ============================================================
+let mapa = null, heat = null, cluster = null, layersCtrl = null;
+let allPuntos = [];          // todos los puntos válidos del snapshot
+let lastQuality = null;      // {sinCoords, fueraBbox, ...}
+let snapDate = "";           // fecha del snapshot
+const filters = {
+  plazasMin: 0, plazasMax: 99,
+  habsMin: 0,   habsMax: 30,
+  yearMin: null, yearMax: null,
+  modalidades: new Set(),    // vacío = todas
+  cps: new Set(),            // vacío = todos
+  locality: "",              // vacío = todos
+};
+
+// ============================================================
+// Cargar datos (snapshot estático, con fallback de URL)
+// ============================================================
+async function fetchSnapshot() {
+  let lastErr;
+  for (const url of SNAPSHOT_URLS) {
+    try {
+      const r = await fetch(url, { cache: "no-cache" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.json();
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error("snapshot no disponible");
+}
+
+async function loadData() {
+  const loader = $("loader");
+  if (loader) { loader.style.opacity = "1"; loader.style.display = "flex"; }
+
+  try {
+    setStatus("Descargando snapshot del RTA (~7 MB)…"); setProgress(10);
+    const snap = await fetchSnapshot();
+    snapDate = snap.fetched_at || "—";
+    const records = snap.records || [];
+    setProgress(60);
+
+    setStatus("Procesando datos…");
+    const quality = {
+      totalRTA: records.length,
+      sinCoords: 0,
+      coordsInvalidas: 0,
+      fueraBbox: 0,
+    };
+
+    const puntos = [];
+    for (const r of records) {
+      const cx = r.coord_x, cy = r.coord_y;
+      if (!cx || !cy) { quality.sinCoords++; continue; }
+      const x = parseFloat(String(cx).replace(",", "."));
+      const y = parseFloat(String(cy).replace(",", "."));
+      if (!isFinite(x) || !isFinite(y)) { quality.coordsInvalidas++; continue; }
+      const [lon, lat] = proj4("EPSG:25830", "EPSG:4326", [x, y]);
+      if (!(lat > 36.30 && lat < 36.70 && lon > -5.10 && lon < -4.60)) {
+        quality.fueraBbox++; continue;
+      }
+      puntos.push({
+        lat, lon,
+        registro: r.registration_code || "", nombre: r.name || "",
+        direccion: r.establishment_address || "", cp: r.postal_code || "",
+        habs: r.tot_gen_ua, plazas: r.tot_gen_places,
+        modalidad: r.group || "", localidad: r.locality || "",
+        fecha: r.registration_date || r.activity_start_date || "",
+        refcat: r.catastral_ref || "",
+      });
+    }
+    quality.mostradas = puntos.length;
+    allPuntos = puntos;
+    lastQuality = quality;
+    setProgress(80);
+
+    const totPlazas = puntos.reduce((s,p)=>s+(p.plazas||0),0);
+    const totHabs   = puntos.reduce((s,p)=>s+(p.habs||0),0);
+    setStatus(`Dibujando ${fmtN(puntos.length)} viviendas…`);
+    await new Promise(r => setTimeout(r, 30));
+
+    const centerLat = puntos.reduce((s,p)=>s+p.lat,0)/puntos.length;
+    const centerLon = puntos.reduce((s,p)=>s+p.lon,0)/puntos.length;
+
+    mapa = L.map("map", { preferCanvas: true }).setView([centerLat, centerLon], 12);
+
+    const tilesClaro = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      { attribution: "© OSM, CARTO", subdomains: "abcd", maxZoom: 20 }).addTo(mapa);
+    const tilesOsm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      { attribution: "© OSM" });
+    const tilesOscuro = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      { attribution: "© OSM, CARTO", subdomains: "abcd", maxZoom: 20 });
+    const tilesSat = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      { attribution: "Tiles © Esri", maxZoom: 19 });
+    // Satélite + etiquetas (híbrido)
+    const satLabels = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+      { attribution: "Labels © Esri", maxZoom: 19, pane: "shadowPane" });
+    const satBase = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      { attribution: "Tiles © Esri", maxZoom: 19 });
+    const tilesHybrid = L.layerGroup([satBase, satLabels]);
+
+    drawDataLayers(puntos);
+
+    layersCtrl = L.control.layers(
+      { "Claro": tilesClaro, "OSM": tilesOsm, "Oscuro": tilesOscuro,
+        "Satélite": tilesSat, "Satélite + nombres": tilesHybrid },
+      { "Mapa de calor": heat, "Viviendas (click)": cluster },
+      { collapsed: true, position: "topright" }
+    ).addTo(mapa);
+    L.control.scale({ imperial: false }).addTo(mapa);
+
+    $("p-count").textContent = fmtN(puntos.length);
+    $("p-fecha").textContent = fmtFecha(snapDate);
+    $("t-counts").innerHTML =
+      `${fmtN(puntos.length)} viviendas · ${fmtN(totPlazas)} plazas · ${fmtN(totHabs)} habitaciones`;
+    $("t-fuentes").innerHTML =
+      `Fuente: Registro de Turismo de Andalucía (OpenRTA) · datos del <b>${fmtFecha(snapDate)}</b>`;
+    renderQualityBadge();
+    $("info").style.display = "block";
+    $("leyenda").style.display = "flex";
+    $("toolbar").style.display = "flex";
+    setupFilters();
+
+    setProgress(100);
+    if (loader) {
+      loader.style.opacity = "0";
+      setTimeout(() => { loader.style.display = "none"; }, 700);
+    }
+  } catch (e) {
+    console.error(e);
+    setStatus(`Error: ${e.message}. Recarga la página.`, true);
+  }
+}
+
+// ============================================================
+// Calidad del dato — badge
+// ============================================================
+function renderQualityBadge() {
+  if (!lastQuality) return;
+  const q = lastQuality;
+  const t = $("t-quality");
+  if (!t) return;
+  const descartadas = q.sinCoords + q.coordsInvalidas + q.fueraBbox;
+  const pctMostrado = q.totalRTA ? (100 * q.mostradas / q.totalRTA) : 0;
+  t.innerHTML = `
+    <b>Calidad del dato</b>
+    <span class="ok" title="El snapshot procede del volcado completo del RTA, no de búsquedas paginadas">✓ Cobertura 100% del RTA</span>
+    <br>
+    Total en RTA Marbella: <b>${fmtN(q.totalRTA)}</b> ·
+    Dibujadas en el mapa: <span class="ok"><b>${fmtN(q.mostradas)}</b> (${pctMostrado.toFixed(1).replace(".", ",")}%)</span>
+    <br>
+    Descartadas por geocoding:
+    <span class="${q.sinCoords ? 'warn' : ''}">${fmtN(q.sinCoords)} sin coords</span> ·
+    <span class="${q.coordsInvalidas ? 'warn' : ''}">${fmtN(q.coordsInvalidas)} coords inválidas</span> ·
+    <span class="${q.fueraBbox ? 'warn' : ''}">${fmtN(q.fueraBbox)} fuera bbox Marbella</span>
+    (total ${fmtN(descartadas)})
+  `;
+}
+
+// ============================================================
+// Dibujar capas (reutilizable por filtros)
+// ============================================================
+function drawDataLayers(puntos) {
+  if (heat && mapa) mapa.removeLayer(heat);
+  if (cluster && mapa) mapa.removeLayer(cluster);
+
+  heat = L.heatLayer(puntos.map(p => [p.lat, p.lon, 0.6]), {
+    radius: 14, blur: 10, minOpacity: 0.45, maxZoom: 13,
+    gradient: { 0.05:"#000033", 0.20:"#0033ff", 0.40:"#00ffff",
+                0.55:"#00ff00", 0.70:"#ffff00", 0.85:"#ff6600", 1.0:"#ff0033" }
+  }).addTo(mapa);
+
+  cluster = L.markerClusterGroup({
+    // Lejos clusters de 45 px; a partir de zoom 16 sólo agrupa los marcadores
+    // que estén EXACTAMENTE en el mismo punto (radio 1 px) → spiderfy on click.
+    maxClusterRadius: function (zoom) { return zoom >= 16 ? 1 : 45; },
+    spiderfyOnMaxZoom: true,
+    spiderfyDistanceMultiplier: 1.8,
+    zoomToBoundsOnClick: true,
+    showCoverageOnHover: false, chunkedLoading: true, chunkInterval: 100, chunkDelay: 30,
+  });
+
+  puntos.forEach(p => {
+    const gm = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}`;
+    const sv = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${p.lat},${p.lon}`;
+    const cat = p.refcat ? `https://www1.sedecatastro.gob.es/CYCBienInmueble/OVCConCiud.aspx?RefC=${p.refcat}` : null;
+    const html = `
+      <div class="vut-pop">
+        <div class="head">VUT ${escapeHTML(p.registro)}</div>
+        <table>
+          <tr><td class="k">Nombre</td><td>${escapeHTML(p.nombre) || "—"}</td></tr>
+          <tr><td class="k">Dirección</td><td class="v">${escapeHTML(String(p.direccion).slice(0,160))}</td></tr>
+          <tr><td class="k">Modalidad</td><td>${escapeHTML(p.modalidad) || "—"}</td></tr>
+          <tr><td class="k">Habitaciones</td><td class="v">${p.habs ?? "—"}</td></tr>
+          <tr><td class="k">Plazas</td><td class="v">${p.plazas ?? "—"}</td></tr>
+          <tr><td class="k">Barrio</td><td>${escapeHTML(p.localidad) || "—"}</td></tr>
+          <tr><td class="k">CP</td><td>${escapeHTML(p.cp) || "—"}</td></tr>
+          <tr><td class="k">Alta</td><td>${fmtFecha(p.fecha)}</td></tr>
+          <tr><td class="k">Ref. catastral</td><td class="mono">${escapeHTML(p.refcat) || "—"}</td></tr>
+          <tr><td class="k">Coords</td><td class="mono">${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}</td></tr>
+        </table>
+        <div class="actions">
+          <a class="a-gm" href="${gm}" target="_blank" rel="noopener">Google Maps</a>
+          <a class="a-sv" href="${sv}" target="_blank" rel="noopener">Street View</a>
+          ${cat ? `<a class="a-cat" href="${cat}" target="_blank" rel="noopener">Catastro</a>` : ""}
+        </div>
+      </div>`;
+    cluster.addLayer(
+      L.circleMarker([p.lat, p.lon], {
+        radius: 4, color: "#7a0000", weight: 1, fillColor: "#d7191c", fillOpacity: 0.85
+      }).bindPopup(html, { maxWidth: 320, minWidth: 240 })
+       .bindTooltip(`VUT ${escapeHTML(p.registro)} · ${p.plazas ?? "?"} plazas`)
+    );
+  });
+  cluster.addTo(mapa);
+}
+
+// ============================================================
+// Filtros
+// ============================================================
+function yearOf(p) {
+  const s = String(p.fecha || "");
+  if (/^\d{4}/.test(s)) return parseInt(s.slice(0,4), 10);
+  return null;
+}
+function passesFilters(p) {
+  const plz = p.plazas || 0, hab = p.habs || 0;
+  if (plz < filters.plazasMin || (filters.plazasMax < 99 && plz > filters.plazasMax)) return false;
+  if (hab < filters.habsMin || (filters.habsMax < 30 && hab > filters.habsMax)) return false;
+  const y = yearOf(p);
+  if (filters.yearMin != null && y != null && y < filters.yearMin) return false;
+  if (filters.yearMax != null && y != null && y > filters.yearMax) return false;
+  if (filters.modalidades.size && !filters.modalidades.has(p.modalidad || "")) return false;
+  if (filters.cps.size && !filters.cps.has(String(p.cp || "").trim())) return false;
+  if (filters.locality && p.localidad !== filters.locality) return false;
+  return true;
+}
+function applyFilters() {
+  const filtered = allPuntos.filter(passesFilters);
+  drawDataLayers(filtered);
+  $("f-count").textContent = fmtN(filtered.length);
+  const totPlz = filtered.reduce((s,p)=>s+(p.plazas||0),0);
+  const totHab = filtered.reduce((s,p)=>s+(p.habs||0),0);
+  $("p-count").textContent = fmtN(filtered.length);
+  $("t-counts").innerHTML =
+    `${fmtN(filtered.length)} viviendas · ${fmtN(totPlz)} plazas · ${fmtN(totHab)} habitaciones`;
+  return filtered;
+}
+function setupFilters() {
+  $("f-total").textContent = fmtN(allPuntos.length);
+  $("f-count").textContent = fmtN(allPuntos.length);
+
+  // Sliders plazas/habs
+  const wireRange = (idMin, idMax, valId, suffix) => {
+    const a = $(idMin), b = $(idMax), v = $(valId);
+    const sync = () => {
+      let lo = +a.value, hi = +b.value;
+      if (lo > hi) { lo = hi; a.value = lo; }
+      filters[idMin.split('-')[1] + "Min"] = lo;
+      filters[idMin.split('-')[1] + "Max"] = hi;
+      v.textContent = `${lo} – ${hi}${suffix || ""}`;
+      applyFilters();
+    };
+    a.addEventListener("input", sync);
+    b.addEventListener("input", sync);
+  };
+  wireRange("f-plazas-min", "f-plazas-max", "f-plazas-val");
+  wireRange("f-habs-min", "f-habs-max", "f-habs-val");
+
+  // Años: derivar rango disponible
+  const years = allPuntos.map(yearOf).filter(y => y != null && y >= 1990 && y <= 2100);
+  const yMin = years.length ? Math.min(...years) : 2000;
+  const yMax = years.length ? Math.max(...years) : new Date().getFullYear();
+  filters.yearMin = yMin; filters.yearMax = yMax;
+  const yMinEl = $("f-year-min"), yMaxEl = $("f-year-max");
+  yMinEl.innerHTML = ""; yMaxEl.innerHTML = "";
+  for (let y = yMin; y <= yMax; y++) {
+    yMinEl.insertAdjacentHTML("beforeend", `<option value="${y}">${y}</option>`);
+    yMaxEl.insertAdjacentHTML("beforeend", `<option value="${y}">${y}</option>`);
+  }
+  yMinEl.value = yMin; yMaxEl.value = yMax;
+  $("f-year-val").textContent = `${yMin} a ${yMax}`;
+  const syncYears = () => {
+    let lo = +yMinEl.value, hi = +yMaxEl.value;
+    if (lo > hi) { lo = hi; yMinEl.value = lo; }
+    filters.yearMin = lo; filters.yearMax = hi;
+    $("f-year-val").textContent = `${lo} a ${hi}`;
+    applyFilters();
+  };
+  yMinEl.addEventListener("change", syncYears);
+  yMaxEl.addEventListener("change", syncYears);
+
+  // Chips de modalidad de alquiler (Completa / Por habitaciones)
+  const mods = [...new Set(allPuntos.map(p => p.modalidad).filter(Boolean))].sort();
+  const modWrap = $("f-modalidad");
+  modWrap.innerHTML = "";
+  mods.forEach(m => {
+    const chip = document.createElement("button");
+    chip.type = "button"; chip.className = "chip"; chip.textContent = m;
+    chip.addEventListener("click", () => {
+      if (filters.modalidades.has(m)) { filters.modalidades.delete(m); chip.classList.remove("active"); }
+      else { filters.modalidades.add(m); chip.classList.add("active"); }
+      applyFilters();
+    });
+    modWrap.appendChild(chip);
+  });
+
+  // Selector de barrio/núcleo (campo locality del RTA)
+  const locSel = $("f-locality");
+  const locs = [...new Set(allPuntos.map(p => p.localidad).filter(Boolean))].sort();
+  locs.forEach(l => locSel.insertAdjacentHTML("beforeend",
+    `<option value="${escapeHTML(l)}">${escapeHTML(l)}</option>`));
+  locSel.addEventListener("change", () => {
+    filters.locality = locSel.value;
+    applyFilters();
+  });
+
+  // CP libre (acepta lista separada por comas)
+  const cpInput = $("f-cp");
+  let cpTimer;
+  cpInput.addEventListener("input", () => {
+    clearTimeout(cpTimer);
+    cpTimer = setTimeout(() => {
+      const raw = cpInput.value.trim();
+      filters.cps = new Set(raw ? raw.split(/[,\s]+/).map(s => s.trim()).filter(Boolean) : []);
+      applyFilters();
+    }, 200);
+  });
+
+  // Botones
+  $("btn-reset").addEventListener("click", () => {
+    $("f-plazas-min").value = 0; $("f-plazas-max").value = 99;
+    $("f-habs-min").value = 0;   $("f-habs-max").value = 30;
+    yMinEl.value = yMin; yMaxEl.value = yMax;
+    cpInput.value = "";
+    locSel.value = "";
+    filters.plazasMin = 0; filters.plazasMax = 99;
+    filters.habsMin = 0;   filters.habsMax = 30;
+    filters.yearMin = yMin; filters.yearMax = yMax;
+    filters.modalidades.clear(); filters.cps.clear();
+    filters.locality = "";
+    modWrap.querySelectorAll(".chip.active").forEach(c => c.classList.remove("active"));
+    $("f-plazas-val").textContent = `0 – 99`;
+    $("f-habs-val").textContent = `0 – 30`;
+    $("f-year-val").textContent = `${yMin} a ${yMax}`;
+    applyFilters();
+  });
+  $("btn-export").addEventListener("click", exportCSV);
+  $("btn-quick-export").addEventListener("click", exportCSV);
+
+  $("btn-open-filters").addEventListener("click", openFilters);
+  document.querySelector(".close-filters").addEventListener("click", closeFilters);
+  $("backdrop").addEventListener("click", closeFilters);
+}
+function openFilters() {
+  $("filters").classList.add("open");
+  $("backdrop").classList.add("show");
+  $("btn-open-filters").classList.add("active");
+}
+function closeFilters() {
+  $("filters").classList.remove("open");
+  $("backdrop").classList.remove("show");
+  $("btn-open-filters").classList.remove("active");
+}
+
+// ============================================================
+// Exportar CSV
+// ============================================================
+function exportCSV() {
+  const data = allPuntos.filter(passesFilters);
+  if (!data.length) { alert("No hay VUTs que cumplan los filtros actuales."); return; }
+  const cols = [
+    ["registro","Codigo VUT"],["nombre","Nombre"],["direccion","Direccion"],
+    ["modalidad","Modalidad"],["habs","Habitaciones"],["plazas","Plazas"],
+    ["localidad","Barrio"],["cp","CP"],["fecha","Alta"],["refcat","Ref. catastral"],
+    ["lat","Latitud"],["lon","Longitud"],
+  ];
+  const esc = v => {
+    const s = String(v ?? "");
+    return /[";\n,]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const rows = [cols.map(c => c[1]).join(";")];
+  for (const p of data) rows.push(cols.map(([k]) => esc(p[k])).join(";"));
+  const csv = "﻿" + rows.join("\r\n"); // BOM para que Excel lo abra bien
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0,16).replace(/[:T-]/g,"");
+  a.href = url; a.download = `VUT_Marbella_${stamp}.csv`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+}
+
+// ============================================================
+// Toggle plegar/expandir cabecera
+// ============================================================
+{
+  const info = $("info");
+  if (window.innerWidth >= 700) info.classList.replace("collapsed", "expanded");
+  info.querySelector(".pill").addEventListener("click", () => {
+    info.classList.replace("collapsed", "expanded");
+  });
+  info.querySelector(".close-x").addEventListener("click", e => {
+    e.stopPropagation();
+    info.classList.replace("expanded", "collapsed");
+  });
+}
+
+// Primera carga
+loadData();
+</script>
+</body>
+</html>

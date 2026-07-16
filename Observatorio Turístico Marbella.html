@@ -1023,7 +1023,7 @@ footer a:hover { color: var(--text); }
     <div class="airport-note">
       🏠 <b>Registro de Turismo de Andalucía (RTA)</b> · Inventario oficial de Viviendas de Uso Turístico (VUT) en Marbella. Toda VUT en Andalucía debe estar inscrita; el dashboard cuenta el stock vivo y las altas por año a partir del <a href="https://www.juntadeandalucia.es/organismos/turismoyandaluciaexterior/areas/registro-turismo/open-rta.html" target="_blank">volcado oficial OpenRTA</a> (la Junta lo publica a diario y este observatorio lo refresca automáticamente cada madrugada vía GitHub Actions — el pie de esta pestaña indica la fecha del dato).
       <br><br>
-      🗺️ <b><a href="https://observatorio-turistico-marbella.github.io/mapa-vut/" target="_blank">Mapa interactivo de VUT</a></b> · Todas las viviendas geolocalizadas sobre el mapa de Marbella, con filtros por plazas, habitaciones, año de alta, modalidad, barrio y código postal, ficha individual de cada vivienda (dirección, catastro, Street View) y exportación a CSV.
+      🗺️ <b><a href="https://josehino.github.io/observatorio-turistico-marbella/mapa-vut/" target="_blank">Mapa interactivo de VUT</a></b> · Todas las viviendas geolocalizadas sobre el mapa de Marbella, con filtros por plazas, habitaciones, año de alta, modalidad, barrio y código postal, ficha individual de cada vivienda (dirección, catastro, Street View) y exportación a CSV.
     </div>
     <div id="rta-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando RTA…</div>
     <div id="kpis-rta" class="grid"></div>
@@ -3124,7 +3124,7 @@ async function loadEcon() {
 // lo regenera cada semana, de modo que la pestaña carga al instante y sin CORS.
 const RTA_SNAPSHOT_URLS = [
     "data/rta_vut_marbella.json",                                                    // junto al HTML (GitHub Pages / servidor local)
-    "https://observatorio-turistico-marbella.github.io/data/rta_vut_marbella.json",  // fallback si el HTML se abre en local (file://)
+    "https://josehino.github.io/observatorio-turistico-marbella/data/rta_vut_marbella.json",  // fallback si el HTML se abre en local (file://)
     "https://josehino.github.io/observatorio-turistico-marbella/data/rta_vut_marbella.json", // URL antigua (transición)
 ];
 
