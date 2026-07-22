@@ -429,7 +429,8 @@ tbody tr:hover { background: rgba(37,99,235,0.05); }
     background: radial-gradient(circle, rgba(37,99,235,0.15), transparent 70%);
     pointer-events: none;
 }
-.weather-current .w-icon { font-size: 52px; margin-bottom: 4px; line-height: 1; filter: drop-shadow(0 4px 14px rgba(37,99,235,0.25)); }
+.weather-current .w-icon { margin-bottom: 4px; line-height: 1; color: var(--accent); filter: drop-shadow(0 4px 14px rgba(37,99,235,0.25)); }
+.weather-current .w-icon svg { width: 52px; height: 52px; }
 .weather-current .w-temp { font-family: var(--mono); font-size: 44px; font-weight: 500; color: var(--text); line-height: 1; letter-spacing: -1.5px; font-variant-numeric: tabular-nums; }
 .weather-current .w-desc { font-family: var(--mono); font-size: 10px; color: var(--cyan); font-weight: 500; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
 .weather-current .w-city { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 6px; font-weight: 400; letter-spacing: 0.2px; }
@@ -442,7 +443,8 @@ tbody tr:hover { background: rgba(37,99,235,0.05); }
     transition: background .1s;
 }
 .weather-stat:hover { background: var(--card2); }
-.weather-stat .ws-icon { font-size: 18px; margin-bottom: 4px; opacity: 0.9; }
+.weather-stat .ws-icon { margin-bottom: 4px; color: var(--accent); }
+.weather-stat .ws-icon svg { width: 18px; height: 18px; }
 .weather-stat .ws-val { font-family: var(--mono); font-size: 18px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
 .weather-stat .ws-lbl { font-family: var(--mono); font-size: 9px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
 
@@ -457,7 +459,9 @@ tbody tr:hover { background: rgba(37,99,235,0.05); }
 }
 .forecast-day:hover { border-color: var(--accent); background: var(--card2); }
 .forecast-day .fd-day { font-family: var(--mono); font-size: 9px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
-.forecast-day .fd-icon { font-size: 20px; margin: 6px 0 4px; }
+.forecast-day .fd-icon { margin: 6px 0 4px; color: var(--accent); }
+.forecast-day .fd-icon svg { width: 20px; height: 20px; }
+svg.nic { width: 15px; height: 15px; vertical-align: -2px; margin-right: 6px; color: var(--accent); }
 .forecast-day .fd-max { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
 .forecast-day .fd-min { font-family: var(--mono); font-size: 10px; color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
 .forecast-day .fd-rain { font-family: var(--mono); font-size: 9px; color: var(--cyan); margin-top: 4px; font-weight: 500; font-variant-numeric: tabular-nums; }
@@ -629,7 +633,8 @@ footer a:hover { color: var(--text); }
     transition: transform .15s ease, box-shadow .15s;
 }
 #chatbot-toggle:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(37,99,235,0.45); }
-#chatbot-toggle .chatbot-icon { font-size: 18px; line-height: 1; }
+#chatbot-toggle .chatbot-icon { line-height: 1; display: grid; place-items: center; }
+#chatbot-toggle .chatbot-icon svg { width: 22px; height: 22px; }
 #chatbot-toggle .chatbot-pulse {
     width: 8px; height: 8px; border-radius: 50%;
     background: #10ff88; box-shadow: 0 0 10px #10ff88;
@@ -853,7 +858,7 @@ footer a:hover { color: var(--text); }
     .forecast-strip { grid-template-columns: repeat(4, 1fr); grid-column: span 1; }
     .weather-stats { grid-column: span 1; }
     .forecast-day { padding: 8px 4px; }
-    .forecast-day .fd-icon { font-size: 18px; }
+    .forecast-day .fd-icon svg { width: 18px; height: 18px; }
 
     /* Tabla: scroll horizontal */
     .table-wrap { max-height: 440px; }
@@ -996,7 +1001,7 @@ footer a:hover { color: var(--text); }
     <div class="airport-note">
       ℹ️ OAT · <b>Ocupación en Alojamientos Turísticos</b> (experimental INE). Explota datos de plataformas digitales (Airbnb, Booking, Vrbo…) e incluye apartamentos turísticos, VUT, casas rurales y albergues. Complementa a EOH/EOAP cubriendo la economía colaborativa. Serie disponible desde 2020.
       <br><br>
-      <b style="color:var(--warn)">⏱ Calendario INE</b> · OAT se publica con ~3 meses de retardo respecto al mes de referencia (frente al ~1 mes de EOH/EOAP). Por ejemplo, los datos de septiembre 2025 se publican en diciembre 2025; los de enero 2026 estarán disponibles hacia abril 2026. El observatorio descarga automáticamente la última fecha disponible en cuanto el INE la publica — no es posible obtener datos OAT más recientes que los publicados oficialmente. <a href="https://www.ine.es/dyngs/Prensa/OAT0325.htm" target="_blank">Calendario oficial</a>.
+      <b style="color:var(--warn)"><svg class="nic" style="color:inherit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Calendario INE</b> · OAT se publica con ~3 meses de retardo respecto al mes de referencia (frente al ~1 mes de EOH/EOAP). Por ejemplo, los datos de septiembre 2025 se publican en diciembre 2025; los de enero 2026 estarán disponibles hacia abril 2026. El observatorio descarga automáticamente la última fecha disponible en cuanto el INE la publica — no es posible obtener datos OAT más recientes que los publicados oficialmente. <a href="https://www.ine.es/dyngs/Prensa/OAT0325.htm" target="_blank">Calendario oficial</a>.
     </div>
     <div id="kpis-oat" class="grid"></div>
     <section>
@@ -1021,9 +1026,9 @@ footer a:hover { color: var(--text); }
   <!-- ── RTA · VUT ───────────────────────────────── -->
   <div id="view-rta" class="view">
     <div class="airport-note">
-      🏠 <b>Registro de Turismo de Andalucía (RTA)</b> · Inventario oficial de Viviendas de Uso Turístico (VUT) en Marbella. Toda VUT en Andalucía debe estar inscrita; el dashboard cuenta el stock vivo y las altas por año a partir del <a href="https://www.juntadeandalucia.es/organismos/turismoyandaluciaexterior/areas/registro-turismo/open-rta.html" target="_blank">volcado oficial OpenRTA</a> (la Junta lo publica a diario y este observatorio lo refresca automáticamente cada madrugada vía GitHub Actions — el pie de esta pestaña indica la fecha del dato).
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg><b>Registro de Turismo de Andalucía (RTA)</b> · Inventario oficial de Viviendas de Uso Turístico (VUT) en Marbella. Toda VUT en Andalucía debe estar inscrita; el dashboard cuenta el stock vivo y las altas por año a partir del <a href="https://www.juntadeandalucia.es/organismos/turismoyandaluciaexterior/areas/registro-turismo/open-rta.html" target="_blank">volcado oficial OpenRTA</a> (la Junta lo publica a diario y este observatorio lo refresca automáticamente cada madrugada vía GitHub Actions — el pie de esta pestaña indica la fecha del dato).
       <br><br>
-      🗺️ <b><a href="https://josehino.github.io/observatorio-turistico-marbella/mapa-vut/" target="_blank">Mapa interactivo de VUT</a></b> · Todas las viviendas geolocalizadas sobre el mapa de Marbella, con filtros por plazas, habitaciones, año de alta, modalidad, barrio y código postal, ficha individual de cada vivienda (dirección, catastro, Street View) y exportación a CSV.
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2.5v15L9 18l6 2.5 6-2.5v-15L15 5.5 9 3z"/><path d="M9 3v15M15 5.5v15"/></svg><b><a href="https://josehino.github.io/observatorio-turistico-marbella/mapa-vut/" target="_blank">Mapa interactivo de VUT</a></b> · Todas las viviendas geolocalizadas sobre el mapa de Marbella, con filtros por plazas, habitaciones, año de alta, modalidad, barrio y código postal, ficha individual de cada vivienda (dirección, catastro, Street View) y exportación a CSV.
     </div>
     <div id="rta-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando RTA…</div>
     <div id="kpis-rta" class="grid"></div>
@@ -1091,7 +1096,7 @@ footer a:hover { color: var(--text); }
   <!-- ── ORIGEN & GASTO ─────────────────────────── -->
   <div id="view-origen" class="view">
     <div class="airport-note">
-      🌍 Origen de los visitantes de Marbella, en 4 capas:
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Origen de los visitantes de Marbella, en 4 capas:
       <b>(1)</b> <b style="color:var(--accent)">País de residencia real de los viajeros alojados, por tipo de alojamiento (Turismo Costa del Sol · microdato EOH del INE)</b>,
       <b>(2)</b> Split España vs Extranjero (EOH + OAT, sin EOAP para evitar doble conteo),
       <b>(3)</b> Rutas del aeropuerto de Málaga por país de origen (Eurostat),
@@ -1101,7 +1106,7 @@ footer a:hover { color: var(--text); }
 
     <!-- ── PAÍS DE RESIDENCIA (Costa del Sol Big Data) ───────────── -->
     <div class="airport-note" style="border-left:3px solid var(--accent)">
-      🎯 <b>Dato directo por país.</b> El INE no publica el desglose por país a nivel municipal
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><b>Dato directo por país.</b> El INE no publica el desglose por país a nivel municipal
       (solo España/Extranjero). Turismo Costa del Sol sí publica una tabulación a medida del
       microdato de la Encuesta de Ocupación Hotelera con ese cruce.
       <span id="cds-validacion"></span>
@@ -1196,7 +1201,7 @@ footer a:hover { color: var(--text); }
   <!-- ── ECONOMÍA ────────────────────────────────── -->
   <div id="view-econ" class="view">
     <div class="airport-note">
-      💶 Indicadores económicos que afectan al turismo en Marbella: poder adquisitivo del turista (tipos de cambio), estacionalidad y presión humana sobre la ciudad.
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M4 14h9M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12a7.9 7.9 0 0 0 7.8 8 7.7 7.7 0 0 0 5.2-2"/></svg>Indicadores económicos que afectan al turismo en Marbella: poder adquisitivo del turista (tipos de cambio), estacionalidad y presión humana sobre la ciudad.
     </div>
     <div id="kpis-econ" class="grid"></div>
 
@@ -1263,7 +1268,7 @@ footer a:hover { color: var(--text); }
   <!-- ── AEROPUERTO AGP ──────────────────────────── -->
   <div id="view-airport" class="view">
     <div class="airport-note">
-      ✈️ Datos mensuales reales del aeropuerto de Málaga-Costa del Sol (LEMG/AGP) desde <a href="https://ec.europa.eu/eurostat/databrowser/view/avia_par_es" target="_blank" style="color:var(--accent)">Eurostat avia_par_es</a>. Serie histórica combinada con totales anuales de <a href="https://www.aena.es/es/estadisticas/" target="_blank" style="color:var(--accent)">AENA</a>.
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a2.12 2.12 0 0 0-3-3L13 8 4.8 6.2a1 1 0 0 0-.9 1.7l4.3 3.7-2.6 3.5H3l1.5 2 2 1.5v-2.7l3.5-2.6 3.7 4.3a1 1 0 0 0 1.7-.9z"/></svg>Datos mensuales reales del aeropuerto de Málaga-Costa del Sol (LEMG/AGP) desde <a href="https://ec.europa.eu/eurostat/databrowser/view/avia_par_es" target="_blank" style="color:var(--accent)">Eurostat avia_par_es</a>. Serie histórica combinada con totales anuales de <a href="https://www.aena.es/es/estadisticas/" target="_blank" style="color:var(--accent)">AENA</a>.
     </div>
     <div id="airport-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando Eurostat…</div>
     <div id="kpis-airport" class="grid"></div>
@@ -1305,7 +1310,7 @@ footer a:hover { color: var(--text); }
 
 <!-- ── CHATBOT ──────────────────────────────────────────── -->
 <button id="chatbot-toggle" aria-label="Abrir asistente">
-  <span class="chatbot-icon">💬</span>
+  <span class="chatbot-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5Z"/></svg></span>
   <span class="chatbot-label">Asistente IA</span>
   <span class="chatbot-pulse"></span>
 </button>
@@ -1902,16 +1907,27 @@ function renderTable() {
 }
 
 // ─── WEATHER (Open-Meteo) ─────────────────────────────────────────────────
+const wsvg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const WICON = {
+    sun:      wsvg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+    partly:   wsvg('<path d="M12 2v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="M20 12h2"/><path d="m17.7 4.9-1.4 1.4"/><path d="M16 12.5a4 4 0 1 0-6-4.5"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>'),
+    cloud:    wsvg('<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>'),
+    fog:      wsvg('<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24"/><path d="M16 17H7M17 21H9"/>'),
+    drizzle:  wsvg('<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24"/><path d="M8 19v1M8 14v1M16 19v1M16 14v1M12 21v1M12 16v1"/>'),
+    rain:     wsvg('<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24"/><path d="M16 14v6M8 14v6M12 16v6"/>'),
+    snow:     wsvg('<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24"/><path d="M8 15h.01M8 19h.01M12 17h.01M12 21h.01M16 15h.01M16 19h.01"/>'),
+    storm:    wsvg('<path d="M6 16.3A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 .5 8.97"/><path d="m13 12-3 5h4l-3 5"/>')
+};
 function weatherInfo(code) {
-    if (code === 0)           return { icon: '☀️', desc: 'Despejado' };
-    if (code <= 2)            return { icon: '🌤️', desc: 'Parcialmente nublado' };
-    if (code <= 3)            return { icon: '☁️', desc: 'Nublado' };
-    if (code <= 48)           return { icon: '🌫️', desc: 'Niebla' };
-    if (code <= 55)           return { icon: '🌦️', desc: 'Llovizna' };
-    if (code <= 65)           return { icon: '🌧️', desc: 'Lluvia' };
-    if (code <= 75)           return { icon: '❄️',  desc: 'Nieve' };
-    if (code <= 82)           return { icon: '🌩️', desc: 'Chubascos' };
-    return                           { icon: '⛈️',  desc: 'Tormenta' };
+    if (code === 0)           return { icon: WICON.sun,     desc: 'Despejado' };
+    if (code <= 2)            return { icon: WICON.partly,  desc: 'Parcialmente nublado' };
+    if (code <= 3)            return { icon: WICON.cloud,   desc: 'Nublado' };
+    if (code <= 48)           return { icon: WICON.fog,     desc: 'Niebla' };
+    if (code <= 55)           return { icon: WICON.drizzle, desc: 'Llovizna' };
+    if (code <= 65)           return { icon: WICON.rain,    desc: 'Lluvia' };
+    if (code <= 75)           return { icon: WICON.snow,    desc: 'Nieve' };
+    if (code <= 82)           return { icon: WICON.storm,   desc: 'Chubascos' };
+    return                           { icon: WICON.storm,   desc: 'Tormenta' };
 }
 
 async function loadWeather() {
@@ -1961,22 +1977,22 @@ function renderWeather(d) {
 
     document.getElementById("wStats").innerHTML = `
       <div class="weather-stat">
-        <div class="ws-icon">💧</div>
+        <div class="ws-icon">${wsvg('<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5S5 13 5 15a7 7 0 0 0 7 7Z"/>')}</div>
         <div class="ws-val">${humidity ?? "—"}%</div>
         <div class="ws-lbl">Humedad</div>
       </div>
       <div class="weather-stat">
-        <div class="ws-icon">💨</div>
+        <div class="ws-icon">${wsvg('<path d="M12.8 19.6A2 2 0 1 0 14 16H2M17.5 8a2.5 2.5 0 1 1 2 4H2M9.8 4.4A2 2 0 1 1 11 8H2"/>')}</div>
         <div class="ws-val">${Math.round(cw.windspeed)} km/h</div>
         <div class="ws-lbl">Viento</div>
       </div>
       <div class="weather-stat">
-        <div class="ws-icon">🌡️</div>
+        <div class="ws-icon">${wsvg('<path d="M14 4.5V14a4 4 0 1 1-4 0V4.5a2 2 0 0 1 4 0Z"/>')}</div>
         <div class="ws-val">${feels != null ? Math.round(feels) + "°" : "—"}</div>
         <div class="ws-lbl">Sensación</div>
       </div>
       <div class="weather-stat">
-        <div class="ws-icon">🔆</div>
+        <div class="ws-icon">${wsvg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>')}</div>
         <div class="ws-val">${uv != null ? uv.toFixed(1) : "—"}</div>
         <div class="ws-lbl">Índice UV</div>
       </div>
