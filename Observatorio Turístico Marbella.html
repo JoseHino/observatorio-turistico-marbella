@@ -916,7 +916,7 @@ footer a:hover { color: var(--text); }
   <button data-view="oat">Plataformas · OAT</button>
   <button data-view="rta">VUT · RTA</button>
   <button data-view="comp">Comparativa</button>
-  <button data-view="origen">Origen &amp; Gasto</button>
+  <button data-view="origen">Nacionalidades</button>
   <button data-view="econ">Economía</button>
   <button data-view="table">Tabla</button>
   <button data-view="weather">Clima</button>
@@ -1096,11 +1096,11 @@ footer a:hover { color: var(--text); }
   <!-- ── ORIGEN & GASTO ─────────────────────────── -->
   <div id="view-origen" class="view">
     <div class="airport-note">
-      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Origen de los visitantes de Marbella, en 4 capas:
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Pernoctaciones y viajeros de Marbella por nacionalidad, con todo el histórico disponible, en 3 capas:
       <b>(1)</b> <b style="color:var(--accent)">País de residencia real de los viajeros alojados, por tipo de alojamiento (Turismo Costa del Sol · microdato EOH del INE)</b>,
       <b>(2)</b> Split España vs Extranjero (EOH + OAT, sin EOAP para evitar doble conteo),
-      <b>(3)</b> Rutas del aeropuerto de Málaga por país de origen (Eurostat),
-      <b>(4)</b> Llegadas internacionales a España por país (FRONTUR, referencia).
+      <b>(3)</b> Llegadas internacionales a España por país (FRONTUR, referencia nacional).
+      <br><span style="color:var(--muted);font-size:11px">Los datos de aeropuerto (AENA / Eurostat) están en la pestaña <b>Aeropuerto</b>; el gasto del turista, en <b>Economía</b>.</span>
     </div>
     <div id="kpis-origen" class="grid"></div>
 
@@ -1159,42 +1159,10 @@ footer a:hover { color: var(--text); }
     </section>
 
     <section>
-      <h2>Rutas aeropuerto de Málaga (AGP) por país <span class="pill">Proxy · Eurostat avia_par_es</span></h2>
-      <div id="origen-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando rutas Eurostat…</div>
-      <div class="month-picker" style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-        <label style="font-size:12px;color:var(--muted);font-weight:600">Año:</label>
-        <select id="origen-year" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
-        <label style="font-size:12px;color:var(--muted);font-weight:600">Mes:</label>
-        <select id="origen-month" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
-        <span id="origen-month-info" style="font-size:11px;color:var(--muted)"></span>
-      </div>
-      <div class="chart-wrap"><canvas id="chOrigenRutas"></canvas></div>
-      <p class="legend-note">Pasajeros mensuales en el aeropuerto de Málaga-Costa del Sol (LEMG), agregados por país del aeropuerto de origen/destino. Principal puerta de entrada para el turismo internacional en Marbella.</p>
-    </section>
-
-    <section>
-      <h2>Evolución mensual por mercado <span class="pill">Top 6 países · rango configurable</span></h2>
-      <div class="month-picker" style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-        <label style="font-size:12px;color:var(--muted);font-weight:600">Desde:</label>
-        <select id="origen-evol-from" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
-        <label style="font-size:12px;color:var(--muted);font-weight:600">Hasta:</label>
-        <select id="origen-evol-to" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
-      </div>
-      <div class="chart-wrap" style="height:360px"><canvas id="chOrigenEvol"></canvas></div>
-    </section>
-
-    <section>
       <h2>Llegadas internacionales a España por país <span class="pill">FRONTUR · referencia nacional</span></h2>
       <div id="frontur-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando FRONTUR…</div>
       <div class="chart-wrap" style="height:360px"><canvas id="chFrontur"></canvas></div>
       <p class="legend-note">FRONTUR solo se publica a nivel nacional. Sirve de referencia del mix de mercados emisores que alimentan el destino Marbella.</p>
-    </section>
-
-    <section>
-      <h2>Gasto medio por turista internacional <span class="pill">EGATUR · Andalucía</span></h2>
-      <div id="egatur-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando EGATUR…</div>
-      <div class="chart-wrap"><canvas id="chEgatur"></canvas></div>
-      <p class="legend-note">Gasto medio por turista y gasto medio diario. EGATUR no publica nivel municipal; se usa el dato de Andalucía como aproximación.</p>
     </section>
   </div>
 
@@ -1222,6 +1190,13 @@ footer a:hover { color: var(--text); }
       <h2>Presión turística sobre Marbella <span class="pill">Pernoctaciones / residente</span></h2>
       <div class="chart-wrap"><canvas id="chPresion"></canvas></div>
       <p class="legend-note">Pernoctaciones mensuales (EOH hoteles + OAT plataformas) divididas por la población residente de Marbella según el padrón del INE del año correspondiente (serie anual dinámica). EOAP se excluye para evitar doble conteo con OAT.</p>
+    </section>
+
+    <section>
+      <h2>Gasto medio por turista internacional <span class="pill">EGATUR · Andalucía</span></h2>
+      <div id="egatur-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando EGATUR…</div>
+      <div class="chart-wrap"><canvas id="chEgatur"></canvas></div>
+      <p class="legend-note">Gasto medio por turista y gasto medio diario. EGATUR no publica nivel municipal; se usa el dato de Andalucía como aproximación.</p>
     </section>
   </div>
 
@@ -1304,6 +1279,18 @@ footer a:hover { color: var(--text); }
     <section>
       <h2>Operaciones de vuelo anuales <span class="pill">AENA</span></h2>
       <div class="chart-wrap"><canvas id="chAirportOps"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Evolución mensual por mercado <span class="pill">Top 6 países · rango configurable</span></h2>
+      <div class="month-picker" style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+        <label style="font-size:12px;color:var(--muted);font-weight:600">Desde:</label>
+        <select id="origen-evol-from" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
+        <label style="font-size:12px;color:var(--muted);font-weight:600">Hasta:</label>
+        <select id="origen-evol-to" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
+      </div>
+      <div class="chart-wrap" style="height:360px"><canvas id="chOrigenEvol"></canvas></div>
+      <p class="legend-note">Evolución de los pasajeros de los principales mercados emisores del aeropuerto de Málaga (LEMG) en el rango de meses seleccionado. Fuente: Eurostat avia_par_es.</p>
     </section>
   </div>
 </main>
@@ -2298,6 +2285,7 @@ async function loadAirport() {
         est.style.color = "var(--bad)";
         renderAirport(null, null);
     }
+    renderOrigenAeropuerto(); // "Evolución mensual por mercado" (movida desde Nacionalidades)
 }
 
 function renderAirport(agg, rows) {
@@ -2495,21 +2483,9 @@ function renderAirportMonth(month) {
 async function loadOrigen() {
     renderOrigenLocal(); // EOH + EOAP + OAT already loaded
     initCdsPais();       // país de residencia (Turismo Costa del Sol · microdato EOH)
-
-    // Rutas aeropuerto · ventana ampliada a 84 meses para navegación por año
-    if (!AIRPORT_DATA) {
-        try {
-            const sinceMonth = new Date(); sinceMonth.setMonth(sinceMonth.getMonth() - 84);
-            const since = `${sinceMonth.getFullYear()}-${String(sinceMonth.getMonth()+1).padStart(2,"0")}`;
-            const j     = await fetchEurostatLEMG(since);
-            const rows  = parseEurostatLEMG(j);
-            const agg   = aggregateByCountry(rows);
-            AIRPORT_DATA = { rows, agg };
-        } catch (e) { console.error(e); }
-    }
-    renderOrigenAeropuerto();
-    loadFrontur();
-    loadEgatur();
+    loadFrontur();       // referencia nacional (llegadas por país)
+    // Nota: las rutas de aeropuerto (Eurostat) están ahora en la pestaña Aeropuerto,
+    // y el gasto (EGATUR) en la pestaña Economía.
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2799,45 +2775,11 @@ function renderOrigenLocal() {
 
 function renderOrigenAeropuerto() {
     if (!AIRPORT_DATA) {
-        document.getElementById("origen-estado").textContent = "Eurostat no disponible";
-        document.getElementById("origen-estado").style.color = "var(--bad)";
-        destroyChart("chOrigenRutas");
         destroyChart("chOrigenEvol");
         return;
     }
-    const est = document.getElementById("origen-estado");
-    est.textContent = "Rutas aéreas cargadas (Eurostat)";
-    est.style.color = "var(--good)";
     const { agg } = AIRPORT_DATA;
-
-    // Poblar selector de año + mes
     const months = listAvailableMonths(agg);
-    const yearSel  = document.getElementById("origen-year");
-    const monthSel = document.getElementById("origen-month");
-    const years = [...new Set(months.map(m => m.slice(0, 4)))].sort();
-    if (yearSel && years.length) {
-        yearSel.innerHTML = years.slice().reverse().map(y => `<option value="${y}">${y}</option>`).join("");
-        yearSel.value = years.at(-1);
-    }
-    const populateOrigenMonths = (year) => {
-        const ms = months.filter(m => m.startsWith(year)).slice().reverse();
-        if (monthSel) {
-            monthSel.innerHTML = ms.map(m => `<option value="${m}">${fmtMonth(m)}</option>`).join("");
-            monthSel.value = ms[0];
-        }
-        return ms[0];
-    };
-    if (yearSel) {
-        yearSel.onchange = () => {
-            const m = populateOrigenMonths(yearSel.value);
-            if (m) renderOrigenRutas(m);
-        };
-    }
-    if (monthSel) {
-        monthSel.onchange = () => renderOrigenRutas(monthSel.value);
-    }
-    const initialMonth = populateOrigenMonths(yearSel?.value || years.at(-1));
-    renderOrigenRutas(initialMonth || months.at(-1));
 
     // Evolución top 6 con selectores de rango Desde/Hasta
     renderOrigenEvol();
@@ -2887,39 +2829,8 @@ function renderOrigenEvol() {
     lineChart("chOrigenEvol", datasets);
 }
 
-function renderOrigenRutas(month) {
-    if (!AIRPORT_DATA || !month) return;
-    const { agg } = AIRPORT_DATA;
-    const { list } = paxByCountryForMonth(agg.byCountryTime, month);
-    const top = list.filter(([cc]) => cc !== "ES").slice(0, 12);
-    const total = top.reduce((a, [,v]) => a+v, 0);
-    const info = document.getElementById("origen-month-info");
-    if (info) info.textContent = `${fmt0.format(total)} pax internacionales · ${top.length} mercados`;
-
-    destroyChart("chOrigenRutas");
-    charts.chOrigenRutas = new Chart(document.getElementById("chOrigenRutas"), {
-        type: "bar",
-        data: {
-            labels: top.map(([cc]) => COUNTRY_NAMES[cc] || cc),
-            datasets: [{
-                label: `Pasajeros ${fmtMonth(month)}`,
-                data: top.map(([,v]) => v),
-                backgroundColor: top.map((_,i) => COUNTRY_COLORS[i % COUNTRY_COLORS.length] + "99"),
-                borderColor:     top.map((_,i) => COUNTRY_COLORS[i % COUNTRY_COLORS.length]),
-                borderWidth: 1, borderRadius: 4,
-            }]
-        },
-        options: {
-            indexAxis: "y",
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmt0.format(ctx.parsed.x) + " pax" } } },
-            scales: {
-                x: { ticks: { color: TICKS, callback: v => fmt0.format(v), font: FONT }, grid: { color: GRID } },
-                y: { ticks: { color: TICKS, font: FONT }, grid: { color: GRID } },
-            }
-        }
-    });
-}
+// (renderOrigenRutas eliminada: la vista "Top rutas por país" ya vive en la
+//  pestaña Aeropuerto, con su propio gráfico chAirportRoutes.)
 
 // ─── FRONTUR (llegadas internacionales a España por país) ─────────────────
 // Series reales "<País>. Turista. Dato base. Total Nacional." (tabla 75719)
@@ -3128,6 +3039,7 @@ async function loadEcon() {
     renderEconECB();
     renderEconGini();
     renderEconPresion();
+    loadEgatur();        // gasto medio del turista (EGATUR · movido desde Nacionalidades)
 }
 
 // ─── RTA · Registro de Turismo de Andalucía ──────────────────────────────
