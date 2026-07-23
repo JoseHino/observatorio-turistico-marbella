@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <title>Mapa VUT Marbella — Viviendas de Uso Turístico (RTA)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
-<meta name="description" content="Mapa interactivo de las viviendas de uso turístico (VUT) de Marbella según el Registro de Turismo de Andalucía. Filtros por plazas, habitaciones, año de alta, modalidad y código postal; ficha individual de cada vivienda.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23d7191c'/%3E%3Ctext x='50' y='72' font-size='60' font-family='sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Mapa de calor e inventario interactivo de las viviendas de uso turístico (VUT) de Marbella según el Registro de Turismo de Andalucía: filtros por zona, plazas, habitaciones y año de alta, ficha individual de cada vivienda e histórico de altas por meses y zonas.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d6efd'/%3E%3Ctext x='50' y='72' font-size='60' font-family='sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Mulish:wght@400;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -14,19 +18,35 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/proj4@2.11.0/dist/proj4.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
 <style>
   :root {
-    --c-primary: #0d6efd; --c-dark: #0a0e27; --c-ok: #1e8e3e;
-    --c-warn: #d35400;    --c-err: #c0392b;  --c-accent: #d7191c;
+    --c-primary: #0d6efd; --c-primary-dark: #0b5ed7; --c-dark: #0a0e27;
+    --c-ok: #1e8e3e; --c-warn: #d35400; --c-err: #c0392b; --c-accent: #d7191c;
+    --c-ink: #1f2733; --c-ink-2: #55606e; --c-ink-3: #8a94a0;
+    --c-line: #e5e8ec; --c-bg: #f6f8fa;
     --c-bg-panel: rgba(255,255,255,0.96);
     --shadow: 0 2px 8px rgba(0,0,0,.18);
+    --shadow-card: 0 1px 3px rgba(16,24,40,.08);
+    --f-head: "Montserrat", "Segoe UI", sans-serif;
+    --f-body: "Mulish", "Segoe UI", sans-serif;
   }
   *, *::before, *::after { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; overflow: hidden;
-    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
-  #map { width: 100%; height: 100dvh; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; }
+  body { font-family: var(--f-body); color: var(--c-ink); background: var(--c-bg);
+         -webkit-text-size-adjust: 100%; }
   button { font-family: inherit; }
+  .ic { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2;
+        fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+  /* ---------- Mapa (bloque superior) ---------- */
+  #map-wrap { position: relative; height: 82dvh; min-height: 480px; overflow: hidden; }
+  #map { width: 100%; height: 100%; }
+  /* El canvas del heatmap queda por encima del canvas de los marcadores y,
+     si captura el ratón, se traga los clicks de las fichas → desactivarlo. */
+  .leaflet-heatmap-layer { pointer-events: none; }
 
   /* ---------- Loader ---------- */
   #loader {
@@ -34,20 +54,17 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     z-index: 99999; transition: opacity .6s ease; padding: 20px; text-align: center;
   }
-  #loader h1 { font-size: clamp(15px,4vw,18px); font-weight: 600; margin: 0 0 6px; }
+  #loader h1 { font-family: var(--f-head); font-size: clamp(15px,4vw,18px); font-weight: 600; margin: 0 0 6px; }
   #loader .sub { font-size: clamp(11px,3vw,13px); opacity: .7; margin-bottom: 28px; }
   #loader .bar { width: min(320px, 80vw); height: 10px; background: #1c2747; border-radius: 6px; overflow: hidden; }
-  #loader .bar > div {
-    height: 100%; width: 0%; background: linear-gradient(90deg,#0033ff,#00ffff,#ffff00,#ff0033);
-    transition: width .4s ease;
-  }
+  #loader .bar > div { height: 100%; width: 0%; background: var(--c-primary); transition: width .4s ease; }
   #loader .status { font-size: clamp(10px,3vw,12px); opacity: .85; margin-top: 12px; min-height: 18px; }
   #loader .err { color: #ff8a8a; }
 
   /* ---------- Cabecera plegable ---------- */
   #info {
     position: absolute; top: 10px; left: 50px; z-index: 500;
-    background: var(--c-bg-panel); border: 1px solid #888;
+    background: var(--c-bg-panel); border: 1px solid #b8c0ca;
     border-radius: 20px; box-shadow: var(--shadow);
     font-size: 12px; max-width: calc(100vw - 110px);
     transition: all .25s ease; overflow: hidden;
@@ -55,57 +72,68 @@
   #info.collapsed { padding: 6px 14px; cursor: pointer; }
   #info.collapsed .full { display: none; }
   #info.collapsed .pill { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-
   #info.expanded { padding: 12px 16px; border-radius: 10px; max-width: min(460px, calc(100vw - 110px)); }
   #info.expanded .pill { display: none; }
   #info.expanded .full { display: block; }
-  #info .close-x {
-    float: right; cursor: pointer; color: #888; font-size: 18px; line-height: 1;
-    margin: -2px -4px 0 8px; padding: 4px 8px;
-  }
+  #info .close-x { float: right; cursor: pointer; color: #888; font-size: 18px; line-height: 1;
+                   margin: -2px -4px 0 8px; padding: 4px 8px; }
   #info .close-x:hover { color: #222; }
-  #info .t1 { font-size: 13px; font-weight: bold; color: #222; }
-  #info .t2 { font-size: 11.5px; color: #555; margin-top: 4px; line-height: 1.4; }
-  #info .t3 { font-size: 10.5px; color: #888; margin-top: 4px; line-height: 1.4; }
+  #info .t1 { font-family: var(--f-head); font-size: 13px; font-weight: 700; color: var(--c-ink);
+              display: flex; align-items: center; gap: 6px; }
+  #info .t2 { font-size: 11.5px; color: var(--c-ink-2); margin-top: 4px; line-height: 1.4; }
+  #info .t3 { font-size: 10.5px; color: var(--c-ink-3); margin-top: 4px; line-height: 1.4; }
   #info .t3 a { color: var(--c-primary); }
-  #info .fresh {
-    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--c-ok); box-shadow: 0 0 6px var(--c-ok); flex-shrink: 0;
-  }
+  #info .fresh { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+                 background: var(--c-ok); box-shadow: 0 0 6px var(--c-ok); flex-shrink: 0; }
+  #live-rta { color: var(--c-ok); font-weight: 700; }
 
   /* ---------- Badge de calidad del dato ---------- */
-  .quality {
-    margin-top: 8px; padding: 6px 8px; background: #fff8e1;
-    border-left: 3px solid #ffb74d; border-radius: 3px;
-    font-size: 10.5px; color: #5d4037; line-height: 1.5;
-  }
+  .quality { margin-top: 8px; padding: 6px 8px; background: #fff8e1;
+             border-left: 3px solid #ffb74d; border-radius: 3px;
+             font-size: 10.5px; color: #5d4037; line-height: 1.5; }
   .quality b { color: #3e2723; }
   .quality .ok { color: var(--c-ok); }
   .quality .warn { color: var(--c-warn); }
 
   /* ---------- Leyenda mini ---------- */
-  #leyenda {
-    position: absolute; bottom: 14px; left: 10px; z-index: 500;
-    background: rgba(255,255,255,0.92); padding: 5px 9px;
-    border: 1px solid #888; border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,.12);
-    font-size: 10px; color: #555;
-    display: flex; align-items: center; gap: 6px;
+  #leyenda { position: absolute; bottom: 14px; left: 10px; z-index: 500;
+             background: rgba(255,255,255,0.92); padding: 5px 9px;
+             border: 1px solid #b8c0ca; border-radius: 4px;
+             box-shadow: 0 2px 4px rgba(0,0,0,.12);
+             font-size: 10px; color: var(--c-ink-2);
+             display: flex; align-items: center; gap: 6px; }
+  #leyenda .grad { width: 90px; height: 8px; border: 1px solid #b8c0ca;
+    background: linear-gradient(to right,#000033,#0033ff,#00ffff,#00ff00,#ffff00,#ff6600,#ff0033); }
+
+  /* ---------- Barra temporal ---------- */
+  #timebar {
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 600; background: var(--c-bg-panel); border: 1px solid #b8c0ca;
+    border-radius: 10px; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 14px; width: min(620px, calc(100vw - 170px));
   }
-  #leyenda .grad {
-    width: 90px; height: 8px; border: 1px solid #888;
-    background: linear-gradient(to right,#000033,#0033ff,#00ffff,#00ff00,#ffff00,#ff6600,#ff0033);
+  #tb-play {
+    background: var(--c-primary); color: #fff; border: 0; border-radius: 50%;
+    width: 34px; height: 34px; min-width: 34px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
   }
+  #tb-play:hover { background: var(--c-primary-dark); }
+  #tb-play .ic { width: 14px; height: 14px; fill: currentColor; stroke: none; }
+  #tb-range { flex: 1; min-width: 0; height: 28px; accent-color: var(--c-primary); cursor: pointer; }
+  #tb-label { font-size: 12px; color: var(--c-ink); white-space: nowrap; text-align: right; min-width: 148px; }
+  #tb-label b { font-family: var(--f-head); }
+  #tb-label .cnt { color: var(--c-primary); font-weight: 700; }
 
   /* ---------- Popup VUT ---------- */
-  .vut-pop { font-size: 12px; line-height: 1.45; width: min(280px, 78vw); }
-  .vut-pop .head { background: var(--c-accent); color:#fff; padding:6px 10px;
+  .vut-pop { font-size: 12px; line-height: 1.45; width: min(280px, 78vw); font-family: var(--f-body); }
+  .vut-pop .head { background: var(--c-primary); color:#fff; padding:6px 10px;
                    border-radius:4px 4px 0 0; margin:-9px -9px 8px;
-                   font-weight:bold; font-size:13px; }
+                   font-family: var(--f-head); font-weight:700; font-size:13px; }
   .vut-pop table { width:100%; border-collapse:collapse; }
   .vut-pop td { padding:2px 4px 2px 0; vertical-align:top; font-size: 11px; }
   .vut-pop td.k { color:#666; white-space: nowrap; }
-  .vut-pop td.v { font-weight: 600; }
+  .vut-pop td.v { font-weight: 700; }
   .vut-pop .mono { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 10px; font-weight: normal; }
   .vut-pop .actions { margin-top:8px; padding-top:6px; border-top:1px solid #eee;
                       display:flex; gap:6px; flex-wrap:wrap; }
@@ -114,141 +142,144 @@
   .a-gm { background:#1a73e8; } .a-sv { background:#34a853; } .a-cat { background:#444; }
 
   /* ---------- Botones flotantes (toolbar) ---------- */
-  #toolbar {
-    position: absolute; top: 10px; right: 50px; z-index: 500;
-    display: flex; gap: 6px;
-  }
-  #toolbar button {
-    background: var(--c-bg-panel); border: 1px solid #888;
+  #toolbar { position: absolute; top: 10px; right: 50px; z-index: 500; display: flex; gap: 6px; }
+  #toolbar button, #toolbar a.tb {
+    background: var(--c-bg-panel); border: 1px solid #b8c0ca;
     border-radius: 6px; box-shadow: var(--shadow);
-    padding: 8px 12px; font-size: 13px; font-weight: 600; color: #222;
-    cursor: pointer; min-height: 36px; min-width: 36px;
-    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--c-ink);
+    cursor: pointer; min-height: 36px; min-width: 36px; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-body);
   }
-  #toolbar button:hover { background: #fff; }
+  #toolbar button:hover, #toolbar a.tb:hover { background: #fff; }
   #toolbar button.active { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
 
-  /* ---------- Panel de filtros (sidebar / bottom-sheet) ---------- */
+  /* ---------- Panel de filtros ---------- */
   #filters {
-    position: absolute; top: 0; right: 0; bottom: 0; width: 320px; z-index: 1000;
+    position: fixed; top: 0; right: 0; bottom: 0; width: 320px; z-index: 1000;
     background: #fff; border-left: 1px solid #ccc; box-shadow: -4px 0 14px rgba(0,0,0,.18);
     transform: translateX(100%); transition: transform .28s ease;
     display: flex; flex-direction: column; overflow: hidden;
   }
   #filters.open { transform: translateX(0); }
-  #filters header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 14px; border-bottom: 1px solid #eee;
-  }
-  #filters header h3 { margin: 0; font-size: 15px; color: #222; }
-  #filters .close-filters {
-    background: transparent; border: 0; font-size: 24px; color: #666;
-    cursor: pointer; padding: 4px 10px; line-height: 1; min-height: 36px;
-  }
+  #filters header { display: flex; align-items: center; justify-content: space-between;
+                    padding: 12px 14px; border-bottom: 1px solid #eee; }
+  #filters header h3 { margin: 0; font-family: var(--f-head); font-size: 15px; color: var(--c-ink); }
+  #filters .close-filters { background: transparent; border: 0; font-size: 24px; color: #666;
+                            cursor: pointer; padding: 4px 10px; line-height: 1; min-height: 36px; }
   #filters .body { padding: 14px; overflow-y: auto; flex: 1; }
   #filters .group { margin-bottom: 14px; }
-  #filters label.lbl {
-    display: flex; justify-content: space-between; align-items: baseline;
-    font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px;
-  }
+  #filters label.lbl { display: flex; justify-content: space-between; align-items: baseline;
+                       font-size: 12px; font-weight: 700; color: #333; margin-bottom: 6px; }
   #filters label.lbl .val { font-weight: 400; color: var(--c-primary); font-size: 11.5px; }
   #filters .range-pair { display: flex; gap: 8px; align-items: center; }
-  #filters .range-pair input[type=range] { flex: 1; min-width: 0; height: 28px; }
+  #filters .range-pair input[type=range] { flex: 1; min-width: 0; height: 28px; accent-color: var(--c-primary); }
   #filters select, #filters input[type=text] {
     width: 100%; padding: 7px 9px; font-size: 13px; font-family: inherit;
     border: 1px solid #ccc; border-radius: 5px; background: #fff;
   }
   #filters .chips { display: flex; flex-wrap: wrap; gap: 5px; }
-  #filters .chip {
-    background: #f1f3f5; border: 1px solid #d0d7de; color: #333;
-    padding: 5px 10px; border-radius: 14px; font-size: 11.5px;
-    cursor: pointer; user-select: none; min-height: 28px;
-  }
+  #filters .chip { background: #f1f3f5; border: 1px solid #d0d7de; color: #333;
+                   padding: 5px 10px; border-radius: 14px; font-size: 11.5px;
+                   cursor: pointer; user-select: none; min-height: 28px; }
   #filters .chip.active { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
-  #filters footer {
-    padding: 10px 14px; border-top: 1px solid #eee; background: #fafafa;
-    display: flex; gap: 8px; flex-direction: column;
-  }
+  #filters footer { padding: 10px 14px; border-top: 1px solid #eee; background: #fafafa;
+                    display: flex; gap: 8px; flex-direction: column; }
   #filters .summary { font-size: 12px; color: #444; text-align: center; }
   #filters .summary b { color: var(--c-primary); }
   #filters .btn-row { display: flex; gap: 8px; }
-  #filters footer button {
-    flex: 1; padding: 10px; font-size: 13px; font-weight: 600;
-    border-radius: 6px; cursor: pointer; border: 1px solid transparent; min-height: 42px;
-  }
+  #filters footer button { flex: 1; padding: 10px; font-size: 13px; font-weight: 700;
+                           border-radius: 6px; cursor: pointer; border: 1px solid transparent; min-height: 42px;
+                           display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
   #btn-reset { background: #f1f3f5; color: #333; border-color: #ccc; }
   #btn-export { background: var(--c-primary); color: #fff; }
-  #btn-export:hover { background: #0b5ed7; }
+  #btn-export:hover { background: var(--c-primary-dark); }
 
-  /* ---------- Backdrop móvil ---------- */
-  #backdrop {
-    position: absolute; inset: 0; background: rgba(0,0,0,.35); z-index: 999;
-    display: none; opacity: 0; transition: opacity .25s ease;
-  }
+  #backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 999;
+              display: none; opacity: 0; transition: opacity .25s ease; }
   #backdrop.show { display: block; opacity: 1; }
 
-  /* ---------- Responsive: tablet ---------- */
+  /* ---------- Sección de estadísticas ---------- */
+  #stats { max-width: 1180px; margin: 0 auto; padding: 34px 18px 60px; }
+  #stats .head-row { display: flex; align-items: baseline; justify-content: space-between;
+                     flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+  #stats h2 { font-family: var(--f-head); font-size: clamp(19px, 3vw, 24px); font-weight: 700;
+              color: var(--c-ink); margin: 0; }
+  #stats .filter-note { font-size: 12px; color: var(--c-ink-3); }
+  #stats .filter-note b { color: var(--c-primary); }
+  #stats .sub-note { font-size: 12.5px; color: var(--c-ink-2); margin: 4px 0 20px; line-height: 1.5; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+           gap: 12px; margin-bottom: 22px; }
+  .tile { background: #fff; border: 1px solid var(--c-line); border-radius: 10px;
+          padding: 14px 16px; box-shadow: var(--shadow-card); }
+  .tile .k { font-size: 11px; font-weight: 700; color: var(--c-ink-3);
+             text-transform: uppercase; letter-spacing: .04em; display: flex; align-items: center; gap: 6px; }
+  .tile .v { font-family: var(--f-head); font-size: clamp(20px, 2.6vw, 27px); font-weight: 700;
+             color: var(--c-ink); margin-top: 5px; line-height: 1.1; }
+  .tile .d { font-size: 11px; color: var(--c-ink-3); margin-top: 3px; }
+  .tile.warn .v { color: var(--c-warn); }
+
+  .nota-coords { background: #fff8e1; border: 1px solid #ffe1a8; border-left: 4px solid #ffb74d;
+                 border-radius: 8px; padding: 12px 14px; font-size: 12.5px; color: #5d4037;
+                 line-height: 1.55; margin-bottom: 22px; display: flex; gap: 10px; align-items: flex-start; }
+  .nota-coords .ic { width: 18px; height: 18px; margin-top: 1px; color: var(--c-warn); }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { background: #fff; border: 1px solid var(--c-line); border-radius: 12px;
+          padding: 18px 18px 12px; box-shadow: var(--shadow-card); min-width: 0; }
+  .card.wide { grid-column: 1 / -1; }
+  .card h3 { font-family: var(--f-head); font-size: 14.5px; font-weight: 700;
+             color: var(--c-ink); margin: 0 0 2px; }
+  .card .sub { font-size: 11.5px; color: var(--c-ink-3); margin-bottom: 12px; }
+  .card .plot { position: relative; height: 260px; }
+  .card.wide .plot { height: 300px; }
+
+  /* tabla de zonas */
+  .tbl-wrap { overflow-x: auto; }
+  table.zonas { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 4px; }
+  table.zonas th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+                   color: var(--c-ink-3); font-weight: 700; padding: 7px 8px; border-bottom: 2px solid var(--c-line); }
+  table.zonas th.num, table.zonas td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.zonas td { padding: 6px 8px; border-bottom: 1px solid #f0f2f4; color: var(--c-ink); }
+  table.zonas tr:last-child td { border-bottom: 0; }
+  table.zonas td .bar { display: inline-block; height: 7px; background: var(--c-primary);
+                        border-radius: 4px; margin-right: 8px; vertical-align: middle; opacity: .85; }
+  table.zonas tr.total td { font-weight: 700; border-top: 2px solid var(--c-line); }
+
+  #stats .foot { margin-top: 26px; font-size: 11.5px; color: var(--c-ink-3); line-height: 1.6;
+                 border-top: 1px solid var(--c-line); padding-top: 14px; }
+  #stats .foot a { color: var(--c-primary); }
+
   @media (max-width: 900px) {
     #toolbar { right: 12px; }
     #filters { width: 300px; }
+    #leyenda { bottom: 64px; }
+    .cards { grid-template-columns: 1fr; }
   }
-
-  /* ---------- Responsive: móvil ---------- */
   @media (max-width: 600px) {
+    #map-wrap { height: 74dvh; }
     #info { left: 56px; top: 8px; max-width: calc(100vw - 110px); }
     #info.expanded { max-width: calc(100vw - 70px); padding: 10px 12px; }
-    #info .t1 { font-size: 12px; }
-    #info .t2 { font-size: 11px; }
-    #info .t3 { font-size: 10px; }
-
-    #toolbar { top: auto; bottom: 14px; right: 10px; left: 10px;
-               justify-content: center; gap: 8px; }
-    #toolbar button { flex: 1; max-width: 160px; justify-content: center; min-height: 44px; }
-
-    #leyenda { bottom: 70px; }
-
-    /* Panel de filtros como bottom-sheet a pantalla completa */
-    #filters {
-      width: 100%; top: auto; bottom: 0; height: 88dvh;
-      border-left: 0; border-top: 1px solid #ccc;
-      border-radius: 16px 16px 0 0;
-      transform: translateY(100%);
-      box-shadow: 0 -4px 14px rgba(0,0,0,.18);
-    }
+    #toolbar { top: auto; bottom: 14px; right: 10px; left: 10px; justify-content: center; gap: 8px; }
+    #toolbar button, #toolbar a.tb { flex: 1; max-width: 160px; justify-content: center; min-height: 44px; }
+    #timebar { bottom: 66px; width: calc(100vw - 20px); padding: 6px 10px; gap: 8px; }
+    #tb-label { min-width: 0; font-size: 11px; }
+    #leyenda { bottom: 118px; }
+    #filters { width: 100%; top: auto; bottom: 0; height: 88dvh;
+               border-left: 0; border-top: 1px solid #ccc; border-radius: 16px 16px 0 0;
+               transform: translateY(100%); box-shadow: 0 -4px 14px rgba(0,0,0,.18); }
     #filters.open { transform: translateY(0); }
-    #filters header { padding: 14px; }
-    #filters header h3 { font-size: 16px; }
     #filters footer button { min-height: 48px; font-size: 14px; }
     #filters select, #filters input[type=text] { font-size: 14px; padding: 9px 10px; min-height: 40px; }
     #filters .chip { min-height: 32px; padding: 6px 12px; }
+    .card .plot { height: 230px; }
+    .card.wide .plot { height: 250px; }
   }
-
-  /* ---------- Pantallas muy pequeñas ---------- */
-  @media (max-width: 360px) {
-    #info.expanded { max-width: calc(100vw - 60px); }
-    #toolbar button { padding: 8px; font-size: 12px; }
-    #leyenda .grad { width: 60px; }
-  }
-
-  /* ---------- Modo paisaje móvil ---------- */
   @media (max-height: 500px) and (orientation: landscape) {
     #filters { height: 100dvh; max-width: 360px; top: 0; bottom: 0;
                border-radius: 0; transform: translateX(100%); }
     #filters.open { transform: translateX(0); }
     #toolbar { top: 8px; bottom: auto; right: 56px; left: auto; }
-  }
-
-  /* ---------- Hi-DPI / soporte safe-area (notch iPhone) ---------- */
-  @supports (padding: max(0px)) {
-    #toolbar { right: max(50px, env(safe-area-inset-right)); }
-    #leyenda { left: max(10px, env(safe-area-inset-left));
-               bottom: max(14px, env(safe-area-inset-bottom)); }
-    @media (max-width: 600px) {
-      #toolbar { bottom: max(14px, env(safe-area-inset-bottom));
-                 left: max(10px, env(safe-area-inset-left));
-                 right: max(10px, env(safe-area-inset-right)); }
-      #leyenda { bottom: max(70px, calc(env(safe-area-inset-bottom) + 56px)); }
-    }
   }
 </style>
 </head>
@@ -261,44 +292,64 @@
   <div class="status" id="status">Descargando datos…</div>
 </div>
 
-<div id="map"></div>
+<!-- ============ MAPA ============ -->
+<div id="map-wrap">
+  <div id="map"></div>
 
-<div id="info" class="collapsed" style="display:none">
-  <!-- Vista plegada: pill compacto -->
-  <div class="pill">
-    <span class="fresh"></span>
-    <b id="p-count">—</b><span style="color:#888"> VUT</span>
-    <span style="color:#888">·</span>
-    <span id="p-fecha" style="font-weight:600;color:#1e8e3e">—</span>
-    <span style="color:#bbb;margin-left:4px">ⓘ</span>
+  <div id="info" class="collapsed" style="display:none">
+    <div class="pill">
+      <span class="fresh"></span>
+      <b id="p-count">—</b><span style="color:#888"> VUT</span>
+      <span style="color:#888">·</span>
+      <span id="p-fecha" style="font-weight:700;color:#1e8e3e">—</span>
+    </div>
+    <div class="full">
+      <span class="close-x" title="Plegar">×</span>
+      <div class="t1"><span class="fresh"></span> Viviendas de Uso Turístico de Marbella</div>
+      <div class="t2" id="t-counts">—</div>
+      <div class="t3" id="t-fuentes">—</div>
+      <div class="t3" id="t-live"></div>
+      <div class="t3">Los datos se regeneran automáticamente cada madrugada a partir del volcado oficial del RTA (Junta de Andalucía).</div>
+      <div class="t3">Ver también el <a href="../" target="_blank" rel="noopener">Observatorio Turístico de Marbella</a></div>
+      <div class="quality" id="t-quality"></div>
+    </div>
   </div>
-  <!-- Vista expandida: ficha completa -->
-  <div class="full">
-    <span class="close-x" title="Plegar">×</span>
-    <div class="t1"><span class="fresh"></span> Viviendas de Uso Turístico de Marbella</div>
-    <div class="t2" id="t-counts">—</div>
-    <div class="t3" id="t-fuentes">—</div>
-    <div class="t3">Los datos se regeneran automáticamente cada madrugada a partir del volcado oficial del RTA (Junta de Andalucía).</div>
-    <div class="t3">📊 Ver también el <a href="../" target="_blank" rel="noopener">Observatorio Turístico de Marbella</a></div>
-    <div class="quality" id="t-quality"></div>
+
+  <div id="leyenda" style="display:none">
+    <span>Densidad de VUT</span>
+    <span style="opacity:.7">menos</span>
+    <div class="grad"></div>
+    <span style="opacity:.7">más</span>
+  </div>
+
+  <!-- Barra temporal: evolución del parque de VUT mes a mes -->
+  <div id="timebar" style="display:none">
+    <button id="tb-play" title="Reproducir evolución" aria-label="Reproducir evolución">
+      <svg class="ic" viewBox="0 0 24 24"><polygon points="6 3 21 12 6 21"/></svg>
+    </button>
+    <input type="range" id="tb-range" min="0" max="0" value="0" step="1"
+           aria-label="Mes: viviendas inscritas hasta esa fecha">
+    <div id="tb-label">—</div>
+  </div>
+
+  <div id="toolbar" style="display:none">
+    <button id="btn-open-filters" title="Filtros">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+      <span class="lbl-txt">Filtros</span>
+    </button>
+    <button id="btn-quick-export" title="Exportar visibles a CSV">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="lbl-txt">CSV</span>
+    </button>
+    <a class="tb" href="#stats" title="Ver histórico y estadísticas">
+      <svg class="ic" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="lbl-txt">Histórico</span>
+    </a>
   </div>
 </div>
 
-<div id="leyenda" style="display:none">
-  <span>VUT</span>
-  <div class="grad"></div>
-</div>
-
-<!-- Toolbar (filtros + export) -->
-<div id="toolbar" style="display:none">
-  <button id="btn-open-filters" title="Filtros">⚙ <span class="lbl-txt">Filtros</span></button>
-  <button id="btn-quick-export" title="Exportar visibles a CSV">⬇ <span class="lbl-txt">CSV</span></button>
-</div>
-
-<!-- Backdrop para cerrar filtros en móvil -->
 <div id="backdrop"></div>
 
-<!-- Panel de filtros (drawer derecha en desktop, bottom-sheet en móvil) -->
 <aside id="filters" role="dialog" aria-modal="true" aria-labelledby="filters-title">
   <header>
     <h3 id="filters-title">Filtros</h3>
@@ -307,18 +358,38 @@
   <div class="body">
 
     <div class="group">
-      <label class="lbl">Plazas <span class="val" id="f-plazas-val">0 – 99</span></label>
+      <label class="lbl">Zona</label>
+      <select id="f-zona" aria-label="Zona">
+        <option value="">Todas</option>
+      </select>
+    </div>
+
+    <div class="group">
+      <label class="lbl">Barrio / núcleo (RTA)</label>
+      <select id="f-locality" aria-label="Barrio o núcleo">
+        <option value="">Todos</option>
+      </select>
+    </div>
+
+    <div class="group">
+      <label class="lbl">Código postal</label>
+      <input type="text" id="f-cp" inputmode="numeric" placeholder="Ej. 29600, 29602 (vacío = todos)">
+      <div style="font-size: 10.5px; color: #888; margin-top: 4px;">Separa varios CP por coma.</div>
+    </div>
+
+    <div class="group">
+      <label class="lbl">Plazas <span class="val" id="f-plazas-val">0 – 20</span></label>
       <div class="range-pair">
-        <input type="range" id="f-plazas-min" min="0" max="99" value="0" step="1" aria-label="Plazas mínimo">
-        <input type="range" id="f-plazas-max" min="0" max="99" value="99" step="1" aria-label="Plazas máximo">
+        <input type="range" id="f-plazas-min" min="0" max="20" value="0" step="1" aria-label="Plazas mínimo">
+        <input type="range" id="f-plazas-max" min="0" max="20" value="20" step="1" aria-label="Plazas máximo">
       </div>
     </div>
 
     <div class="group">
-      <label class="lbl">Habitaciones <span class="val" id="f-habs-val">0 – 30</span></label>
+      <label class="lbl">Habitaciones <span class="val" id="f-habs-val">0 – 15</span></label>
       <div class="range-pair">
-        <input type="range" id="f-habs-min" min="0" max="30" value="0" step="1" aria-label="Habitaciones mínimo">
-        <input type="range" id="f-habs-max" min="0" max="30" value="30" step="1" aria-label="Habitaciones máximo">
+        <input type="range" id="f-habs-min" min="0" max="15" value="0" step="1" aria-label="Habitaciones mínimo">
+        <input type="range" id="f-habs-max" min="0" max="15" value="15" step="1" aria-label="Habitaciones máximo">
       </div>
     </div>
 
@@ -335,42 +406,112 @@
       <div class="chips" id="f-modalidad"></div>
     </div>
 
-    <div class="group">
-      <label class="lbl">Código postal</label>
-      <input type="text" id="f-cp" inputmode="numeric" placeholder="Ej. 29600, 29602 (vacío = todos)">
-      <div style="font-size: 10.5px; color: #888; margin-top: 4px;">Separa varios CP por coma.</div>
-    </div>
-
-    <div class="group">
-      <label class="lbl">Barrio / núcleo</label>
-      <select id="f-locality" aria-label="Barrio o núcleo">
-        <option value="">Todos</option>
-      </select>
-    </div>
-
   </div>
   <footer>
-    <div class="summary"><b id="f-count">—</b> de <span id="f-total">—</span> VUTs visibles</div>
+    <div class="summary"><b id="f-count">—</b> de <span id="f-total">—</span> VUT visibles</div>
     <div class="btn-row">
       <button id="btn-reset">Limpiar</button>
-      <button id="btn-export">⬇ Exportar CSV</button>
+      <button id="btn-export">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar CSV
+      </button>
     </div>
   </footer>
 </aside>
 
+<!-- ============ ESTADÍSTICAS E HISTÓRICO ============ -->
+<section id="stats">
+  <div class="head-row">
+    <h2>Histórico y estadísticas del parque de VUT</h2>
+    <div class="filter-note" id="stats-filter-note">Mostrando <b>todo el registro</b></div>
+  </div>
+  <div class="sub-note">
+    Todas las cifras y gráficas responden a los filtros activos del mapa e incluyen también
+    las viviendas sin coordenadas (que no pueden dibujarse en el mapa).
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="k">VUT en el registro</div><div class="v" id="st-total">—</div><div class="d" id="st-total-d">inscritas en el RTA</div></div>
+    <div class="tile"><div class="k">Plazas totales</div><div class="v" id="st-plazas">—</div><div class="d">capacidad legal máxima</div></div>
+    <div class="tile"><div class="k">Media de plazas</div><div class="v" id="st-media">—</div><div class="d">por vivienda</div></div>
+    <div class="tile"><div class="k">Altas últimos 12 meses</div><div class="v" id="st-alta12">—</div><div class="d" id="st-alta12-d">—</div></div>
+    <div class="tile warn"><div class="k">Sin coordenadas</div><div class="v" id="st-nocoords">—</div><div class="d">no aparecen en el mapa</div></div>
+  </div>
+
+  <div class="nota-coords">
+    <svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <div>
+      <b id="nota-nocoords">—</b> viviendas del registro <b>no tienen coordenadas publicadas</b> en el RTA
+      (o las tienen inválidas o fuera del término municipal), por lo que no pueden situarse en el mapa.
+      Sí se contabilizan en todas las estadísticas de esta sección y en la exportación CSV.
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card wide">
+      <h3>Altas mensuales de VUT</h3>
+      <div class="sub">Nuevas inscripciones en el RTA por mes, desde el inicio del registro (mayo 2016)</div>
+      <div class="plot"><canvas id="ch-mensual"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>Parque acumulado</h3>
+      <div class="sub">Total de VUT inscritas al final de cada mes</div>
+      <div class="plot"><canvas id="ch-acumulado"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>Distribución por plazas</h3>
+      <div class="sub">Número de viviendas según su capacidad legal</div>
+      <div class="plot"><canvas id="ch-plazas"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>VUT por zona</h3>
+      <div class="sub">Zonas a partir del barrio/núcleo del RTA y, en su defecto, del código postal</div>
+      <div class="plot"><canvas id="ch-zonas"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>Detalle por zona</h3>
+      <div class="sub">Viviendas, cuota y plazas de cada zona</div>
+      <div class="tbl-wrap">
+        <table class="zonas" id="tbl-zonas">
+          <thead>
+            <tr><th>Zona</th><th class="num">VUT</th><th class="num">%</th><th class="num">Plazas</th><th class="num">Media</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    Fuente: <a href="https://www.juntadeandalucia.es/datosabiertos/portal/dataset/openrta" target="_blank" rel="noopener">OpenRTA — Registro de Turismo de Andalucía</a>
+    (Junta de Andalucía, licencia CC BY 4.0). Snapshot regenerado a diario por GitHub Actions ·
+    datos del <span id="foot-fecha">—</span>.
+    La fecha de alta es la de inscripción en el registro; las bajas no se reflejan (el volcado
+    solo contiene viviendas actualmente inscritas), por lo que el histórico reconstruye el parque vigente.
+    · <a href="../" >Observatorio Turístico de Marbella</a>
+  </div>
+</section>
+
 <script>
 // ============================================================
-// Configuración — fuente de datos
-// ------------------------------------------------------------
-// La API de búsqueda de OpenRTA dejó de admitir filtros por municipio
-// (HTTP 422), así que el mapa carga el snapshot pre-filtrado que un
-// workflow de GitHub Actions regenera cada madrugada a partir del
-// volcado oficial diario del RTA. Ver scripts/build_rta_snapshot.mjs.
+// Fuente de datos: snapshot pre-filtrado del volcado oficial
+// diario del RTA, regenerado cada madrugada por GitHub Actions.
+// Ver scripts/build_rta_snapshot.mjs y .github/workflows/update-rta.yml
 // ============================================================
 const SNAPSHOT_URLS = [
-  "../data/rta_vut_marbella.json",  // mismo repo (GitHub Pages)
-  "https://josehino.github.io/observatorio-turistico-marbella/data/rta_vut_marbella.json", // por si se abre el HTML en local
+  "../data/rta_vut_marbella.json",
+  "https://josehino.github.io/observatorio-turistico-marbella/data/rta_vut_marbella.json",
 ];
+// Consulta en vivo (la API tiene CORS abierto): solo para contrastar el total de hoy
+const LIVE_COUNT_URL = "https://datos.juntadeandalucia.es/api/v0/openrta/search?" + [
+  "id=-", "object_type=" + encodeURIComponent("Vivienda de uso turístico"),
+  "category=-", "group=-", "modality=-", "province=-", "municipality=MARBELLA",
+  "order_by=id", "mode=ASC", "format=json", "size=1",
+].join("&");
 
 proj4.defs("EPSG:25830",
   "+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
@@ -392,28 +533,76 @@ const fmtFecha = s => {
   if (/^\d{8}$/.test(s)) return `${s.slice(6,8)}/${s.slice(4,6)}/${s.slice(0,4)}`;
   return s || "—";
 };
-// useGrouping:"always": es-ES no separa millares en números de 4 cifras por defecto
 const _nf = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0, useGrouping: "always" });
 const fmtN = n => _nf.format(Number(n || 0));
+const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const MESES_L = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const fmtYM = ym => { // "2016-05" → "may 2016"
+  const [y, m] = ym.split("-");
+  return `${MESES[+m-1]} ${y}`;
+};
+const fmtYML = ym => {
+  const [y, m] = ym.split("-");
+  return `${MESES_L[+m-1]} de ${y}`;
+};
+
+// ============================================================
+// Zonas: barrio/núcleo del RTA si es específico; si no, CP
+// ============================================================
+const LOC_ZONA = {
+  "NUEVA ANDALUCIA": "Nueva Andalucía–Puerto Banús",
+  "ELVIRIA": "Las Chapas–Elviria–Cabopino",
+  "ARTOLA": "Las Chapas–Elviria–Cabopino",
+  "RICMAR": "Las Chapas–Elviria–Cabopino",
+  "MONTEROS (LOS)": "Marbella Este (Los Monteros–Río Real)",
+  "RIO REAL": "Marbella Este (Los Monteros–Río Real)",
+  "ROSARIO (EL)": "Marbella Este (Los Monteros–Río Real)",
+  "SAN PEDRO ALCANTARA": "San Pedro Alcántara",
+  "GUADALMINA": "Guadalmina–Linda Vista",
+  "SALTO DEL AGUA": "San Pedro Alcántara",
+};
+const CP_ZONA = {
+  "29600": "Marbella Centro",
+  "29601": "Marbella Centro",
+  "29602": "Marbella ciudad Este",
+  "29603": "Marbella Este (Los Monteros–Río Real)",
+  "29604": "Las Chapas–Elviria–Cabopino",
+  "29660": "Nueva Andalucía–Puerto Banús",
+  "29670": "San Pedro Alcántara",
+  "29678": "San Pedro Alcántara",
+  "29679": "Guadalmina–Linda Vista",
+};
+function zonaDe(localidad, cp) {
+  const loc = String(localidad || "").trim().toUpperCase();
+  if (LOC_ZONA[loc]) return LOC_ZONA[loc];
+  const z = CP_ZONA[String(cp || "").trim()];
+  if (z) return z;
+  return "Otras zonas / sin CP de Marbella";
+}
 
 // ============================================================
 // Estado
 // ============================================================
 let mapa = null, heat = null, cluster = null, layersCtrl = null;
-let allPuntos = [];          // todos los puntos válidos del snapshot
-let lastQuality = null;      // {sinCoords, fueraBbox, ...}
-let snapDate = "";           // fecha del snapshot
+let allRecords = [];         // TODOS los registros (con y sin coordenadas)
+let lastQuality = null;
+let snapDate = "";
 const filters = {
-  plazasMin: 0, plazasMax: 99,
-  habsMin: 0,   habsMax: 30,
+  plazasMin: 0, plazasMax: 20,
+  habsMin: 0,   habsMax: 15,
   yearMin: null, yearMax: null,
-  modalidades: new Set(),    // vacío = todas
-  cps: new Set(),            // vacío = todos
-  locality: "",              // vacío = todos
+  modalidades: new Set(),
+  cps: new Set(),
+  locality: "",
+  zona: "",
+  timeCap: null,             // "AAAA-MM": solo VUT dadas de alta hasta ese mes
 };
+let charts = {};             // instancias Chart.js
+let TIMELINE = [];           // meses desde la primera alta hasta el snapshot
+let playTimer = null;        // animación de la barra temporal
 
 // ============================================================
-// Cargar datos (snapshot estático, con fallback de URL)
+// Cargar datos
 // ============================================================
 async function fetchSnapshot() {
   let lastErr;
@@ -425,6 +614,18 @@ async function fetchSnapshot() {
     } catch (e) { lastErr = e; }
   }
   throw lastErr || new Error("snapshot no disponible");
+}
+
+async function fetchLiveCount() {
+  try {
+    const r = await fetch(LIVE_COUNT_URL);
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d && typeof d.total_hits === "number") {
+      $("t-live").innerHTML =
+        `Comprobación en vivo contra la API del RTA: <span id="live-rta">${fmtN(d.total_hits)}</span> VUT inscritas ahora mismo.`;
+    }
+  } catch (e) { /* silencioso: es solo un contraste */ }
 }
 
 async function loadData() {
@@ -439,41 +640,40 @@ async function loadData() {
     setProgress(60);
 
     setStatus("Procesando datos…");
-    const quality = {
-      totalRTA: records.length,
-      sinCoords: 0,
-      coordsInvalidas: 0,
-      fueraBbox: 0,
-    };
+    const quality = { totalRTA: records.length, sinCoords: 0, coordsInvalidas: 0, fueraBbox: 0 };
 
-    const puntos = [];
+    const out = [];
     for (const r of records) {
-      const cx = r.coord_x, cy = r.coord_y;
-      if (!cx || !cy) { quality.sinCoords++; continue; }
-      const x = parseFloat(String(cx).replace(",", "."));
-      const y = parseFloat(String(cy).replace(",", "."));
-      if (!isFinite(x) || !isFinite(y)) { quality.coordsInvalidas++; continue; }
-      const [lon, lat] = proj4("EPSG:25830", "EPSG:4326", [x, y]);
-      if (!(lat > 36.30 && lat < 36.70 && lon > -5.10 && lon < -4.60)) {
-        quality.fueraBbox++; continue;
-      }
-      puntos.push({
-        lat, lon,
+      const rec = {
+        lat: null, lon: null,
         registro: r.registration_code || "", nombre: r.name || "",
         direccion: r.establishment_address || "", cp: r.postal_code || "",
         habs: r.tot_gen_ua, plazas: r.tot_gen_places,
         modalidad: r.group || "", localidad: r.locality || "",
         fecha: r.registration_date || r.activity_start_date || "",
         refcat: r.catastral_ref || "",
-      });
+      };
+      rec.zona = zonaDe(rec.localidad, rec.cp);
+      rec.ym = /^\d{4}-\d{2}/.test(rec.fecha) ? rec.fecha.slice(0, 7) : null;
+
+      const cx = r.coord_x, cy = r.coord_y;
+      if (!cx || !cy) { quality.sinCoords++; out.push(rec); continue; }
+      const x = parseFloat(String(cx).replace(",", "."));
+      const y = parseFloat(String(cy).replace(",", "."));
+      if (!isFinite(x) || !isFinite(y)) { quality.coordsInvalidas++; out.push(rec); continue; }
+      const [lon, lat] = proj4("EPSG:25830", "EPSG:4326", [x, y]);
+      if (!(lat > 36.30 && lat < 36.70 && lon > -5.10 && lon < -4.60)) {
+        quality.fueraBbox++; out.push(rec); continue;
+      }
+      rec.lat = lat; rec.lon = lon;
+      out.push(rec);
     }
-    quality.mostradas = puntos.length;
-    allPuntos = puntos;
+    allRecords = out;
+    quality.mostradas = out.filter(p => p.lat != null).length;
     lastQuality = quality;
     setProgress(80);
 
-    const totPlazas = puntos.reduce((s,p)=>s+(p.plazas||0),0);
-    const totHabs   = puntos.reduce((s,p)=>s+(p.habs||0),0);
+    const puntos = out.filter(p => p.lat != null);
     setStatus(`Dibujando ${fmtN(puntos.length)} viviendas…`);
     await new Promise(r => setTimeout(r, 30));
 
@@ -488,39 +688,44 @@ async function loadData() {
       { attribution: "© OSM" });
     const tilesOscuro = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       { attribution: "© OSM, CARTO", subdomains: "abcd", maxZoom: 20 });
-    const tilesSat = L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      { attribution: "Tiles © Esri", maxZoom: 19 });
-    // Satélite + etiquetas (híbrido)
-    const satLabels = L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-      { attribution: "Labels © Esri", maxZoom: 19, pane: "shadowPane" });
     const satBase = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       { attribution: "Tiles © Esri", maxZoom: 19 });
+    const satLabels = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+      { attribution: "Labels © Esri", maxZoom: 19, pane: "shadowPane" });
     const tilesHybrid = L.layerGroup([satBase, satLabels]);
 
     drawDataLayers(puntos);
 
     layersCtrl = L.control.layers(
       { "Claro": tilesClaro, "OSM": tilesOsm, "Oscuro": tilesOscuro,
-        "Satélite": tilesSat, "Satélite + nombres": tilesHybrid },
+        "Satélite": satBase, "Satélite + nombres": tilesHybrid },
       { "Mapa de calor": heat, "Viviendas (click)": cluster },
       { collapsed: true, position: "topright" }
     ).addTo(mapa);
     L.control.scale({ imperial: false }).addTo(mapa);
 
+    // Reescalar el calor al cambiar de zoom (evita la saturación en rojo)
+    mapa.on("zoomend", () => {
+      if (heat) heat.setOptions(Object.assign({}, HEAT_BASE, heatOptsFor(mapa.getZoom())));
+    });
+
     $("p-count").textContent = fmtN(puntos.length);
     $("p-fecha").textContent = fmtFecha(snapDate);
-    $("t-counts").innerHTML =
-      `${fmtN(puntos.length)} viviendas · ${fmtN(totPlazas)} plazas · ${fmtN(totHabs)} habitaciones`;
     $("t-fuentes").innerHTML =
       `Fuente: Registro de Turismo de Andalucía (OpenRTA) · datos del <b>${fmtFecha(snapDate)}</b>`;
+    $("foot-fecha").textContent = fmtFecha(snapDate);
     renderQualityBadge();
     $("info").style.display = "block";
     $("leyenda").style.display = "flex";
     $("toolbar").style.display = "flex";
+    TIMELINE = monthRange(allRecords);
     setupFilters();
+    setupTimebar();
+    buildCharts();
+    applyFilters();
+    fetchLiveCount();
 
     setProgress(100);
     if (loader) {
@@ -545,35 +750,72 @@ function renderQualityBadge() {
   const pctMostrado = q.totalRTA ? (100 * q.mostradas / q.totalRTA) : 0;
   t.innerHTML = `
     <b>Calidad del dato</b>
-    <span class="ok" title="El snapshot procede del volcado completo del RTA, no de búsquedas paginadas">✓ Cobertura 100% del RTA</span>
+    <span class="ok" title="El snapshot procede del volcado completo del RTA, no de búsquedas paginadas">Cobertura 100% del RTA</span>
     <br>
     Total en RTA Marbella: <b>${fmtN(q.totalRTA)}</b> ·
-    Dibujadas en el mapa: <span class="ok"><b>${fmtN(q.mostradas)}</b> (${pctMostrado.toFixed(1).replace(".", ",")}%)</span>
+    En el mapa: <span class="ok"><b>${fmtN(q.mostradas)}</b> (${pctMostrado.toFixed(1).replace(".", ",")}%)</span>
     <br>
-    Descartadas por geocoding:
+    No dibujables:
     <span class="${q.sinCoords ? 'warn' : ''}">${fmtN(q.sinCoords)} sin coords</span> ·
     <span class="${q.coordsInvalidas ? 'warn' : ''}">${fmtN(q.coordsInvalidas)} coords inválidas</span> ·
     <span class="${q.fueraBbox ? 'warn' : ''}">${fmtN(q.fueraBbox)} fuera bbox Marbella</span>
-    (total ${fmtN(descartadas)})
+    (total ${fmtN(descartadas)}; sí cuentan en las estadísticas)
   `;
+  $("st-nocoords").textContent = fmtN(descartadas);
+  $("nota-nocoords").textContent = fmtN(descartadas);
 }
 
 // ============================================================
-// Dibujar capas (reutilizable por filtros)
+// Capas del mapa (reutilizable por filtros)
 // ============================================================
+// --- Escala del calor adaptada al zoom ---
+// Con 15.500 VUT el heatmap saturaba: a vista de ciudad cualquier celda con
+// unas decenas de puntos ya alcanzaba el techo y TODO salía rojo. El techo
+// (max) crece al alejar el zoom para que solo los focos realmente densos
+// lleguen al rojo y el resto de la ciudad muestre el gradiente completo.
+function heatOptsFor(z) {
+  const tabla = [
+    [10, { radius: 8,  blur: 6,  max: 3 }],
+    [11, { radius: 9,  blur: 7,  max: 2.2 }],
+    [12, { radius: 10, blur: 8,  max: 2 }],
+    [13, { radius: 12, blur: 9,  max: 1.2 }],
+    [14, { radius: 14, blur: 10, max: 1 }],
+  ];
+  for (const [zz, o] of tabla) if (z <= zz) return o;
+  return { radius: 16, blur: 12, max: 0.8 };
+}
+const HEAT_BASE = {
+  // OJO: minOpacity alto satura el lienzo (cada sello parte de esa alfa y los
+  // solapes suman): con 0.4 toda la ciudad salía roja fuese cual fuese 'max'.
+  minOpacity: 0.05, maxZoom: 18,
+  gradient: { 0.05:"#000033", 0.20:"#0033ff", 0.40:"#00ffff",
+              0.55:"#00ff00", 0.70:"#ffff00", 0.85:"#ff6600", 1.0:"#ff0033" }
+};
+
 function drawDataLayers(puntos) {
-  if (heat && mapa) mapa.removeLayer(heat);
+  // conservar qué capas tenía activas el usuario y refrescar el control de
+  // capas (antes referenciaba capas muertas tras aplicar un filtro)
+  const heatOn = heat ? mapa.hasLayer(heat) : true;
+  const clusterOn = cluster ? mapa.hasLayer(cluster) : true;
+  if (layersCtrl) {
+    if (heat) layersCtrl.removeLayer(heat);
+    if (cluster) layersCtrl.removeLayer(cluster);
+  }
+  if (heat && mapa) {
+    // cancelar el redibujado pendiente de leaflet.heat: si su frame salta
+    // después de quitar la capa, revienta con "_map is null"
+    if (heat._frame) { L.Util.cancelAnimFrame(heat._frame); heat._frame = null; }
+    mapa.removeLayer(heat);
+  }
   if (cluster && mapa) mapa.removeLayer(cluster);
 
-  heat = L.heatLayer(puntos.map(p => [p.lat, p.lon, 0.6]), {
-    radius: 14, blur: 10, minOpacity: 0.45, maxZoom: 13,
-    gradient: { 0.05:"#000033", 0.20:"#0033ff", 0.40:"#00ffff",
-                0.55:"#00ff00", 0.70:"#ffff00", 0.85:"#ff6600", 1.0:"#ff0033" }
-  }).addTo(mapa);
+  heat = L.heatLayer(puntos.map(p => [p.lat, p.lon, 1]),
+    Object.assign({}, HEAT_BASE, heatOptsFor(mapa.getZoom())));
+  if (heatOn) heat.addTo(mapa);
 
   cluster = L.markerClusterGroup({
-    // Lejos clusters de 45 px; a partir de zoom 16 sólo agrupa los marcadores
-    // que estén EXACTAMENTE en el mismo punto (radio 1 px) → spiderfy on click.
+    // Lejos, clusters de 45 px; desde zoom 16 solo agrupa marcadores en el MISMO
+    // punto exacto (radio 1 px) → al pinchar se despliegan en abanico (spiderfy).
     maxClusterRadius: function (zoom) { return zoom >= 16 ? 1 : 45; },
     spiderfyOnMaxZoom: true,
     spiderfyDistanceMultiplier: 1.8,
@@ -591,10 +833,11 @@ function drawDataLayers(puntos) {
         <table>
           <tr><td class="k">Nombre</td><td>${escapeHTML(p.nombre) || "—"}</td></tr>
           <tr><td class="k">Dirección</td><td class="v">${escapeHTML(String(p.direccion).slice(0,160))}</td></tr>
+          <tr><td class="k">Zona</td><td>${escapeHTML(p.zona)}</td></tr>
           <tr><td class="k">Modalidad</td><td>${escapeHTML(p.modalidad) || "—"}</td></tr>
           <tr><td class="k">Habitaciones</td><td class="v">${p.habs ?? "—"}</td></tr>
           <tr><td class="k">Plazas</td><td class="v">${p.plazas ?? "—"}</td></tr>
-          <tr><td class="k">Barrio</td><td>${escapeHTML(p.localidad) || "—"}</td></tr>
+          <tr><td class="k">Barrio (RTA)</td><td>${escapeHTML(p.localidad) || "—"}</td></tr>
           <tr><td class="k">CP</td><td>${escapeHTML(p.cp) || "—"}</td></tr>
           <tr><td class="k">Alta</td><td>${fmtFecha(p.fecha)}</td></tr>
           <tr><td class="k">Ref. catastral</td><td class="mono">${escapeHTML(p.refcat) || "—"}</td></tr>
@@ -608,12 +851,16 @@ function drawDataLayers(puntos) {
       </div>`;
     cluster.addLayer(
       L.circleMarker([p.lat, p.lon], {
-        radius: 4, color: "#7a0000", weight: 1, fillColor: "#d7191c", fillOpacity: 0.85
+        radius: 4, color: "#083d8c", weight: 1, fillColor: "#0d6efd", fillOpacity: 0.85
       }).bindPopup(html, { maxWidth: 320, minWidth: 240 })
        .bindTooltip(`VUT ${escapeHTML(p.registro)} · ${p.plazas ?? "?"} plazas`)
     );
   });
-  cluster.addTo(mapa);
+  if (clusterOn) cluster.addTo(mapa);
+  if (layersCtrl) {
+    layersCtrl.addOverlay(heat, "Mapa de calor");
+    layersCtrl.addOverlay(cluster, "Viviendas (click)");
+  }
 }
 
 // ============================================================
@@ -626,32 +873,44 @@ function yearOf(p) {
 }
 function passesFilters(p) {
   const plz = p.plazas || 0, hab = p.habs || 0;
-  if (plz < filters.plazasMin || (filters.plazasMax < 99 && plz > filters.plazasMax)) return false;
-  if (hab < filters.habsMin || (filters.habsMax < 30 && hab > filters.habsMax)) return false;
+  if (plz < filters.plazasMin || (filters.plazasMax < 20 && plz > filters.plazasMax)) return false;
+  if (hab < filters.habsMin || (filters.habsMax < 15 && hab > filters.habsMax)) return false;
   const y = yearOf(p);
   if (filters.yearMin != null && y != null && y < filters.yearMin) return false;
   if (filters.yearMax != null && y != null && y > filters.yearMax) return false;
   if (filters.modalidades.size && !filters.modalidades.has(p.modalidad || "")) return false;
   if (filters.cps.size && !filters.cps.has(String(p.cp || "").trim())) return false;
   if (filters.locality && p.localidad !== filters.locality) return false;
+  if (filters.zona && p.zona !== filters.zona) return false;
+  if (filters.timeCap && p.ym && p.ym > filters.timeCap) return false;
   return true;
 }
+function anyFilterActive() {
+  return filters.plazasMin > 0 || filters.plazasMax < 20 ||
+         filters.habsMin > 0 || filters.habsMax < 15 ||
+         (filters._yBounds && (filters.yearMin > filters._yBounds[0] || filters.yearMax < filters._yBounds[1])) ||
+         filters.modalidades.size > 0 || filters.cps.size > 0 ||
+         filters.locality !== "" || filters.zona !== "" ||
+         filters.timeCap !== null;
+}
 function applyFilters() {
-  const filtered = allPuntos.filter(passesFilters);
-  drawDataLayers(filtered);
+  const filtered = allRecords.filter(passesFilters);
+  const puntos = filtered.filter(p => p.lat != null);
+  drawDataLayers(puntos);
+  if (TIMELINE.length) tbUpdateLabel(+$("tb-range").value);
   $("f-count").textContent = fmtN(filtered.length);
   const totPlz = filtered.reduce((s,p)=>s+(p.plazas||0),0);
   const totHab = filtered.reduce((s,p)=>s+(p.habs||0),0);
-  $("p-count").textContent = fmtN(filtered.length);
+  $("p-count").textContent = fmtN(puntos.length);
   $("t-counts").innerHTML =
-    `${fmtN(filtered.length)} viviendas · ${fmtN(totPlz)} plazas · ${fmtN(totHab)} habitaciones`;
+    `${fmtN(filtered.length)} viviendas (${fmtN(puntos.length)} en el mapa) · ${fmtN(totPlz)} plazas · ${fmtN(totHab)} habitaciones`;
+  updateStats(filtered);
   return filtered;
 }
 function setupFilters() {
-  $("f-total").textContent = fmtN(allPuntos.length);
-  $("f-count").textContent = fmtN(allPuntos.length);
+  $("f-total").textContent = fmtN(allRecords.length);
+  $("f-count").textContent = fmtN(allRecords.length);
 
-  // Sliders plazas/habs
   const wireRange = (idMin, idMax, valId, suffix) => {
     const a = $(idMin), b = $(idMax), v = $(valId);
     const sync = () => {
@@ -668,11 +927,11 @@ function setupFilters() {
   wireRange("f-plazas-min", "f-plazas-max", "f-plazas-val");
   wireRange("f-habs-min", "f-habs-max", "f-habs-val");
 
-  // Años: derivar rango disponible
-  const years = allPuntos.map(yearOf).filter(y => y != null && y >= 1990 && y <= 2100);
+  const years = allRecords.map(yearOf).filter(y => y != null && y >= 1990 && y <= 2100);
   const yMin = years.length ? Math.min(...years) : 2000;
   const yMax = years.length ? Math.max(...years) : new Date().getFullYear();
   filters.yearMin = yMin; filters.yearMax = yMax;
+  filters._yBounds = [yMin, yMax];
   const yMinEl = $("f-year-min"), yMaxEl = $("f-year-max");
   yMinEl.innerHTML = ""; yMaxEl.innerHTML = "";
   for (let y = yMin; y <= yMax; y++) {
@@ -691,8 +950,7 @@ function setupFilters() {
   yMinEl.addEventListener("change", syncYears);
   yMaxEl.addEventListener("change", syncYears);
 
-  // Chips de modalidad de alquiler (Completa / Por habitaciones)
-  const mods = [...new Set(allPuntos.map(p => p.modalidad).filter(Boolean))].sort();
+  const mods = [...new Set(allRecords.map(p => p.modalidad).filter(Boolean))].sort();
   const modWrap = $("f-modalidad");
   modWrap.innerHTML = "";
   mods.forEach(m => {
@@ -706,17 +964,20 @@ function setupFilters() {
     modWrap.appendChild(chip);
   });
 
-  // Selector de barrio/núcleo (campo locality del RTA)
+  // Zona (agrupación propia barrio+CP)
+  const zonaSel = $("f-zona");
+  const zonas = [...new Set(allRecords.map(p => p.zona))].sort();
+  zonas.forEach(z => zonaSel.insertAdjacentHTML("beforeend",
+    `<option value="${escapeHTML(z)}">${escapeHTML(z)}</option>`));
+  zonaSel.addEventListener("change", () => { filters.zona = zonaSel.value; applyFilters(); });
+
+  // Barrio/núcleo tal cual viene en el RTA
   const locSel = $("f-locality");
-  const locs = [...new Set(allPuntos.map(p => p.localidad).filter(Boolean))].sort();
+  const locs = [...new Set(allRecords.map(p => p.localidad).filter(Boolean))].sort();
   locs.forEach(l => locSel.insertAdjacentHTML("beforeend",
     `<option value="${escapeHTML(l)}">${escapeHTML(l)}</option>`));
-  locSel.addEventListener("change", () => {
-    filters.locality = locSel.value;
-    applyFilters();
-  });
+  locSel.addEventListener("change", () => { filters.locality = locSel.value; applyFilters(); });
 
-  // CP libre (acepta lista separada por comas)
   const cpInput = $("f-cp");
   let cpTimer;
   cpInput.addEventListener("input", () => {
@@ -728,22 +989,21 @@ function setupFilters() {
     }, 200);
   });
 
-  // Botones
   $("btn-reset").addEventListener("click", () => {
-    $("f-plazas-min").value = 0; $("f-plazas-max").value = 99;
-    $("f-habs-min").value = 0;   $("f-habs-max").value = 30;
+    $("f-plazas-min").value = 0; $("f-plazas-max").value = 20;
+    $("f-habs-min").value = 0;   $("f-habs-max").value = 15;
     yMinEl.value = yMin; yMaxEl.value = yMax;
-    cpInput.value = "";
-    locSel.value = "";
-    filters.plazasMin = 0; filters.plazasMax = 99;
-    filters.habsMin = 0;   filters.habsMax = 30;
+    cpInput.value = ""; locSel.value = ""; zonaSel.value = "";
+    filters.plazasMin = 0; filters.plazasMax = 20;
+    filters.habsMin = 0;   filters.habsMax = 15;
     filters.yearMin = yMin; filters.yearMax = yMax;
     filters.modalidades.clear(); filters.cps.clear();
-    filters.locality = "";
+    filters.locality = ""; filters.zona = "";
     modWrap.querySelectorAll(".chip.active").forEach(c => c.classList.remove("active"));
-    $("f-plazas-val").textContent = `0 – 99`;
-    $("f-habs-val").textContent = `0 – 30`;
+    $("f-plazas-val").textContent = `0 – 20`;
+    $("f-habs-val").textContent = `0 – 15`;
     $("f-year-val").textContent = `${yMin} a ${yMax}`;
+    tbReset();
     applyFilters();
   });
   $("btn-export").addEventListener("click", exportCSV);
@@ -753,6 +1013,80 @@ function setupFilters() {
   document.querySelector(".close-filters").addEventListener("click", closeFilters);
   $("backdrop").addEventListener("click", closeFilters);
 }
+// ============================================================
+// Barra temporal — evolución del parque mes a mes
+// ------------------------------------------------------------
+// Mientras se arrastra o reproduce solo se actualiza el mapa de
+// calor (heat.setLatLngs, barato); al soltar/pausar se reconstruyen
+// también los marcadores y las gráficas con applyFilters().
+// ============================================================
+const ICON_PLAY = '<svg class="ic" viewBox="0 0 24 24"><polygon points="6 3 21 12 6 21"/></svg>';
+const ICON_PAUSE = '<svg class="ic" viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg>';
+
+function tbSetCap(idx) {
+  const last = TIMELINE.length - 1;
+  filters.timeCap = (idx >= last) ? null : TIMELINE[idx];
+}
+function tbUpdateLabel(idx) {
+  const filtered = allRecords.filter(passesFilters);
+  $("tb-label").innerHTML =
+    `hasta <b>${fmtYM(TIMELINE[idx])}</b> · <span class="cnt">${fmtN(filtered.length)}</span> VUT`;
+  return filtered;
+}
+function tbQuickUpdate(idx) {   // solo capa de calor + etiqueta (fluido)
+  tbSetCap(idx);
+  const filtered = tbUpdateLabel(idx);
+  if (heat) heat.setLatLngs(
+    filtered.filter(p => p.lat != null).map(p => [p.lat, p.lon, 1]));
+}
+let _playClusterWasOn = false;
+function tbStop(commit) {
+  if (playTimer) { clearInterval(playTimer); playTimer = null; }
+  $("tb-play").innerHTML = ICON_PLAY;
+  $("tb-play").title = "Reproducir evolución";
+  // restaurar los marcadores ocultados durante la animación
+  if (_playClusterWasOn && cluster && !mapa.hasLayer(cluster)) cluster.addTo(mapa);
+  _playClusterWasOn = false;
+  if (commit) applyFilters();
+}
+function setupTimebar() {
+  if (!TIMELINE.length) return;
+  const range = $("tb-range");
+  const last = TIMELINE.length - 1;
+  range.max = last; range.value = last;
+  tbUpdateLabel(last);
+  $("timebar").style.display = "flex";
+
+  range.addEventListener("input", () => { tbStop(false); tbQuickUpdate(+range.value); });
+  range.addEventListener("change", () => applyFilters());
+
+  $("tb-play").addEventListener("click", () => {
+    if (playTimer) { tbStop(true); return; }
+    // si está al final, arrancar desde el principio
+    if (+range.value >= last) range.value = 0;
+    // ocultar marcadores durante la animación (solo se anima el calor)
+    _playClusterWasOn = !!(cluster && mapa.hasLayer(cluster));
+    if (_playClusterWasOn) mapa.removeLayer(cluster);
+    $("tb-play").innerHTML = ICON_PAUSE;
+    $("tb-play").title = "Pausar";
+    playTimer = setInterval(() => {
+      const i = +range.value;
+      if (i >= last) { tbStop(true); return; }
+      range.value = i + 1;
+      tbQuickUpdate(i + 1);
+    }, 140);
+  });
+}
+function tbReset() {
+  tbStop(false);
+  const range = $("tb-range");
+  if (TIMELINE.length) {
+    range.value = TIMELINE.length - 1;
+    filters.timeCap = null;
+    tbUpdateLabel(TIMELINE.length - 1);
+  }
+}
+
 function openFilters() {
   $("filters").classList.add("open");
   $("backdrop").classList.add("show");
@@ -765,15 +1099,236 @@ function closeFilters() {
 }
 
 // ============================================================
+// Estadísticas e histórico (Chart.js) — reaccionan a los filtros
+// ============================================================
+const AZUL = "#0d6efd", AZUL_SUAVE = "rgba(13,110,253,.14)", INK2 = "#55606e", GRID = "#eef0f3";
+
+Chart.defaults.font.family = "'Mulish','Segoe UI',sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = INK2;
+
+const tooltipBase = {
+  backgroundColor: "#1f2733", titleFont: { family: "'Montserrat',sans-serif", weight: "700" },
+  padding: 10, cornerRadius: 6, displayColors: false,
+};
+
+function monthRange(records) {
+  const yms = records.map(r => r.ym).filter(Boolean).sort();
+  if (!yms.length) return [];
+  const out = [];
+  let [y, m] = yms[0].split("-").map(Number);
+  const [ye, me] = yms[yms.length-1].split("-").map(Number);
+  while (y < ye || (y === ye && m <= me)) {
+    out.push(`${y}-${String(m).padStart(2,"0")}`);
+    m++; if (m > 12) { m = 1; y++; }
+  }
+  return out;
+}
+
+function buildCharts() {
+  charts.mensual = new Chart($("ch-mensual"), {
+    type: "bar",
+    data: { labels: [], datasets: [{ data: [], backgroundColor: AZUL,
+            borderRadius: { topLeft: 3, topRight: 3 }, borderSkipped: "bottom",
+            categoryPercentage: 0.92, barPercentage: 1.0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipBase,
+          callbacks: {
+            title: items => fmtYML(items[0].label),
+            label: item => `${fmtN(item.raw)} altas de VUT`,
+          } },
+      },
+      scales: {
+        x: { grid: { display: false }, border: { color: GRID },
+             ticks: { autoSkip: false, maxRotation: 0,
+               callback: function(v) {
+                 const l = this.getLabelForValue(v);
+                 return l.endsWith("-01") ? l.slice(0,4) : null;
+               } } },
+        y: { beginAtZero: true, grid: { color: GRID }, border: { display: false },
+             ticks: { precision: 0, maxTicksLimit: 6 } },
+      },
+    },
+  });
+
+  charts.acumulado = new Chart($("ch-acumulado"), {
+    type: "line",
+    data: { labels: [], datasets: [{ data: [], borderColor: AZUL, backgroundColor: AZUL_SUAVE,
+            borderWidth: 2, pointRadius: 0, pointHitRadius: 12, pointHoverRadius: 4,
+            fill: true, tension: 0.15 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipBase,
+          callbacks: {
+            title: items => fmtYML(items[0].label),
+            label: item => `${fmtN(item.raw)} VUT acumuladas`,
+          } },
+      },
+      scales: {
+        x: { grid: { display: false }, border: { color: GRID },
+             ticks: { autoSkip: false, maxRotation: 0,
+               callback: function(v) {
+                 const l = this.getLabelForValue(v);
+                 return l.endsWith("-01") ? l.slice(0,4) : null;
+               } } },
+        y: { beginAtZero: true, grid: { color: GRID }, border: { display: false },
+             ticks: { precision: 0, maxTicksLimit: 6, callback: v => fmtN(v) } },
+      },
+    },
+  });
+
+  charts.plazas = new Chart($("ch-plazas"), {
+    type: "bar",
+    data: { labels: [], datasets: [{ data: [], backgroundColor: AZUL,
+            borderRadius: { topLeft: 3, topRight: 3 }, borderSkipped: "bottom",
+            categoryPercentage: 0.75, barPercentage: 1.0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipBase,
+          callbacks: {
+            title: items => `${items[0].label} plazas`,
+            label: item => `${fmtN(item.raw)} viviendas`,
+          } },
+      },
+      scales: {
+        x: { grid: { display: false }, border: { color: GRID },
+             title: { display: true, text: "Plazas de la vivienda", font: { size: 10.5 } } },
+        y: { beginAtZero: true, grid: { color: GRID }, border: { display: false },
+             ticks: { precision: 0, maxTicksLimit: 6, callback: v => fmtN(v) } },
+      },
+    },
+  });
+
+  charts.zonas = new Chart($("ch-zonas"), {
+    type: "bar",
+    data: { labels: [], datasets: [{ data: [], backgroundColor: AZUL,
+            borderRadius: { topRight: 3, bottomRight: 3 }, borderSkipped: "left",
+            categoryPercentage: 0.72, barPercentage: 1.0 }] },
+    options: {
+      indexAxis: "y",
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipBase,
+          callbacks: { label: item => `${fmtN(item.raw)} VUT` } },
+      },
+      scales: {
+        x: { beginAtZero: true, grid: { color: GRID }, border: { display: false },
+             ticks: { precision: 0, maxTicksLimit: 6, callback: v => fmtN(v) } },
+        y: { grid: { display: false }, border: { color: GRID },
+             ticks: { autoSkip: false, font: { size: 10.5 },
+               callback: function(v) {
+                 const l = this.getLabelForValue(v);
+                 return l.length > 26 ? l.slice(0, 25) + "…" : l;
+               } } },
+      },
+    },
+  });
+}
+
+function updateStats(filtered) {
+  // ---- tiles
+  const total = filtered.length;
+  const plazas = filtered.reduce((s,p)=>s+(p.plazas||0),0);
+  const sinCoords = filtered.filter(p => p.lat == null).length;
+  $("st-total").textContent = fmtN(total);
+  $("st-plazas").textContent = fmtN(plazas);
+  $("st-media").textContent = total ? (plazas/total).toFixed(1).replace(".", ",") : "—";
+  $("st-nocoords").textContent = fmtN(sinCoords);
+  $("nota-nocoords").textContent = fmtN(sinCoords);
+
+  // últimos 12 meses según la fecha del snapshot
+  const yms = monthRange(filtered);
+  let alta12 = 0, alta12lbl = "—";
+  if (yms.length) {
+    const last12 = yms.slice(-12);
+    const setLast = new Set(last12);
+    alta12 = filtered.filter(r => setLast.has(r.ym)).length;
+    alta12lbl = `${fmtYM(last12[0])} – ${fmtYM(last12[last12.length-1])}`;
+  }
+  $("st-alta12").textContent = fmtN(alta12);
+  $("st-alta12-d").textContent = alta12lbl;
+
+  $("stats-filter-note").innerHTML = anyFilterActive()
+    ? `Filtros activos: <b>${fmtN(total)}</b> de ${fmtN(allRecords.length)} VUT`
+    : `Mostrando <b>todo el registro</b> (${fmtN(total)} VUT)`;
+
+  // ---- altas mensuales + acumulado
+  const porMes = new Map();
+  filtered.forEach(r => { if (r.ym) porMes.set(r.ym, (porMes.get(r.ym)||0)+1); });
+  const serieMes = yms.map(m => porMes.get(m) || 0);
+  let acc = 0;
+  const serieAcc = serieMes.map(v => (acc += v));
+
+  charts.mensual.data.labels = yms;
+  charts.mensual.data.datasets[0].data = serieMes;
+  charts.mensual.update("none");
+
+  charts.acumulado.data.labels = yms;
+  charts.acumulado.data.datasets[0].data = serieAcc;
+  charts.acumulado.update("none");
+
+  // ---- distribución por plazas
+  const maxPl = 18;
+  const distPl = Array.from({length: maxPl}, () => 0);
+  filtered.forEach(r => {
+    const p = r.plazas || 0;
+    if (p >= 1 && p <= maxPl) distPl[p-1]++;
+  });
+  charts.plazas.data.labels = distPl.map((_,i) => String(i+1));
+  charts.plazas.data.datasets[0].data = distPl;
+  charts.plazas.update("none");
+
+  // ---- zonas (gráfica + tabla)
+  const porZona = new Map();
+  filtered.forEach(r => {
+    const z = porZona.get(r.zona) || { n: 0, plazas: 0 };
+    z.n++; z.plazas += r.plazas || 0;
+    porZona.set(r.zona, z);
+  });
+  const zonasOrd = [...porZona.entries()].sort((a,b) => b[1].n - a[1].n);
+
+  charts.zonas.data.labels = zonasOrd.map(z => z[0]);
+  charts.zonas.data.datasets[0].data = zonasOrd.map(z => z[1].n);
+  charts.zonas.update("none");
+
+  const tb = $("tbl-zonas").querySelector("tbody");
+  const maxN = zonasOrd.length ? zonasOrd[0][1].n : 1;
+  tb.innerHTML = zonasOrd.map(([z, v]) => `
+    <tr>
+      <td><span class="bar" style="width:${Math.max(3, Math.round(46 * v.n / maxN))}px"></span>${escapeHTML(z)}</td>
+      <td class="num">${fmtN(v.n)}</td>
+      <td class="num">${total ? (100*v.n/total).toFixed(1).replace(".", ",") : "0"}%</td>
+      <td class="num">${fmtN(v.plazas)}</td>
+      <td class="num">${v.n ? (v.plazas/v.n).toFixed(1).replace(".", ",") : "—"}</td>
+    </tr>`).join("") + `
+    <tr class="total">
+      <td>Total</td>
+      <td class="num">${fmtN(total)}</td>
+      <td class="num">100%</td>
+      <td class="num">${fmtN(plazas)}</td>
+      <td class="num">${total ? (plazas/total).toFixed(1).replace(".", ",") : "—"}</td>
+    </tr>`;
+}
+
+// ============================================================
 // Exportar CSV
 // ============================================================
 function exportCSV() {
-  const data = allPuntos.filter(passesFilters);
-  if (!data.length) { alert("No hay VUTs que cumplan los filtros actuales."); return; }
+  const data = allRecords.filter(passesFilters);
+  if (!data.length) { alert("No hay VUT que cumplan los filtros actuales."); return; }
   const cols = [
     ["registro","Codigo VUT"],["nombre","Nombre"],["direccion","Direccion"],
-    ["modalidad","Modalidad"],["habs","Habitaciones"],["plazas","Plazas"],
-    ["localidad","Barrio"],["cp","CP"],["fecha","Alta"],["refcat","Ref. catastral"],
+    ["zona","Zona"],["modalidad","Modalidad"],["habs","Habitaciones"],["plazas","Plazas"],
+    ["localidad","Barrio RTA"],["cp","CP"],["fecha","Alta"],["refcat","Ref. catastral"],
     ["lat","Latitud"],["lon","Longitud"],
   ];
   const esc = v => {
@@ -782,7 +1337,7 @@ function exportCSV() {
   };
   const rows = [cols.map(c => c[1]).join(";")];
   for (const p of data) rows.push(cols.map(([k]) => esc(p[k])).join(";"));
-  const csv = "﻿" + rows.join("\r\n"); // BOM para que Excel lo abra bien
+  const csv = "﻿" + rows.join("\r\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
