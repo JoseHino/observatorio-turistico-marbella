@@ -2,7 +2,13 @@
 // Uso: node build_rta_snapshot.mjs <dataset-openrta.json> <salida.json>
 // El volcado es un array JSON de ~174k objetos planos (~323 MB); se parsea en
 // streaming (control de profundidad + estado de string) para no cargarlo entero.
-import { createReadStream, writeFileSync } from "node:fs";
+import { createReadStream, writeFileSync, existsSync, readFileSync } from "node:fs";
+
+// Caída máxima tolerada frente al censo anterior antes de negarse a publicar.
+// El RTA es un registro administrativo: crece, y las bajas son goteo. Una caída
+// de más del 5 % en un día no es que hayan dado de baja ochocientas viviendas,
+// es que el volcado ha llegado a medias.
+const CAIDA_MAX = 0.05;
 
 const [,, INPUT, OUTPUT] = process.argv;
 if (!INPUT || !OUTPUT) { console.error("uso: node build_rta_snapshot.mjs <in> <out>"); process.exit(1); }
@@ -64,6 +70,29 @@ stream.on("data", chunk => {
 });
 
 stream.on("end", () => {
+    // Guarda contra volcados a medias. Este script lee el fichero en streaming y
+    // se queda con lo que encuentre, así que una descarga cortada no da error:
+    // simplemente produce menos registros y publica un censo recortado sin que
+    // nadie se entere. Antes de escribir se compara con el censo anterior.
+    if (existsSync(OUTPUT)) {
+        try {
+            const previo = JSON.parse(readFileSync(OUTPUT, "utf8"));
+            const antes = previo.total ?? (previo.records || []).length;
+            if (antes > 0) {
+                const caida = (antes - records.length) / antes;
+                if (caida > CAIDA_MAX) {
+                    console.error(
+                        `::error::El censo pasaría de ${antes} a ${records.length} viviendas ` +
+                        `(-${(caida * 100).toFixed(1)} %). El RTA no pierde ese volumen en un día: ` +
+                        `el volcado ha llegado incompleto. No se sobrescribe el snapshot.`);
+                    process.exit(1);
+                }
+            }
+        } catch (e) {
+            console.error(`aviso: no se pudo leer el snapshot anterior (${e.message}); se publica sin comparar`);
+        }
+    }
+
     // stock vivo primero no aplica: guardamos todo el histórico ordenado por fecha de alta
     records.sort((a, b) => String(a.registration_date).localeCompare(String(b.registration_date)));
     const out = {

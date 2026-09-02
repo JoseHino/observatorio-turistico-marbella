@@ -18,11 +18,43 @@ jobs:
         with:
           node-version: "20"
 
+      # Hay que bajarse el volcado ENTERO de Andalucía (~323 MB, unos diez
+      # minutos) para quedarse con Marbella. No es por gusto: el endpoint
+      # /search filtra por municipio y tarda 24 s, pero su parámetro `size`
+      # topa en 10.000 registros y Marbella tiene 15.966; no admite paginación
+      # (`page`, `from` y `offset` se ignoran y devuelven siempre la primera
+      # página), y /all ignora los filtros de municipio y provincia —devuelve
+      # el mismo primer registro con ellos y sin ellos—. Comprobado todo.
+      #
+      # Siendo una descarga larga, lo que hay que hacer es que aguante:
+      #   --retry-all-errors  el fallo real fue «curl: (56) Recv failure», que
+      #                       el --retry a secas NO reintenta.
+      #   --speed-limit/time  si el caudal cae por debajo de 5 KB/s durante dos
+      #                       minutos, se corta y se reintenta, en vez de
+      #                       quedarse colgado hasta agotar el trabajo.
+      #   --max-time          tope por intento, con holgura sobre los ~10 min
+      #                       que tarda cuando va bien.
       - name: Descargar volcado completo OpenRTA (~323 MB)
         run: |
-          curl -sSL --retry 3 --retry-delay 30 -o /tmp/dataset-openrta.json \
+          curl -sSL -o /tmp/dataset-openrta.json \
+            --retry 5 --retry-delay 60 --retry-all-errors \
+            --connect-timeout 60 --max-time 2400 \
+            --speed-limit 5000 --speed-time 120 \
             "https://datos.juntadeandalucia.es/api/v0/openrta/all?format=json"
           ls -la /tmp/dataset-openrta.json
+          # Una descarga a medias sigue siendo JSON parseable hasta donde llega,
+          # así que el generador la aceptaría y publicaría un censo recortado sin
+          # decir nada. Se comprueba antes el tamaño y que el fichero cierre.
+          bytes=$(stat -c%s /tmp/dataset-openrta.json)
+          echo "descargados $bytes bytes"
+          if [ "$bytes" -lt 250000000 ]; then
+            echo "::error::El volcado ocupa $bytes bytes, muy por debajo de los ~323 MB esperados: descarga incompleta."
+            exit 1
+          fi
+          if [ "$(tail -c 1 /tmp/dataset-openrta.json)" != "]" ]; then
+            echo "::error::El volcado no termina en ']': la descarga se cortó a mitad."
+            exit 1
+          fi
 
       - name: Generar snapshot filtrado (VUT Marbella)
         run: node scripts/build_rta_snapshot.mjs /tmp/dataset-openrta.json data/rta_vut_marbella.json
