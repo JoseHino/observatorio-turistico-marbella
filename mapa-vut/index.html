@@ -696,7 +696,7 @@ async function loadData() {
       { attribution: "Labels © Esri", maxZoom: 19, pane: "shadowPane" });
     const tilesHybrid = L.layerGroup([satBase, satLabels]);
 
-    drawDataLayers(puntos);
+    ensureLayers();   // capas persistentes; applyFilters() las rellena una sola vez
 
     layersCtrl = L.control.layers(
       { "Claro": tilesClaro, "OSM": tilesOsm, "Oscuro": tilesOscuro,
@@ -792,27 +792,13 @@ const HEAT_BASE = {
               0.55:"#00ff00", 0.70:"#ffff00", 0.85:"#ff6600", 1.0:"#ff0033" }
 };
 
-function drawDataLayers(puntos) {
-  // conservar qué capas tenía activas el usuario y refrescar el control de
-  // capas (antes referenciaba capas muertas tras aplicar un filtro)
-  const heatOn = heat ? mapa.hasLayer(heat) : true;
-  const clusterOn = cluster ? mapa.hasLayer(cluster) : true;
-  if (layersCtrl) {
-    if (heat) layersCtrl.removeLayer(heat);
-    if (cluster) layersCtrl.removeLayer(cluster);
-  }
-  if (heat && mapa) {
-    // cancelar el redibujado pendiente de leaflet.heat: si su frame salta
-    // después de quitar la capa, revienta con "_map is null"
-    if (heat._frame) { L.Util.cancelAnimFrame(heat._frame); heat._frame = null; }
-    mapa.removeLayer(heat);
-  }
-  if (cluster && mapa) mapa.removeLayer(cluster);
-
-  heat = L.heatLayer(puntos.map(p => [p.lat, p.lon, 1]),
-    Object.assign({}, HEAT_BASE, heatOptsFor(mapa.getZoom())));
-  if (heatOn) heat.addTo(mapa);
-
+// Las capas son PERSISTENTES: se crean una sola vez y nunca se quitan del
+// mapa al filtrar; solo se les cambia el contenido. Recrearlas provocaba una
+// carrera con la carga troceada del clúster (los marcadores se añaden en
+// chunks asíncronos y el clúster viejo, ya sin mapa, reventaba con
+// "null.getMinZoom") y además rompía el control de capas.
+function ensureLayers() {
+  heat = L.heatLayer([], Object.assign({}, HEAT_BASE, heatOptsFor(mapa.getZoom()))).addTo(mapa);
   cluster = L.markerClusterGroup({
     // Lejos, clusters de 45 px; desde zoom 16 solo agrupa marcadores en el MISMO
     // punto exacto (radio 1 px) → al pinchar se despliegan en abanico (spiderfy).
@@ -821,9 +807,13 @@ function drawDataLayers(puntos) {
     spiderfyDistanceMultiplier: 1.8,
     zoomToBoundsOnClick: true,
     showCoverageOnHover: false, chunkedLoading: true, chunkInterval: 100, chunkDelay: 30,
-  });
+  }).addTo(mapa);
+}
 
-  puntos.forEach(p => {
+function drawDataLayers(puntos) {
+  heat.setLatLngs(puntos.map(p => [p.lat, p.lon, 1]));
+
+  const markers = puntos.map(p => {
     const gm = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}`;
     const sv = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${p.lat},${p.lon}`;
     const cat = p.refcat ? `https://www1.sedecatastro.gob.es/CYCBienInmueble/OVCConCiud.aspx?RefC=${p.refcat}` : null;
@@ -849,18 +839,13 @@ function drawDataLayers(puntos) {
           ${cat ? `<a class="a-cat" href="${cat}" target="_blank" rel="noopener">Catastro</a>` : ""}
         </div>
       </div>`;
-    cluster.addLayer(
-      L.circleMarker([p.lat, p.lon], {
+    return L.circleMarker([p.lat, p.lon], {
         radius: 4, color: "#083d8c", weight: 1, fillColor: "#0d6efd", fillOpacity: 0.85
       }).bindPopup(html, { maxWidth: 320, minWidth: 240 })
-       .bindTooltip(`VUT ${escapeHTML(p.registro)} · ${p.plazas ?? "?"} plazas`)
-    );
+       .bindTooltip(`VUT ${escapeHTML(p.registro)} · ${p.plazas ?? "?"} plazas`);
   });
-  if (clusterOn) cluster.addTo(mapa);
-  if (layersCtrl) {
-    layersCtrl.addOverlay(heat, "Mapa de calor");
-    layersCtrl.addOverlay(cluster, "Viviendas (click)");
-  }
+  cluster.clearLayers();
+  cluster.addLayers(markers);
 }
 
 // ============================================================
@@ -913,13 +898,17 @@ function setupFilters() {
 
   const wireRange = (idMin, idMax, valId, suffix) => {
     const a = $(idMin), b = $(idMax), v = $(valId);
+    let t;
     const sync = () => {
       let lo = +a.value, hi = +b.value;
       if (lo > hi) { lo = hi; a.value = lo; }
       filters[idMin.split('-')[1] + "Min"] = lo;
       filters[idMin.split('-')[1] + "Max"] = hi;
       v.textContent = `${lo} – ${hi}${suffix || ""}`;
-      applyFilters();
+      // debounce: el arrastre dispara 'input' por cada píxel y reconstruir
+      // 15.000 marcadores cada vez ahoga el mapa
+      clearTimeout(t);
+      t = setTimeout(applyFilters, 250);
     };
     a.addEventListener("input", sync);
     b.addEventListener("input", sync);
@@ -1039,15 +1028,11 @@ function tbQuickUpdate(idx) {   // solo capa de calor + etiqueta (fluido)
   if (heat) heat.setLatLngs(
     filtered.filter(p => p.lat != null).map(p => [p.lat, p.lon, 1]));
 }
-let _playClusterWasOn = false;
 function tbStop(commit) {
   if (playTimer) { clearInterval(playTimer); playTimer = null; }
   $("tb-play").innerHTML = ICON_PLAY;
   $("tb-play").title = "Reproducir evolución";
-  // restaurar los marcadores ocultados durante la animación
-  if (_playClusterWasOn && cluster && !mapa.hasLayer(cluster)) cluster.addTo(mapa);
-  _playClusterWasOn = false;
-  if (commit) applyFilters();
+  if (commit) applyFilters();   // reconstruye los marcadores vaciados al reproducir
 }
 function setupTimebar() {
   if (!TIMELINE.length) return;
@@ -1064,9 +1049,9 @@ function setupTimebar() {
     if (playTimer) { tbStop(true); return; }
     // si está al final, arrancar desde el principio
     if (+range.value >= last) range.value = 0;
-    // ocultar marcadores durante la animación (solo se anima el calor)
-    _playClusterWasOn = !!(cluster && mapa.hasLayer(cluster));
-    if (_playClusterWasOn) mapa.removeLayer(cluster);
+    // vaciar los marcadores durante la animación (solo se anima el calor);
+    // la capa NO se quita del mapa (evita carreras con la carga troceada)
+    if (cluster) cluster.clearLayers();
     $("tb-play").innerHTML = ICON_PAUSE;
     $("tb-play").title = "Pausar";
     playTimer = setInterval(() => {
