@@ -682,12 +682,12 @@ async function loadData() {
 
     mapa = L.map("map", { preferCanvas: true }).setView([centerLat, centerLon], 12);
 
-    const tilesClaro = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-      { attribution: "© OSM, CARTO", subdomains: "abcd", maxZoom: 20 }).addTo(mapa);
+    const tilesClaro = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+      { attribution: "Tiles © Esri", maxNativeZoom: 16, maxZoom: 20 }).addTo(mapa);
     const tilesOsm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       { attribution: "© OSM" });
-    const tilesOscuro = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      { attribution: "© OSM, CARTO", subdomains: "abcd", maxZoom: 20 });
+    const tilesOscuro = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+      { attribution: "Tiles © Esri", maxNativeZoom: 16, maxZoom: 20 });
     const satBase = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       { attribution: "Tiles © Esri", maxZoom: 19 });
