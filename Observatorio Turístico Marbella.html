@@ -265,6 +265,54 @@ header {
 .ia-out table { border-collapse: collapse; margin: 10px 0; font-size: 12.5px; }
 .ia-out th, .ia-out td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
 .ia-out th { background: var(--bg2); }
+/* Informe técnico en formato AMMA Consulting (mismo aspecto que el Word) */
+.ia-out.amma { background: #e9edf2; padding: 18px; }
+.ia-out.amma > div { background: #fff; color: #222; max-width: 760px; margin: 0 auto; }
+.amma-portada { text-align: center; padding: 34px 48px 26px; }
+.amma-portada img { width: 120px; }
+.amma-sub { margin-top: 26px; color: #37A0B4; font: 700 15px Calibri, Carlito, 'Segoe UI', sans-serif; }
+.amma-titulo {
+    margin-top: 12px; padding: 12px 0; border-top: 1px solid #37A0B4; border-bottom: 1px solid #37A0B4;
+    font: 700 23px/1.2 'Franklin Gothic Medium Cond', 'Arial Narrow', sans-serif; letter-spacing: -.2px;
+}
+.amma-encabezado {
+    display: grid; grid-template-columns: 150px 1fr; align-items: center;
+    border: 1px solid #37A0B4; margin: 0 auto !important; padding: 8px 14px; gap: 14px;
+    border-top: 6px solid #e9edf2; /* separa visualmente la portada como un salto de página */
+}
+.amma-encabezado img { width: 120px; }
+.amma-encabezado span { text-align: center; color: #37A0B4; font: 700 15px Calibri, Carlito, 'Segoe UI', sans-serif; }
+.amma-cuerpo {
+    padding: 18px 44px 34px; counter-reset: cap;
+    font: 15px/1.45 Calibri, Carlito, 'Segoe UI', sans-serif; text-align: justify;
+}
+.amma-cuerpo h2 { counter-increment: cap; counter-reset: apt; color: #37A0B4; font-size: 20px; font-weight: 700; text-transform: uppercase; margin: 28px 0 12px; }
+.amma-cuerpo h2::before { content: counter(cap) ". "; }
+.amma-cuerpo h3 { counter-increment: apt; color: #37A0B4; font-size: 17px; font-weight: 700; margin: 18px 0 10px; }
+.amma-cuerpo h3::before { content: counter(cap) "." counter(apt) ". "; }
+.amma-cuerpo h4, .amma-cuerpo h5 { color: #37A0B4; font-size: 16px; font-weight: 700; }
+.amma-cuerpo ul { list-style: none; padding-left: 26px; }
+.amma-cuerpo ul > li { position: relative; }
+.amma-cuerpo ul > li::before { content: "•"; color: #37A0B4; position: absolute; left: -16px; }
+.amma-cuerpo ol li::marker { color: #37A0B4; }
+.amma-cuerpo blockquote { margin: 8px 0; padding: 0; font-style: italic; }
+.amma-cuerpo hr { display: none; }
+.amma-cuerpo table { margin: 12px auto; border-collapse: collapse; font-size: 12.5px; text-align: center; }
+.amma-cuerpo th, .amma-cuerpo td {
+    font: 12.5px/1.3 Calibri, Carlito, 'Segoe UI', sans-serif; text-transform: none; letter-spacing: 0;
+    padding: 4px 8px; color: #222; text-align: center;
+}
+.amma-cuerpo th { background: #37A0B4; color: #fff; font-weight: 700; border: 1px solid #37A0B4; }
+.amma-cuerpo td { border: 1px solid #8EAADB; }
+.amma-cuerpo td:first-child { text-align: left; }
+.amma-cuerpo tr:nth-child(even) td { background: #D9E2F3; }
+@media (max-width: 640px) {
+    .amma-cuerpo { padding: 14px 16px 24px; }
+    .amma-portada { padding: 24px 16px; }
+    .amma-encabezado { grid-template-columns: 90px 1fr; }
+    .amma-encabezado img { width: 80px; }
+    .ia-out.amma { padding: 8px; }
+}
 @media (max-width: 640px) {
     .ia-config { grid-template-columns: 1fr; }
     .ia-out { padding: 14px 16px 20px; }
@@ -1423,7 +1471,7 @@ footer a:hover { color: var(--text); }
       </label>
       <div class="ia-hint" style="align-self:end">Redactado con Claude a partir de los datos del observatorio. Cada mes se genera una vez y queda publicado para todos los visitantes; revísalo antes de difundirlo.</div>
       <label class="ia-wide">Indicaciones adicionales (opcional · el resultado será solo para ti)
-        <textarea id="ia-extra" placeholder="Ej.: este mes se celebró el Starlite; destacar el mercado nórdico; incluir declaraciones de la delegada…"></textarea>
+        <textarea id="ia-extra" placeholder="Ej.: poner el foco en la rentabilidad; destacar el mercado nórdico; tono más breve…"></textarea>
       </label>
     </div>
     <div class="ia-actions">
@@ -4344,13 +4392,35 @@ function iaStatus(msg, cls = "") { const s = iaEls().status; s.textContent = msg
 
 function iaHTML(md) { return DOMPurify.sanitize(marked.parse(md || "")); }
 
+// Vista en pantalla del informe con el formato AMMA: portada, encabezado en
+// cuadrícula, títulos turquesa numerados (sin los números escritos por Claude,
+// como en el Word) y tablas corporativas.
+function iaHTMLAmma(md) {
+    if (!md) return "";
+    const mes = iaEls().mes.value;
+    const limpio = md.split("\n")
+        .filter(l => !/^#\s/.test(l))                                     // el título va en la portada
+        .map(l => l.replace(/^(#{2,6})\s+(?:\d+(?:\.\d+)*\.?\s+)?/, "$1 ")) // Word/CSS numeran solos
+        .join("\n");
+    const logo = "plantillas/logo-amma.jpg";
+    return `<div class="amma-portada">
+        <img src="${logo}" alt="AMMA Consulting">
+        <div class="amma-sub">OBSERVATORIO TURÍSTICO DE MARBELLA</div>
+        <div class="amma-titulo">INFORME TÉCNICO DE COYUNTURA TURÍSTICA<br>MARBELLA · ${mes ? iaLabel(mes).toLocaleUpperCase("es-ES") : ""}</div>
+      </div>
+      <div class="amma-encabezado"><img src="${logo}" alt=""><span>INFORME TÉCNICO DE COYUNTURA TURÍSTICA</span></div>
+      <div class="amma-cuerpo">${DOMPurify.sanitize(marked.parse(limpio))}</div>`;
+}
+
 function iaRender() {
     if (IA.rafPending) return;
     IA.rafPending = true;
     requestAnimationFrame(() => {
         IA.rafPending = false;
         const e = iaEls();
-        e.out.innerHTML = iaHTML(IA.texto);
+        const amma = IA.modo === "informe";
+        e.out.classList.toggle("amma", amma);
+        e.out.innerHTML = amma ? iaHTMLAmma(IA.texto) : iaHTML(IA.texto);
         e.copy.disabled = e.word.disabled = !IA.texto || IA.running;
         e.gen.disabled = IA.running || !e.mes.value;
         e.gen.textContent = IA.texto && !IA.running ? "Regenerar" : "Generar";
@@ -4439,8 +4509,14 @@ async function iaGenerar() {
             IA.texto = IA.texto.slice(0, i).trim();
             iaStatus(msg, "err");
         } else {
+            IA.fecha = Date.now();
             iaStatus(extra ? "Listo. Con indicaciones propias: esta versión es solo para ti y no sustituye a la publicada."
                            : "Listo y guardado para todos los visitantes. Revísalo antes de publicarlo.", "ok");
+            // El informe técnico se entrega directamente en Word con formato AMMA.
+            if (IA.modo === "informe") {
+                try { await iaWordAMMA(); iaStatus("Listo: se ha descargado el Word con formato AMMA. Al abrirlo, acepta actualizar los campos para rellenar el índice.", "ok"); }
+                catch (err) { console.error(err); iaStatus("Informe listo, pero no se pudo crear el Word: " + err.message, "err"); }
+            }
         }
     } catch (err) {
         console.error(err);
