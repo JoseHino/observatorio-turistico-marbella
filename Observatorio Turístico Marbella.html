@@ -13,6 +13,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <style>
 :root {
     /* Light tech palette · inspired by Linear / Vercel / Notion / Stripe Dashboard */
@@ -201,6 +203,72 @@ header {
     border-color: var(--border);
 }
 .btn-secondary:hover { background: var(--card2); border-color: var(--accent); color: var(--accent); }
+.btn-ia {
+    background: #0b1220;
+    color: #fff;
+    border-color: #0b1220;
+}
+.btn-ia::before { content: "✦"; color: #10ff88; font-size: 11px; }
+.btn-ia:hover { background: #1e293b; border-color: #1e293b; }
+
+/* ── INFORMES IA (Claude) ─────────────────────── */
+#ia-modal {
+    position: fixed; inset: 0; z-index: 100;
+    display: none; align-items: flex-start; justify-content: center;
+    background: rgba(11,18,32,0.45);
+    padding: 32px 16px; overflow-y: auto;
+}
+#ia-modal.open { display: flex; }
+.ia-box {
+    background: var(--card); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    width: 100%; max-width: 880px;
+    box-shadow: 0 24px 60px rgba(15,23,42,0.25);
+    display: flex; flex-direction: column;
+}
+.ia-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+}
+.ia-head h2 { margin: 0; font-size: 16px; font-family: var(--sans); }
+.ia-close { background: none; border: 0; font-size: 22px; line-height: 1; cursor: pointer; color: var(--muted); }
+.ia-config {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--card2);
+}
+.ia-config label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: .4px; }
+.ia-config input, .ia-config select, .ia-config textarea {
+    font: 13px var(--sans); color: var(--text); background: var(--card);
+    border: 1px solid var(--border); border-radius: 5px; padding: 7px 9px;
+    text-transform: none; letter-spacing: 0;
+}
+.ia-config textarea { min-height: 54px; resize: vertical; }
+.ia-config .ia-wide { grid-column: 1 / -1; }
+.ia-config .ia-hint { font-size: 11px; color: var(--muted); text-transform: none; letter-spacing: 0; font-family: var(--sans); }
+.ia-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+.ia-actions button {
+    cursor: pointer; padding: 7px 14px; border-radius: 5px; font: 600 12px 'Inter', sans-serif;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+}
+.ia-actions button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ia-actions button:disabled { opacity: .45; cursor: default; }
+.ia-status { font: 12px var(--mono); color: var(--muted); margin-left: auto; }
+.ia-status.err { color: var(--bad); }
+.ia-status.ok  { color: var(--good); }
+.ia-out {
+    padding: 18px 26px 26px; font: 14px/1.6 'Inter', sans-serif; min-height: 120px;
+    overflow-x: auto;
+}
+.ia-out:empty::before { content: "El texto aparecerá aquí según se vaya generando."; color: var(--faint); }
+.ia-out h1 { font-size: 21px; } .ia-out h2 { font-size: 17px; margin-top: 22px; } .ia-out h3 { font-size: 15px; }
+.ia-out table { border-collapse: collapse; margin: 10px 0; font-size: 12.5px; }
+.ia-out th, .ia-out td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
+.ia-out th { background: var(--bg2); }
+@media (max-width: 640px) {
+    .ia-config { grid-template-columns: 1fr; }
+    .ia-out { padding: 14px 16px 20px; }
+    #ia-modal { padding: 12px 8px; }
+}
 
 /* ── TABS ─────────────────────────────────────── */
 .tabs {
@@ -906,6 +974,8 @@ footer a:hover { color: var(--text); }
       <button id="refresh" class="btn-primary">Refresh</button>
       <button id="xlsx" class="btn-secondary">Excel</button>
       <button id="csv"  class="btn-secondary">CSV</button>
+      <button id="ia-informe" class="btn-ia" title="Informe técnico mensual generado con Claude">Informe técnico</button>
+      <button id="ia-prensa"  class="btn-ia" title="Nota de prensa a partir del último informe técnico">Nota de prensa</button>
     </div>
   </div>
 </header>
@@ -1337,6 +1407,35 @@ footer a:hover { color: var(--text); }
     <button type="submit" aria-label="Enviar">→</button>
   </form>
   <div class="chatbot-foot">Las respuestas se generan localmente a partir de las series cargadas en el dashboard. No se envían datos a terceros.</div>
+</div>
+
+<!-- Informes con Claude: informe técnico mensual y nota de prensa -->
+<div id="ia-modal" role="dialog" aria-modal="true" aria-labelledby="ia-title">
+  <div class="ia-box">
+    <div class="ia-head">
+      <h2 id="ia-title">Informe técnico</h2>
+      <button class="ia-close" id="ia-close" aria-label="Cerrar">×</button>
+    </div>
+    <div class="ia-config">
+      <label>Mes de referencia
+        <select id="ia-mes"></select>
+      </label>
+      <label>Clave API de Claude
+        <input id="ia-key" type="password" placeholder="sk-ant-…" autocomplete="off">
+        <span class="ia-hint">Se guarda solo en este navegador. <a href="#" id="ia-key-forget">Olvidar clave</a></span>
+      </label>
+      <label class="ia-wide">Indicaciones adicionales (opcional)
+        <textarea id="ia-extra" placeholder="Ej.: este mes se celebró el Starlite; destacar el mercado nórdico; incluir declaraciones de la delegada…"></textarea>
+      </label>
+    </div>
+    <div class="ia-actions">
+      <button id="ia-generar" class="primary">Generar</button>
+      <button id="ia-copiar" disabled>Copiar texto</button>
+      <button id="ia-word" disabled>Descargar Word</button>
+      <span class="ia-status" id="ia-status"></span>
+    </div>
+    <div class="ia-out" id="ia-out"></div>
+  </div>
 </div>
 
 <footer>
@@ -4215,6 +4314,440 @@ function initChatbot() {
     });
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// INFORMES CON CLAUDE · informe técnico mensual + nota de prensa
+// ═══════════════════════════════════════════════════════════════════════════
+// El informe compara cada indicador con el mismo mes del año anterior (eje
+// principal), con el mes previo como apoyo y el acumulado del año. La nota de
+// prensa se redacta a partir del último informe guardado.
+// La llamada sale del navegador con la clave API de quien lo usa (guardada en
+// localStorage): en el repo no hay ninguna clave.
+const IA_SDK_URL = "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.132.1/+esm";
+const IA_MODEL   = "claude-opus-5-5";
+const IA_LS      = { key: "obsTur.claudeKey", informe: "obsTur.informe", prensa: "obsTur.prensa" };
+const MESES_LARGOS = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const IA = { modo: "informe", texto: "", running: false, ine: null, rafPending: false };
+
+function iaGet(k)    { try { return localStorage.getItem(k); } catch (_) { return null; } }
+function iaSet(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (_) {} }
+function iaGetJSON(k) { try { return JSON.parse(iaGet(k) || "null"); } catch (_) { return null; } }
+
+const iaYM      = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+const iaShift   = (ym, n) => { const [y, m] = ym.split("-").map(Number); return iaYM(new Date(y, m - 1 + n, 1)); };
+const iaLabel   = ym => { const [y, m] = ym.split("-").map(Number); return `${MESES_LARGOS[m - 1]} ${y}`; };
+const iaPct     = (a, b) => (a == null || b == null || b === 0) ? null : (a - b) / b * 100;
+const iaSigned  = (d, unit) => d == null ? "n/d" : `${d >= 0 ? "+" : "−"}${fmt.format(Math.abs(d))}${unit}`;
+
+// Series INE con ventana fija de 40 meses: da para elegir cualquier mes de los
+// dos últimos años y tener su interanual y su acumulado, sea cual sea el rango
+// elegido en la cabecera.
+async function iaLoadINE() {
+    if (IA.ine) return IA.ine;
+    const keys = Object.keys(ALL_SERIES);
+    const entries = await Promise.all(keys.map(async k =>
+        [k, await fetchSerie(ALL_SERIES[k].cod, 40).catch(e => { console.warn(k, e); return []; })]
+    ));
+    IA.ine = Object.fromEntries(entries.map(([k, s]) => [k, new Map(s.map(p => [iaYM(p.fecha), p]))]));
+    return IA.ine;
+}
+
+// tipo: "flujo" (sumable: % y acumulado del año) · "tasa" (variación en p.p.) · "nivel" (solo %)
+const IA_BLOQUES = [
+    { titulo: "Hoteles · INE, Encuesta de Ocupación Hotelera (EOH)", filas: [
+        ["Pernoctaciones totales",                    ["eoh_pernoc_esp", "eoh_pernoc_ext"], "flujo"],
+        ["Pernoctaciones · residentes en España",     ["eoh_pernoc_esp"], "flujo"],
+        ["Pernoctaciones · residentes en el extranjero", ["eoh_pernoc_ext"], "flujo"],
+        ["Viajeros totales",                          ["eoh_viaj_esp", "eoh_viaj_ext"], "flujo"],
+        ["Viajeros · residentes en España",           ["eoh_viaj_esp"], "flujo"],
+        ["Viajeros · residentes en el extranjero",    ["eoh_viaj_ext"], "flujo"],
+        ["Ocupación por plazas (%)",                  ["eoh_ocup_plz"], "tasa"],
+        ["Ocupación por habitaciones (%)",            ["eoh_ocup_hab"], "tasa"],
+        ["Ocupación por plazas en fin de semana (%)", ["eoh_ocup_finde"], "tasa"],
+        ["Estancia media (días)",                     ["eoh_estancia"], "nivel"],
+        ["Establecimientos abiertos",                 ["eoh_establec"], "nivel"],
+        ["Plazas estimadas",                          ["eoh_plazas"], "nivel"],
+        ["Habitaciones estimadas",                    ["eoh_habitac"], "nivel"],
+        ["Personal empleado",                         ["eoh_personal"], "nivel"],
+    ]},
+    { titulo: "Rentabilidad hotelera · INE, Índice de Rentabilidad del Sector Hotelero (IRSH)", filas: [
+        ["ADR · tarifa media diaria (€)",             ["irsh_adr"], "nivel"],
+        ["RevPAR · ingreso por habitación disponible (€)", ["irsh_revpar"], "nivel"],
+    ]},
+    { titulo: "Apartamentos turísticos · INE, Encuesta de Ocupación en Apartamentos (EOAP)", filas: [
+        ["Pernoctaciones totales",                    ["eoap_pernoc_esp", "eoap_pernoc_ext"], "flujo"],
+        ["Pernoctaciones · residentes en España",     ["eoap_pernoc_esp"], "flujo"],
+        ["Pernoctaciones · residentes en el extranjero", ["eoap_pernoc_ext"], "flujo"],
+        ["Viajeros totales",                          ["eoap_viaj_esp", "eoap_viaj_ext"], "flujo"],
+        ["Ocupación por plazas (%)",                  ["eoap_ocup_plz"], "tasa"],
+        ["Ocupación por apartamentos (%)",            ["eoap_ocup_apt"], "tasa"],
+        ["Ocupación por apartamentos en fin de semana (%)", ["eoap_ocup_finde"], "tasa"],
+        ["Estancia media (días)",                     ["eoap_estancia"], "nivel"],
+        ["Apartamentos estimados",                    ["eoap_apartam"], "nivel"],
+        ["Plazas estimadas",                          ["eoap_plazas"], "nivel"],
+        ["Personal empleado",                         ["eoap_personal"], "nivel"],
+    ]},
+    { titulo: "Plataformas digitales · INE, Ocupación en Alojamientos Turísticos (OAT, experimental: Airbnb, Booking, Vrbo…)", filas: [
+        ["Alojamientos ocupados · total",             ["oat_aloj_tot"], "flujo"],
+        ["Pernoctaciones · total",                    ["oat_pernoc_tot"], "flujo"],
+        ["Pernoctaciones · residentes en España",     ["oat_pernoc_esp"], "flujo"],
+        ["Pernoctaciones · residentes en el extranjero", ["oat_pernoc_ext"], "flujo"],
+        ["Estancia media · total (días)",             ["oat_estancia_tot"], "nivel"],
+    ]},
+];
+
+function iaFila(ine, label, keys, tipo, ref) {
+    const val = ym => {
+        let v = 0, prov = false;
+        for (const k of keys) {
+            const p = ine[k]?.get(ym);
+            if (!p || p.valor == null) return null;
+            v += p.valor; prov = prov || p.provisional;
+        }
+        return { v, prov };
+    };
+    // Si la serie aún no ha publicado el mes de referencia, se usa su último mes.
+    let mes = ref;
+    for (let i = 0; i < 6 && !val(mes); i++) mes = iaShift(mes, -1);
+    const act = val(mes);
+    if (!act) return `| ${label} | sin datos | | | | | | | |`;
+    const ant = val(iaShift(mes, -12)), prev = val(iaShift(mes, -1));
+    const unit = tipo === "tasa" ? " p.p." : " %";
+    const dif  = (a, b) => !a || !b ? null : (tipo === "tasa" ? a.v - b.v : iaPct(a.v, b.v));
+    let acum = ["", "", ""];
+    if (tipo === "flujo") {
+        const [y, m] = mes.split("-").map(Number);
+        let a = 0, b = 0, ok = true;
+        for (let i = 1; i <= m; i++) {
+            const pa = val(`${y}-${String(i).padStart(2, "0")}`), pb = val(`${y - 1}-${String(i).padStart(2, "0")}`);
+            if (!pa || !pb) { ok = false; break; }
+            a += pa.v; b += pb.v;
+        }
+        if (ok) acum = [fmt0.format(a), fmt0.format(b), iaSigned(iaPct(a, b), " %")];
+    }
+    const f = x => x ? fmt.format(x.v) : "n/d";
+    const mesTxt = iaLabel(mes) + (mes !== ref ? " (último publicado)" : "") + (act.prov ? " · provisional" : "");
+    return `| ${label} | ${mesTxt} | ${f(act)} | ${f(ant)} | **${iaSigned(dif(act, ant), unit)}** | ${f(prev)} | ${iaSigned(dif(act, prev), unit)} | ${acum.join(" | ")} |`;
+}
+
+function iaTablasINE(ine, ref) {
+    const head = "| Indicador | Mes | Valor | Mismo mes año anterior | Var. interanual | Mes anterior | Var. mensual | Acumulado del año | Acumulado año anterior | Var. acumulada |\n|---|---|---|---|---|---|---|---|---|---|";
+    return IA_BLOQUES.map(b =>
+        `### ${b.titulo}\n${head}\n${b.filas.map(([l, k, t]) => iaFila(ine, l, k, t, ref)).join("\n")}`
+    ).join("\n\n");
+}
+
+function iaTablaPaises(ref) {
+    if (typeof CDS_PAIS === "undefined" || !CDS_PAIS?.meses) return "### Mercados de origen\nSin datos embebidos.";
+    const disp = CDS_PAIS.meses.filter(m => m <= ref);
+    const mes = disp.at(-1);
+    if (!mes) return "### Mercados de origen\nSin datos para el periodo.";
+    const i = CDS_PAIS.meses.indexOf(mes), j = CDS_PAIS.meses.indexOf(iaShift(mes, -12));
+    const out = [`### Mercados de origen por país de residencia · Turismo Costa del Sol, Big Data (microdato EOH/EOAP del INE) · ${iaLabel(mes)}${mes !== ref ? " (último mes disponible en esta fuente)" : ""}`];
+    for (const tipo of ["Hoteles", "Apartamentos"]) {
+        const V = CDS_PAIS.datos?.[tipo]?.Viajeros || {}, P = CDS_PAIS.datos?.[tipo]?.Pernoctaciones || {};
+        const totP = P.Total?.[i];
+        const mercados = Object.keys(P).filter(k => !CDS_AGREGADOS.has(k) || k === "España" || k === "Extranjero")
+            .filter(k => P[k]?.[i] != null)
+            .sort((a, b) => (P[b][i] || 0) - (P[a][i] || 0)).slice(0, 14);
+        out.push(`\n**${tipo}**\n| Mercado | Viajeros | Var. interanual viajeros | Pernoctaciones | Var. interanual pernoctaciones | Cuota de pernoctaciones |\n|---|---|---|---|---|---|`);
+        for (const k of mercados) {
+            const v = V[k]?.[i], va = j >= 0 ? V[k]?.[j] : null, p = P[k][i], pa = j >= 0 ? P[k]?.[j] : null;
+            out.push(`| ${k} | ${v == null ? "n/d" : fmt0.format(v)} | ${iaSigned(iaPct(v, va), " %")} | ${fmt0.format(p)} | ${iaSigned(iaPct(p, pa), " %")} | ${totP ? fmt.format(p / totP * 100) + " %" : "n/d"} |`);
+        }
+    }
+    return out.join("\n");
+}
+
+async function iaTablaAeropuerto(ref) {
+    try {
+        let agg = AIRPORT_DATA?.agg;
+        if (!agg) agg = aggregateByCountry(parseEurostatLEMG(await fetchEurostatLEMG(iaShift(ref, -40))));
+        const tot = agg.totalByTime || {};
+        const mes = Object.keys(tot).filter(m => m <= ref).sort().at(-1);
+        // Eurostat publica este conjunto con mucho retraso: un dato de hace más de
+        // medio año no describe la coyuntura del mes y se deja fuera.
+        if (!mes || mes < iaShift(ref, -6))
+            return `### Conectividad aérea (aeropuerto de Málaga)\nSin datos recientes: Eurostat solo ha publicado hasta ${mes ? iaLabel(mes) : "un periodo anterior"}. No se incluye en el análisis del mes.`;
+        const ant = iaShift(mes, -12), [y, m] = mes.split("-").map(Number);
+        let a = 0, b = 0;
+        for (let k = 1; k <= m; k++) { a += tot[`${y}-${String(k).padStart(2, "0")}`] || 0; b += tot[`${y - 1}-${String(k).padStart(2, "0")}`] || 0; }
+        const filas = Object.entries(agg.byCountryTime).map(([cc, o]) => [cc, o[mes] || 0, o[ant] || 0])
+            .sort((p, q) => q[1] - p[1]).slice(0, 12)
+            .map(([cc, v, va]) => `| ${COUNTRY_NAMES[cc] || cc} | ${fmt0.format(v)} | ${fmt0.format(va)} | ${iaSigned(iaPct(v, va), " %")} |`);
+        return [
+            `### Conectividad aérea · Eurostat (avia_par_es), pasajeros en las rutas monitorizadas del aeropuerto de Málaga-Costa del Sol · ${iaLabel(mes)}${mes !== ref ? " (último mes publicado por Eurostat)" : ""}`,
+            `Total del mes: ${fmt0.format(tot[mes])} pasajeros; mismo mes del año anterior: ${tot[ant] ? fmt0.format(tot[ant]) : "n/d"} (${iaSigned(iaPct(tot[mes], tot[ant]), " %")}). Acumulado enero–${MESES_LARGOS[m - 1]}: ${fmt0.format(a)} frente a ${fmt0.format(b)} (${iaSigned(iaPct(a, b), " %")}).`,
+            "| País de origen/destino | Pasajeros | Mismo mes año anterior | Var. interanual |\n|---|---|---|---|",
+            ...filas,
+        ].join("\n");
+    } catch (e) {
+        console.warn("IA aeropuerto", e);
+        return "### Aeropuerto de Málaga\nNo se pudo consultar Eurostat.";
+    }
+}
+
+async function iaTablaRTA(ref) {
+    for (const url of RTA_SNAPSHOT_URLS) {
+        try {
+            const r = await fetch(url, { cache: "no-cache" });
+            if (!r.ok) continue;
+            const snap = await r.json(), recs = snap.records || [];
+            const porMes = {};
+            let plazas = 0;
+            recs.forEach(x => {
+                const ym = (x.registration_date || x.activity_start_date || "").slice(0, 7);
+                if (/^\d{4}-\d{2}$/.test(ym)) porMes[ym] = (porMes[ym] || 0) + 1;
+                plazas += parseInt(x.tot_gen_places, 10) || 0;
+            });
+            const [y, m] = ref.split("-").map(Number);
+            let a = 0, b = 0;
+            for (let k = 1; k <= m; k++) { a += porMes[`${y}-${String(k).padStart(2, "0")}`] || 0; b += porMes[`${y - 1}-${String(k).padStart(2, "0")}`] || 0; }
+            const v = porMes[ref] || 0, va = porMes[iaShift(ref, -12)] || 0;
+            return [
+                "### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)",
+                `Altas inscritas en ${iaLabel(ref)}: ${fmt0.format(v)}; mismo mes del año anterior: ${fmt0.format(va)} (${iaSigned(iaPct(v, va), " %")}).`,
+                `Altas acumuladas enero–${MESES_LARGOS[m - 1]} ${y}: ${fmt0.format(a)} frente a ${fmt0.format(b)} en ${y - 1} (${iaSigned(iaPct(a, b), " %")}).`,
+                `Parque inscrito a fecha del volcado (${snap.fetched_at || "s/f"}): ${fmt0.format(recs.length)} VUT y ${fmt0.format(plazas)} plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.`,
+            ].join("\n");
+        } catch (_) { /* siguiente URL */ }
+    }
+    return "### Viviendas con fines turísticos (RTA)\nNo se pudo cargar el volcado.";
+}
+
+async function iaContexto(ref) {
+    const ine = await iaLoadINE();
+    const [aero, rta] = await Promise.all([iaTablaAeropuerto(ref), iaTablaRTA(ref)]);
+    return [
+        `MES DE REFERENCIA: ${iaLabel(ref)}. Comparación principal: ${iaLabel(iaShift(ref, -12))}.`,
+        `Datos extraídos el ${new Date().toLocaleDateString("es-ES")} por el Observatorio Turístico de Marbella. Municipio: Marbella (punto turístico del INE).`,
+        iaTablasINE(ine, ref),
+        iaTablaPaises(ref),
+        aero,
+        rta,
+    ].join("\n\n");
+}
+
+const IA_SYS_INFORME = `Eres técnico/a del Observatorio Turístico de Marbella (Destino Turístico Inteligente). Redactas el informe técnico mensual de coyuntura turística a partir exclusivamente de los datos que se te facilitan.
+
+Criterios:
+- El eje del informe es la comparación interanual: cada indicador frente al mismo mes del año anterior. La variación mensual solo es apoyo y debe leerse teniendo en cuenta la estacionalidad; no la uses para titular. El acumulado del año sirve para dar perspectiva.
+- Usa solo cifras que estén en los datos. No inventes ni estimes. Puedes calcular derivados sencillos (cuotas, diferencias, sumas) siempre que se deduzcan de los datos.
+- Las tasas de ocupación varían en puntos porcentuales (p.p.); el resto, en %.
+- Cuando una fuente se refiera a un mes distinto del de referencia por desfase de publicación, dilo. Señala los datos provisionales.
+- Tono técnico, neutral y objetivo: recoge con el mismo rigor lo que mejora y lo que empeora, y apunta posibles explicaciones solo cuando se apoyen en los propios datos (por ejemplo, más oferta abierta o cambio en el peso de los mercados).
+- Español de España. Formato Markdown, con tablas donde aclaren.
+
+Estructura:
+# Informe técnico de coyuntura turística · Marbella · <mes y año>
+1. Resumen ejecutivo (6-8 viñetas con las cifras clave y su variación interanual)
+2. Alojamiento hotelero: demanda, mercado nacional y extranjero, ocupación, estancia, oferta y empleo
+3. Rentabilidad hotelera (ADR y RevPAR)
+4. Apartamentos turísticos
+5. Plataformas digitales (OAT)
+6. Mercados de origen
+7. Conectividad aérea
+8. Viviendas con fines turísticos (RTA)
+9. Balance acumulado del año
+10. Conclusiones y puntos de atención
+Notas metodológicas y fuentes (breves).
+Si una sección no tiene datos, indícalo en una línea.`;
+
+const IA_SYS_PRENSA = `Eres responsable de comunicación de la Delegación de Turismo del Ayuntamiento de Marbella. Redactas notas de prensa para la sección de noticias de la web de la Delegación a partir del informe técnico mensual del Observatorio Turístico que se te facilita.
+
+Criterio editorial:
+- Pon en primer plano los datos positivos: crecimientos interanuales, máximos de la serie, buen comportamiento de mercados, rentabilidad, empleo, conectividad. Cuanto mejor sea un dato, más protagonismo (titular y entradilla).
+- No destaques los datos negativos; omítelos siempre que sea posible. Si alguno es imprescindible para que la nota no resulte engañosa, menciónalo brevemente y con contexto (acumulado del año, comparación con ejercicios anteriores, efecto calendario).
+- No inventes ni distorsiones cifras: cada dato sale del informe tal cual y con su periodo correcto. No presentes una caída como subida ni cambies de periodo para mejorar un dato sin decirlo.
+- No inventes nombres de personas. Si incluyes una declaración, atribúyela a «[Nombre y cargo de la persona titular de la Delegación de Turismo]» para que se rellene antes de publicar, con un mensaje coherente con los datos.
+
+Formato (Markdown, sin tablas):
+# Titular
+*Subtítulo*
+Entradilla con el dato más potente.
+4-6 párrafos breves, con una declaración entrecomillada.
+Párrafo final «Sobre el Observatorio Turístico de Marbella» de dos líneas citando las fuentes (INE, Eurostat, Registro de Turismo de Andalucía, Turismo Costa del Sol).
+Entre 350 y 550 palabras. Español de España, estilo periodístico institucional.`;
+
+function iaEls() {
+    return {
+        modal: document.getElementById("ia-modal"), title: document.getElementById("ia-title"),
+        mes: document.getElementById("ia-mes"), key: document.getElementById("ia-key"),
+        extra: document.getElementById("ia-extra"), out: document.getElementById("ia-out"),
+        status: document.getElementById("ia-status"), gen: document.getElementById("ia-generar"),
+        copy: document.getElementById("ia-copiar"), word: document.getElementById("ia-word"),
+    };
+}
+
+function iaStatus(msg, cls = "") { const s = iaEls().status; s.textContent = msg; s.className = "ia-status " + cls; }
+
+function iaHTML(md) { return DOMPurify.sanitize(marked.parse(md || "")); }
+
+function iaRender() {
+    if (IA.rafPending) return;
+    IA.rafPending = true;
+    requestAnimationFrame(() => {
+        IA.rafPending = false;
+        const e = iaEls();
+        e.out.innerHTML = iaHTML(IA.texto);
+        e.copy.disabled = e.word.disabled = !IA.texto || IA.running;
+    });
+}
+
+async function iaAbrir(modo) {
+    const e = iaEls();
+    IA.modo = modo;
+    e.title.textContent = modo === "informe" ? "Informe técnico mensual" : "Nota de prensa · Delegación de Turismo";
+    e.key.value = iaGet(IA_LS.key) || "";
+    e.modal.classList.add("open");
+    const guardado = iaGetJSON(modo === "informe" ? IA_LS.informe : IA_LS.prensa);
+    if (modo === "prensa") {
+        const inf = iaGetJSON(IA_LS.informe);
+        e.mes.innerHTML = inf ? `<option value="${inf.mes}">${iaLabel(inf.mes)} (del informe técnico)</option>` : `<option value="">Sin informe técnico</option>`;
+        e.mes.disabled = true;
+        e.gen.disabled = !inf;
+        IA.texto = guardado && inf && guardado.mes === inf.mes ? guardado.texto : "";
+        iaStatus(inf ? `Se redactará a partir del informe de ${iaLabel(inf.mes)} generado el ${new Date(inf.fecha).toLocaleString("es-ES")}.`
+                     : "Primero genera el informe técnico: la nota de prensa se basa en él.", inf ? "" : "err");
+        iaRender();
+        return;
+    }
+    e.mes.disabled = true; e.gen.disabled = true;
+    e.mes.innerHTML = `<option>Cargando meses…</option>`;
+    iaStatus("Consultando el INE…");
+    try {
+        const ine = await iaLoadINE();
+        const meses = [...ine.eoh_pernoc_esp.keys()].sort().reverse()
+            .filter(m => ine.eoh_pernoc_esp.has(iaShift(m, -12))).slice(0, 24);
+        e.mes.innerHTML = meses.map(m => `<option value="${m}">${iaLabel(m)}</option>`).join("");
+        if (guardado && meses.includes(guardado.mes)) e.mes.value = guardado.mes;
+        e.mes.disabled = false; e.gen.disabled = false;
+        IA.texto = guardado && guardado.mes === e.mes.value ? guardado.texto : "";
+        iaStatus(guardado && IA.texto ? `Informe guardado del ${new Date(guardado.fecha).toLocaleString("es-ES")}. Puedes regenerarlo.` : `Último mes publicado por el INE: ${iaLabel(meses[0])}.`);
+    } catch (err) {
+        iaStatus("No se pudo consultar el INE: " + err.message, "err");
+    }
+    iaRender();
+}
+
+async function iaGenerar() {
+    const e = iaEls();
+    const key = e.key.value.trim();
+    if (!key) { iaStatus("Introduce la clave API de Claude.", "err"); e.key.focus(); return; }
+    iaSet(IA_LS.key, key);
+    const extra = e.extra.value.trim();
+    let system, content, mes;
+    if (IA.modo === "informe") {
+        mes = e.mes.value;
+        iaStatus("Reuniendo los datos de todas las fuentes…");
+        let datos;
+        try { datos = await iaContexto(mes); }
+        catch (err) { iaStatus("No se pudieron reunir los datos: " + err.message, "err"); return; }
+        console.info("[Observatorio] Datos enviados a Claude:\n" + datos);
+        system = IA_SYS_INFORME;
+        content = `Redacta el informe técnico de ${iaLabel(mes)} con estos datos:\n\n${datos}` + (extra ? `\n\nIndicaciones adicionales del equipo técnico:\n${extra}` : "");
+    } else {
+        const inf = iaGetJSON(IA_LS.informe);
+        if (!inf) return;
+        mes = inf.mes;
+        system = IA_SYS_PRENSA;
+        content = `Informe técnico de ${iaLabel(mes)}:\n\n${inf.texto}` + (extra ? `\n\nIndicaciones de la Delegación para esta nota:\n${extra}` : "");
+    }
+    IA.running = true; IA.texto = "";
+    e.gen.disabled = true; e.mes.disabled = true;
+    iaRender();
+    iaStatus("Claude está redactando…");
+    let Anthropic;
+    try {
+        Anthropic = (await import(IA_SDK_URL)).default;
+        const client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
+        const stream = client.beta.messages.stream({
+            model: IA_MODEL,
+            max_tokens: 32000,
+            betas: ["server-side-fallback-2026-07-01"],
+            fallbacks: "default",
+            thinking: { type: "adaptive" },
+            output_config: { effort: IA.modo === "informe" ? "high" : "medium" },
+            system,
+            messages: [{ role: "user", content }],
+        });
+        stream.on("text", t => { IA.texto += t; iaRender(); });
+        const msg = await stream.finalMessage();
+        if (msg.stop_reason === "refusal") {
+            iaStatus("Claude ha rechazado la petición. Revisa las indicaciones adicionales.", "err");
+        } else {
+            iaSet(IA.modo === "informe" ? IA_LS.informe : IA_LS.prensa, JSON.stringify({ mes, texto: IA.texto, fecha: Date.now() }));
+            iaStatus(msg.stop_reason === "max_tokens" ? "Texto cortado por longitud: vuelve a generarlo." : "Listo. Revísalo antes de publicarlo.",
+                     msg.stop_reason === "max_tokens" ? "err" : "ok");
+        }
+    } catch (err) {
+        console.error(err);
+        let txt = "Error: " + (err?.message || err);
+        if (Anthropic && err instanceof Anthropic.AuthenticationError) txt = "La clave API no es válida.";
+        else if (Anthropic && err instanceof Anthropic.PermissionDeniedError) txt = "La clave API no tiene permiso para este modelo.";
+        else if (Anthropic && err instanceof Anthropic.RateLimitError) txt = "Límite de uso alcanzado; inténtalo en un minuto.";
+        else if (Anthropic && err instanceof Anthropic.APIConnectionError) txt = "No hay conexión con la API de Claude.";
+        else if (Anthropic && err instanceof Anthropic.APIError && err.status >= 500) txt = "La API de Claude no responde ahora mismo; inténtalo más tarde.";
+        iaStatus(txt, "err");
+    } finally {
+        IA.running = false;
+        e.gen.disabled = false;
+        e.mes.disabled = IA.modo === "prensa";
+        iaRender();
+    }
+}
+
+function iaNombreArchivo() {
+    const mes = iaEls().mes.value;
+    return `${IA.modo === "informe" ? "Informe técnico turismo Marbella" : "Nota de prensa turismo Marbella"} - ${mes ? iaLabel(mes) : ""}`;
+}
+
+async function iaCopiar() {
+    const html = iaHTML(IA.texto);
+    try {
+        if (window.ClipboardItem) {
+            await navigator.clipboard.write([new ClipboardItem({
+                "text/html":  new Blob([html], { type: "text/html" }),
+                "text/plain": new Blob([IA.texto], { type: "text/plain" }),
+            })]);
+        } else {
+            await navigator.clipboard.writeText(IA.texto);
+        }
+        iaStatus("Copiado con formato: pégalo en el gestor de la web o en Word.", "ok");
+    } catch (_) {
+        iaStatus("El navegador no ha dejado copiar; usa «Descargar Word».", "err");
+    }
+}
+
+function iaWord() {
+    const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${iaNombreArchivo()}</title>
+<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.4}h1{font-size:18pt}h2{font-size:14pt}h3{font-size:12pt}table{border-collapse:collapse}th,td{border:1px solid #999;padding:3px 6px;font-size:9.5pt}th{background:#e8eef7}</style></head><body>${iaHTML(IA.texto)}</body></html>`;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿", doc], { type: "application/msword" }));
+    a.download = iaNombreArchivo() + ".doc";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function initIA() {
+    const e = iaEls();
+    document.getElementById("ia-informe").addEventListener("click", () => iaAbrir("informe"));
+    document.getElementById("ia-prensa").addEventListener("click", () => iaAbrir("prensa"));
+    document.getElementById("ia-close").addEventListener("click", () => e.modal.classList.remove("open"));
+    e.modal.addEventListener("click", ev => { if (ev.target === e.modal && !IA.running) e.modal.classList.remove("open"); });
+    document.addEventListener("keydown", ev => { if (ev.key === "Escape" && e.modal.classList.contains("open") && !IA.running) e.modal.classList.remove("open"); });
+    e.gen.addEventListener("click", iaGenerar);
+    e.copy.addEventListener("click", iaCopiar);
+    e.word.addEventListener("click", iaWord);
+    e.mes.addEventListener("change", () => {
+        const g = iaGetJSON(IA_LS.informe);
+        IA.texto = g && g.mes === e.mes.value ? g.texto : "";
+        iaRender();
+    });
+    document.getElementById("ia-key-forget").addEventListener("click", ev => {
+        ev.preventDefault(); iaSet(IA_LS.key, null); e.key.value = ""; iaStatus("Clave borrada de este navegador.", "ok");
+    });
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────
 document.getElementById("refresh").addEventListener("click", loadAll);
 document.getElementById("nult").addEventListener("change", loadAll);
@@ -4223,6 +4756,7 @@ document.getElementById("csv").addEventListener("click", exportCSV);
 window.addEventListener("DOMContentLoaded", () => {
     loadAll();
     initChatbot();
+    initIA();
 });
 </script>
 </body>
