@@ -265,53 +265,74 @@ header {
 .ia-out table { border-collapse: collapse; margin: 10px 0; font-size: 12.5px; }
 .ia-out th, .ia-out td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
 .ia-out th { background: var(--bg2); }
-/* Informe técnico en formato AMMA Consulting (mismo aspecto que el Word) */
-.ia-out.amma { background: #e9edf2; padding: 18px; }
-.ia-out.amma > div { background: #fff; color: #222; max-width: 760px; margin: 0 auto; }
-.amma-portada { text-align: center; padding: 34px 48px 26px; }
-.amma-portada img { width: 120px; }
-.amma-sub { margin-top: 26px; color: #37A0B4; font: 700 15px Calibri, Carlito, 'Segoe UI', sans-serif; }
+/* Informe técnico en formato AMMA Consulting (colores y tipografía del Word) */
+.ia-out.amma { background: #eef1f4; padding: 24px 18px; }
+.amma-hoja {
+    background: #fff; color: #2b2b2b; max-width: 780px; margin: 0 auto;
+    border-radius: 6px; box-shadow: 0 1px 3px rgba(15,23,42,.08), 0 10px 30px rgba(15,23,42,.08);
+    overflow: hidden;
+}
+.amma-portada { text-align: center; padding: 44px 56px 30px; border-bottom: 4px solid #37A0B4; }
+.amma-portada img { width: 132px; }
+.amma-sub { margin-top: 30px; color: #37A0B4; font: 700 14px Calibri, Carlito, 'Segoe UI', sans-serif; letter-spacing: 1.5px; }
 .amma-titulo {
-    margin-top: 12px; padding: 12px 0; border-top: 1px solid #37A0B4; border-bottom: 1px solid #37A0B4;
-    font: 700 23px/1.2 'Franklin Gothic Medium Cond', 'Arial Narrow', sans-serif; letter-spacing: -.2px;
+    margin: 14px auto 0; max-width: 560px; padding: 14px 0; border-top: 1px solid #37A0B4; border-bottom: 1px solid #37A0B4;
+    font: 700 25px/1.2 'Franklin Gothic Medium Cond', 'Arial Narrow', sans-serif; color: #1f2933;
 }
-.amma-encabezado {
-    display: grid; grid-template-columns: 150px 1fr; align-items: center;
-    border: 1px solid #37A0B4; margin: 0 auto !important; padding: 8px 14px; gap: 14px;
-    border-top: 6px solid #e9edf2; /* separa visualmente la portada como un salto de página */
+.amma-titulo small { display: block; margin-top: 6px; font-size: 19px; color: #37A0B4; }
+.amma-fecha { margin-top: 22px; text-align: right; font: italic 13px Calibri, Carlito, 'Segoe UI', sans-serif; color: #6b7280; }
+.amma-ficha {
+    margin: 26px 48px 0; padding: 14px 18px; background: #EEF7F9; border-left: 4px solid #37A0B4; border-radius: 0 6px 6px 0;
+    font: 14px/1.55 Calibri, Carlito, 'Segoe UI', sans-serif; color: #374151;
 }
-.amma-encabezado img { width: 120px; }
-.amma-encabezado span { text-align: center; color: #37A0B4; font: 700 15px Calibri, Carlito, 'Segoe UI', sans-serif; }
+.amma-ficha p { margin: 0 0 6px; text-align: left; } .amma-ficha p:last-child { margin-bottom: 0; }
+.amma-ficha blockquote { margin: 6px 0 0; font-style: normal; }
+.amma-ficha ul { margin: 4px 0 0; padding-left: 22px; }
+.amma-ficha em { font-style: normal; }
+.amma-ficha hr { display: none; }
 .amma-cuerpo {
-    padding: 18px 44px 34px; counter-reset: cap;
-    font: 15px/1.45 Calibri, Carlito, 'Segoe UI', sans-serif; text-align: justify;
+    padding: 8px 48px 44px; counter-reset: cap;
+    font: 15.5px/1.6 Calibri, Carlito, 'Segoe UI', sans-serif; text-align: justify;
 }
-.amma-cuerpo h2 { counter-increment: cap; counter-reset: apt; color: #37A0B4; font-size: 20px; font-weight: 700; text-transform: uppercase; margin: 28px 0 12px; }
+.amma-cuerpo h2 {
+    counter-increment: cap; counter-reset: apt; color: #37A0B4; font-size: 20px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .3px; text-align: left;
+    margin: 38px 0 14px; padding-bottom: 6px; border-bottom: 2px solid #D4ECF1;
+}
 .amma-cuerpo h2::before { content: counter(cap) ". "; }
-.amma-cuerpo h3 { counter-increment: apt; color: #37A0B4; font-size: 17px; font-weight: 700; margin: 18px 0 10px; }
+.amma-cuerpo h3 { counter-increment: apt; color: #37A0B4; font-size: 17px; font-weight: 700; margin: 24px 0 8px; text-align: left; }
 .amma-cuerpo h3::before { content: counter(cap) "." counter(apt) ". "; }
-.amma-cuerpo h4, .amma-cuerpo h5 { color: #37A0B4; font-size: 16px; font-weight: 700; }
-.amma-cuerpo ul { list-style: none; padding-left: 26px; }
+.amma-cuerpo h4, .amma-cuerpo h5 { color: #2f8597; font-size: 15.5px; font-weight: 700; margin: 18px 0 6px; text-align: left; }
+.amma-cuerpo p { margin: 0 0 10px; }
+.amma-cuerpo strong { color: #1f2933; }
+.amma-cuerpo ul { list-style: none; padding-left: 24px; margin: 6px 0 12px; }
+.amma-cuerpo li { margin: 0 0 5px; }
 .amma-cuerpo ul > li { position: relative; }
-.amma-cuerpo ul > li::before { content: "•"; color: #37A0B4; position: absolute; left: -16px; }
-.amma-cuerpo ol li::marker { color: #37A0B4; }
-.amma-cuerpo blockquote { margin: 8px 0; padding: 0; font-style: italic; }
+.amma-cuerpo ul > li::before { content: "•"; color: #37A0B4; font-weight: 700; position: absolute; left: -16px; }
+.amma-cuerpo ul ul { margin: 4px 0 2px; }
+.amma-cuerpo ul ul > li::before { content: "–"; }
+.amma-cuerpo ol { padding-left: 24px; }
+.amma-cuerpo ol li::marker { color: #37A0B4; font-weight: 700; }
+.amma-cuerpo blockquote { margin: 10px 0; padding: 10px 14px; background: #EEF7F9; border-left: 4px solid #37A0B4; font-style: normal; }
 .amma-cuerpo hr { display: none; }
-.amma-cuerpo table { margin: 12px auto; border-collapse: collapse; font-size: 12.5px; text-align: center; }
+.amma-cuerpo .amma-tabla { overflow-x: auto; margin: 14px 0 18px; border-radius: 6px; box-shadow: 0 0 0 1px #D4E3E9; }
+.amma-cuerpo table { width: 100%; border-collapse: collapse; margin: 0; }
 .amma-cuerpo th, .amma-cuerpo td {
-    font: 12.5px/1.3 Calibri, Carlito, 'Segoe UI', sans-serif; text-transform: none; letter-spacing: 0;
-    padding: 4px 8px; color: #222; text-align: center;
+    font: 13px/1.35 Calibri, Carlito, 'Segoe UI', sans-serif; text-transform: none; letter-spacing: 0;
+    padding: 7px 10px; color: #2b2b2b; text-align: right; border: 0; white-space: nowrap;
 }
-.amma-cuerpo th { background: #37A0B4; color: #fff; font-weight: 700; border: 1px solid #37A0B4; }
-.amma-cuerpo td { border: 1px solid #8EAADB; }
-.amma-cuerpo td:first-child { text-align: left; }
-.amma-cuerpo tr:nth-child(even) td { background: #D9E2F3; }
+.amma-cuerpo th { background: #37A0B4; color: #fff; font-weight: 700; text-align: right; white-space: normal; }
+.amma-cuerpo th:first-child { text-align: left; }
+.amma-cuerpo td { border-top: 1px solid #E3EDF1; font-variant-numeric: tabular-nums; }
+.amma-cuerpo td:first-child { text-align: left; white-space: normal; font-weight: 600; color: #1f2933; }
+.amma-cuerpo tr:nth-child(even) td { background: #F3F9FA; }
+.amma-cuerpo tbody tr:hover td { background: #E4F2F5; }
 @media (max-width: 640px) {
-    .amma-cuerpo { padding: 14px 16px 24px; }
-    .amma-portada { padding: 24px 16px; }
-    .amma-encabezado { grid-template-columns: 90px 1fr; }
-    .amma-encabezado img { width: 80px; }
     .ia-out.amma { padding: 8px; }
+    .amma-portada { padding: 28px 18px 22px; }
+    .amma-titulo { font-size: 20px; }
+    .amma-ficha { margin: 18px 16px 0; }
+    .amma-cuerpo { padding: 4px 16px 28px; font-size: 15px; }
 }
 @media (max-width: 640px) {
     .ia-config { grid-template-columns: 1fr; }
@@ -4402,14 +4423,26 @@ function iaHTMLAmma(md) {
         .filter(l => !/^#\s/.test(l))                                     // el título va en la portada
         .map(l => l.replace(/^(#{2,6})\s+(?:\d+(?:\.\d+)*\.?\s+)?/, "$1 ")) // Word/CSS numeran solos
         .join("\n");
-    const logo = "plantillas/logo-amma.jpg";
-    return `<div class="amma-portada">
-        <img src="${logo}" alt="AMMA Consulting">
+    // Lo que va antes del primer capítulo (mes de referencia, desfases) se
+    // muestra como ficha del informe; el resto es el cuerpo.
+    const corte = limpio.search(/^##\s/m);
+    const ficha = corte > 0 ? limpio.slice(0, corte).trim() : "";
+    const cuerpo = corte > 0 ? limpio.slice(corte) : limpio;
+    const html = m => DOMPurify.sanitize(marked.parse(m))
+        .replace(/<table>/g, '<div class="amma-tabla"><table>').replace(/<\/table>/g, "</table></div>");
+    const f = new Date(IA.fecha || Date.now());
+    const fecha = `${MESES_LARGOS[f.getMonth()][0].toUpperCase()}${MESES_LARGOS[f.getMonth()].slice(1)}, ${f.getFullYear()}`;
+    // En pantalla no se repite el encabezado de página del Word: es una sola hoja continua.
+    return `<div class="amma-hoja">
+      <div class="amma-portada">
+        <img src="plantillas/logo-amma.jpg" alt="AMMA Consulting">
         <div class="amma-sub">OBSERVATORIO TURÍSTICO DE MARBELLA</div>
-        <div class="amma-titulo">INFORME TÉCNICO DE COYUNTURA TURÍSTICA<br>MARBELLA · ${mes ? iaLabel(mes).toLocaleUpperCase("es-ES") : ""}</div>
+        <div class="amma-titulo">INFORME TÉCNICO DE COYUNTURA TURÍSTICA<small>MARBELLA · ${mes ? iaLabel(mes).toLocaleUpperCase("es-ES") : ""}</small></div>
+        <div class="amma-fecha">${fecha}</div>
       </div>
-      <div class="amma-encabezado"><img src="${logo}" alt=""><span>INFORME TÉCNICO DE COYUNTURA TURÍSTICA</span></div>
-      <div class="amma-cuerpo">${DOMPurify.sanitize(marked.parse(limpio))}</div>`;
+      ${ficha ? `<div class="amma-ficha">${html(ficha)}</div>` : ""}
+      <div class="amma-cuerpo">${html(cuerpo)}</div>
+    </div>`;
 }
 
 function iaRender() {
