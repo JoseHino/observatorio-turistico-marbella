@@ -1,0 +1,13 @@
+# Worker de informes con Claude del Observatorio Turístico de Marbella.
+# La clave de Anthropic NO va aquí: npx wrangler secret put ANTHROPIC_API_KEY
+name = "observatorio-turismo-informes"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "INFORMES"
+id = "d2c81e7bb405484689d4e3110fbb27bf"
+
+[observability]
+enabled = true

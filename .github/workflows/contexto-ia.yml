@@ -1,0 +1,39 @@
+name: Datos para informes con Claude
+
+# Prepara el paquete de datos (comparativa interanual de todas las fuentes)
+# que usa el Worker para redactar el informe técnico y la nota de prensa.
+# Diario: así el mes nuevo está disponible el mismo día que lo publica el INE.
+
+on:
+  schedule:
+    - cron: "40 6 * * *" # después del refresco del RTA (05:17 UTC)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  contexto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generar contextos mensuales
+        run: node scripts/build_ia_context.mjs data/ia
+
+      - name: Commit si hay cambios
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ia
+          if git diff --cached --quiet; then
+            echo "Sin cambios."
+          else
+            git commit -m "data: contextos para informes con Claude"
+            git pull --rebase
+            git push
+          fi
