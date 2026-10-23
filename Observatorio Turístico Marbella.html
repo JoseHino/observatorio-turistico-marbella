@@ -15,6 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root {
     /* Light tech palette · inspired by Linear / Vercel / Notion / Stripe Dashboard */
@@ -4473,14 +4474,129 @@ async function iaCopiar() {
     }
 }
 
-function iaWord() {
-    const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${iaNombreArchivo()}</title>
-<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.4}h1{font-size:18pt}h2{font-size:14pt}h3{font-size:12pt}table{border-collapse:collapse}th,td{border:1px solid #999;padding:3px 6px;font-size:9.5pt}th{background:#e8eef7}</style></head><body>${iaHTML(IA.texto)}</body></html>`;
+function iaDescargar(blob, nombre) {
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob(["﻿", doc], { type: "application/msword" }));
-    a.download = iaNombreArchivo() + ".doc";
+    a.href = URL.createObjectURL(blob);
+    a.download = nombre;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// ─── Word del informe técnico con formato AMMA Consulting ─────────────────
+// plantillas/informe-tecnico-amma.docx sale de la skill «formato AMMA» (DocAMMA):
+// portada, índice, encabezado en cuadrícula y pie ya montados, con las marcas
+// @@MES@@, @@FECHA@@ y @@CUERPO@@. Aquí se convierte el Markdown del informe
+// en párrafos de Word con los mismos estilos y numeraciones que usa DocAMMA.
+const AMMA_PLANTILLA_URLS = [
+    "plantillas/informe-tecnico-amma.docx",
+    "https://josehino.github.io/observatorio-turistico-marbella/plantillas/informe-tecnico-amma.docx",
+];
+const AMMA = { numTitulos: 900, numVineta: 3, numNumerada: 22, ancho: 8789 }; // ancho útil 15,5 cm en dxa
+
+const xmlEsc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function ammaRuns(tokens, fmt = {}) {
+    let out = "";
+    for (const t of tokens || []) {
+        if (t.type === "strong")        out += ammaRuns(t.tokens, { ...fmt, b: true });
+        else if (t.type === "em")       out += ammaRuns(t.tokens, { ...fmt, i: true });
+        else if (t.type === "br")       out += "<w:r><w:br/></w:r>";
+        else if (t.tokens?.length)      out += ammaRuns(t.tokens, fmt);
+        else {
+            const txt = (t.text ?? t.raw ?? "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+            if (!txt) continue;
+            const rPr = (fmt.b ? "<w:b/>" : "") + (fmt.i ? "<w:i/>" : "") + (fmt.sz ? `<w:sz w:val="${fmt.sz}"/><w:szCs w:val="${fmt.sz}"/>` : "");
+            out += `<w:r>${rPr ? `<w:rPr>${rPr}</w:rPr>` : ""}<w:t xml:space="preserve">${xmlEsc(txt)}</w:t></w:r>`;
+        }
+    }
+    return out;
+}
+
+// La numeración la pone Word: se quitan los «2.», «2.1» escritos por Claude.
+const ammaSinNumero = s => s.replace(/^\s*\d+(\.\d+)*\.?\s+/, "");
+
+function ammaCuerpo(md) {
+    const tokens = marked.lexer(md);
+    AMMA.listasNuevas = [];
+    let xml = "", primerH1 = true;
+    const titulo = (estilo, texto, nivel) =>
+        `<w:p><w:pPr><w:pStyle w:val="${estilo}"/>${nivel != null ? `<w:numPr><w:ilvl w:val="${nivel}"/><w:numId w:val="${AMMA.numTitulos}"/></w:numPr>` : ""}</w:pPr><w:r><w:t xml:space="preserve">${xmlEsc(texto)}</w:t></w:r></w:p>`;
+    // Viñetas y listas, con sublistas en el nivel siguiente. Cada lista numerada
+    // estrena su propio w:num para que vuelva a empezar en 1 (ver iaWordAMMA).
+    const lista = (l, nivel = 0, fmt = {}, numPadre = null) => {
+        const numId = !l.ordered ? AMMA.numVineta
+                    : numPadre ?? (AMMA.listasNuevas.push(1000 + AMMA.listasNuevas.length), AMMA.listasNuevas.at(-1));
+        return l.items.map(it => (it.tokens || []).map(t => {
+        if (t.type === "list") return lista(t, nivel + 1, fmt, t.ordered ? numId : null);
+        if (t.type !== "text" && t.type !== "paragraph") return "";
+        return `<w:p><w:pPr><w:pStyle w:val="Prrafodelista"/><w:numPr><w:ilvl w:val="${nivel}"/><w:numId w:val="${numId}"/></w:numPr></w:pPr>${ammaRuns(t.tokens || [t], fmt)}</w:p>`;
+        }).join("")).join("");
+    };
+    const tabla = t => {
+        const ncol = t.header.length, w = Math.floor(AMMA.ancho / ncol), sz = ncol > 5 ? 18 : 20;
+        const celda = (c, j, cab) => `<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="${w}"/><w:vAlign w:val="center"/>${cab ? '<w:shd w:val="clear" w:color="auto" w:fill="37A0B4"/>' : ""}</w:tcPr><w:p><w:pPr><w:spacing w:before="40" w:after="40"/><w:jc w:val="${cab || j > 0 ? "center" : "left"}"/></w:pPr>${ammaRuns(c.tokens, { b: cab, sz })}</w:p></w:tc>`;
+        return `<w:tbl><w:tblPr><w:tblStyle w:val="Tablaconcuadrcula4-nfasis5"/><w:tblW w:type="dxa" w:w="${w * ncol}"/><w:jc w:val="center"/><w:tblLayout w:type="fixed"/><w:tblLook w:firstRow="1" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/></w:tblPr>`
+            + `<w:tblGrid>${`<w:gridCol w:w="${w}"/>`.repeat(ncol)}</w:tblGrid>`
+            + `<w:tr><w:trPr><w:tblHeader/></w:trPr>${t.header.map((c, j) => celda(c, j, true)).join("")}</w:tr>`
+            + t.rows.map(r => `<w:tr>${r.map((c, j) => celda(c, j, false)).join("")}</w:tr>`).join("")
+            + `</w:tbl><w:p/>`;
+    };
+    for (const t of tokens) {
+        if (t.type === "heading") {
+            const texto = ammaSinNumero(t.text.replace(/[*_`]/g, ""));
+            if (t.depth === 1) continue;                       // el título ya está en la portada
+            if (t.depth === 2) {
+                if (!primerH1) xml += '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'; // cada capítulo en página nueva
+                primerH1 = false;
+                xml += titulo("Ttulo1", texto.toLocaleUpperCase("es-ES"), 0);
+            } else if (t.depth === 3) xml += titulo("Ttulo2", texto, 1);
+            else xml += titulo("Ttulo3", texto, null);
+        }
+        else if (t.type === "paragraph")  xml += `<w:p>${ammaRuns(t.tokens)}</w:p>`;
+        else if (t.type === "list")       xml += lista(t);
+        else if (t.type === "table")      xml += tabla(t);
+        else if (t.type === "blockquote") xml += t.tokens.map(b =>
+            b.type === "list" ? lista(b, 0, { i: true }) : b.tokens ? `<w:p>${ammaRuns(b.tokens, { i: true })}</w:p>` : "").join("");
+    }
+    return xml;
+}
+
+async function iaWordAMMA() {
+    let plantilla = null;
+    for (const url of AMMA_PLANTILLA_URLS) {
+        try { const r = await fetch(url); if (r.ok) { plantilla = await r.arrayBuffer(); break; } } catch (_) { /* siguiente */ }
+    }
+    if (!plantilla) throw new Error("No se pudo cargar la plantilla AMMA.");
+    const zip = await JSZip.loadAsync(plantilla);
+    const mes = iaEls().mes.value;
+    const fecha = new Date(IA.fecha || Date.now());
+    const fechaTxt = `${MESES_LARGOS[fecha.getMonth()][0].toUpperCase()}${MESES_LARGOS[fecha.getMonth()].slice(1)}, ${fecha.getFullYear()}`;
+    let doc = await zip.file("word/document.xml").async("string");
+    doc = doc.replace("@@MES@@", xmlEsc(iaLabel(mes).toLocaleUpperCase("es-ES")))
+             .replace("@@FECHA@@", xmlEsc(fechaTxt))
+             .replace(/<w:p>(?:(?!<w:p>).)*?@@CUERPO@@.*?<\/w:p>/s, ammaCuerpo(IA.texto));
+    zip.file("word/document.xml", doc);
+    // Una instancia de la lista numerada de la plantilla por cada lista, reiniciada en 1.
+    let num = await zip.file("word/numbering.xml").async("string");
+    const abstracto = num.match(new RegExp(`<w:num w:numId="${AMMA.numNumerada}"[^>]*>\\s*<w:abstractNumId w:val="(\\d+)"`))?.[1];
+    if (abstracto && AMMA.listasNuevas.length) {
+        const nuevas = AMMA.listasNuevas.map(id =>
+            `<w:num w:numId="${id}"><w:abstractNumId w:val="${abstracto}"/><w:lvlOverride w:ilvl="0"><w:startOverride w:val="1"/></w:lvlOverride></w:num>`).join("");
+        zip.file("word/numbering.xml", num.replace("</w:numbering>", nuevas + "</w:numbering>"));
+    }
+    const blob = await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    iaDescargar(blob, iaNombreArchivo() + ".docx");
+}
+
+async function iaWord() {
+    if (IA.modo === "informe") {
+        try { await iaWordAMMA(); iaStatus("Word con formato AMMA descargado. Al abrirlo, acepta actualizar los campos para rellenar el índice.", "ok"); }
+        catch (err) { console.error(err); iaStatus(err.message, "err"); }
+        return;
+    }
+    const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${iaNombreArchivo()}</title>
+<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.4}h1{font-size:18pt}h2{font-size:14pt}h3{font-size:12pt}table{border-collapse:collapse}th,td{border:1px solid #999;padding:3px 6px;font-size:9.5pt}th{background:#e8eef7}</style></head><body>${iaHTML(IA.texto)}</body></html>`;
+    iaDescargar(new Blob(["﻿", doc], { type: "application/msword" }), iaNombreArchivo() + ".doc");
 }
 
 function initIA() {
