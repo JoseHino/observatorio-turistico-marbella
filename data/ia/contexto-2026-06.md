@@ -94,4 +94,4 @@ Sin datos recientes: Eurostat solo ha publicado hasta diciembre 2024. No se incl
 ### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)
 Altas inscritas en junio 2026: 96; mismo mes del año anterior: 138 (−30,43 %).
 Altas acumuladas enero–junio 2026: 464 frente a 1.269 en 2025 (−63,44 %).
-Parque inscrito a fecha del volcado (2026-10-24): 15.763 VUT y 92.055 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.
+Parque inscrito a fecha del volcado (2026-10-25): 15.761 VUT y 92.044 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.
