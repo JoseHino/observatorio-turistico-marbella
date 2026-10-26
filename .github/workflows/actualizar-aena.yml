@@ -1,0 +1,47 @@
+name: Actualizar aeropuerto AGP (AENA)
+
+# Descarga de AENA el Excel mensual de tráfico (pasajeros y operaciones de
+# Málaga-Costa del Sol) y la nota de prensa del aeropuerto (primeros mercados
+# por país) y los guarda en data/aena_agp.json, que lee la pestaña Aeropuerto.
+# AENA no admite CORS, por eso no se consulta desde el navegador.
+
+on:
+  schedule:
+    # AENA publica entre el día 10 y el 16 del mes siguiente. Se mira a diario
+    # del 8 al 20; los días sin novedades no hay commit. 06:10 UTC: antes del
+    # contexto para los informes con Claude (06:40).
+    - cron: "10 6 8-20 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Dependencias
+        run: pip install openpyxl xlrd pypdf
+
+      - name: Descargar datos de AENA
+        run: python scripts/fetch_aena_agp.py data/aena_agp.json
+
+      - name: Commit si hay cambios
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/aena_agp.json
+          # El campo "actualizado" cambia siempre: solo cuenta si cambia algo más.
+          if git diff --cached -U0 | grep -E '^[+-] ' | grep -vq '"actualizado"'; then
+            git commit -m "data: aeropuerto AGP (AENA)"
+            git pull --rebase
+            git push
+          else
+            echo "Sin datos nuevos."
+          fi

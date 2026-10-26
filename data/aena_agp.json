@@ -1,0 +1,2607 @@
+{
+ "actualizado": "2026-10-26T09:26:50+00:00",
+ "fuente": "AENA · Informes mensuales de tráfico y notas de prensa del Aeropuerto de Málaga-Costa del Sol",
+ "ultimo_mes": "2026-09",
+ "meses": {
+  "2015-01": {
+   "pax": 644750,
+   "pax_var": 0.0948,
+   "ops": 5776,
+   "ops_var": 0.0201,
+   "estado": "definitivo",
+   "blob": "1576856793970"
+  },
+  "2015-02": {
+   "pax": 674688,
+   "pax_var": 0.0599,
+   "ops": 5526,
+   "ops_var": -0.0143,
+   "estado": "definitivo",
+   "acum_pax": 1319438,
+   "acum_pax_var": 0.0767,
+   "acum_ops": 11302,
+   "acum_ops_var": 0.003,
+   "blob": "1576856797562"
+  },
+  "2015-03": {
+   "pax": 900453,
+   "pax_var": 0.0613,
+   "ops": 6965,
+   "ops_var": 0.0094,
+   "estado": "definitivo",
+   "acum_pax": 2219891,
+   "acum_pax_var": 0.0704,
+   "acum_ops": 18267,
+   "acum_ops_var": 0.0054,
+   "blob": "1576856792586"
+  },
+  "2015-04": {
+   "pax": 1294158,
+   "pax_var": 0.0097,
+   "ops": 9757,
+   "ops_var": -0.0301,
+   "estado": "definitivo",
+   "acum_pax": 3514049,
+   "acum_pax_var": 0.0472,
+   "acum_ops": 28024,
+   "acum_ops_var": -0.0072,
+   "blob": "1576856796208"
+  },
+  "2015-05": {
+   "pax": 1449144,
+   "pax_var": 0.0599,
+   "ops": 10811,
+   "ops_var": 0.0203,
+   "estado": "definitivo",
+   "acum_pax": 4963193,
+   "acum_pax_var": 0.0509,
+   "acum_ops": 38835,
+   "acum_ops_var": 0.0003,
+   "blob": "1576856797974"
+  },
+  "2015-06": {
+   "pax": 1478204,
+   "pax_var": 0.0307,
+   "ops": 10784,
+   "ops_var": -0.0089,
+   "estado": "definitivo",
+   "acum_pax": 6441397,
+   "acum_pax_var": 0.0462,
+   "acum_ops": 49619,
+   "acum_ops_var": -0.0017,
+   "blob": "1576856792392"
+  },
+  "2015-07": {
+   "pax": 1705174,
+   "pax_var": 0.0452,
+   "ops": 12582,
+   "ops_var": 0.0145,
+   "estado": "definitivo",
+   "acum_pax": 8146571,
+   "acum_pax_var": 0.046,
+   "acum_ops": 62201,
+   "acum_ops_var": 0.0015,
+   "blob": "1576856798758"
+  },
+  "2015-08": {
+   "pax": 1736950,
+   "pax_var": 0.0335,
+   "ops": 12801,
+   "ops_var": 0.0036,
+   "estado": "definitivo",
+   "acum_pax": 9883521,
+   "acum_pax_var": 0.0438,
+   "acum_ops": 75002,
+   "acum_ops_var": 0.0019,
+   "blob": "1576856794254"
+  },
+  "2015-09": {
+   "pax": 1534974,
+   "pax_var": 0.0361,
+   "ops": 10813,
+   "ops_var": 0.0081,
+   "estado": "definitivo",
+   "acum_pax": 11418495,
+   "acum_pax_var": 0.0427,
+   "acum_ops": 85815,
+   "acum_ops_var": 0.0027,
+   "blob": "1576868601886"
+  },
+  "2015-10": {
+   "pax": 1431683,
+   "pax_var": 0.0559,
+   "ops": 10241,
+   "ops_var": 0.0169,
+   "estado": "definitivo",
+   "acum_pax": 12850178,
+   "acum_pax_var": 0.0442,
+   "acum_ops": 96056,
+   "acum_ops_var": 0.0042,
+   "blob": "1576856791736"
+  },
+  "2015-11": {
+   "pax": 799691,
+   "pax_var": 0.055,
+   "ops": 6546,
+   "ops_var": 0.0182,
+   "estado": "definitivo",
+   "acum_pax": 13649869,
+   "acum_pax_var": 0.0448,
+   "acum_ops": 102602,
+   "acum_ops_var": 0.005,
+   "blob": "1576856795708"
+  },
+  "2015-12": {
+   "pax": 754337,
+   "pax_var": 0.1019,
+   "ops": 6307,
+   "ops_var": 0.0217,
+   "estado": "definitivo",
+   "acum_pax": 14404206,
+   "acum_pax_var": 0.0477,
+   "acum_ops": 108909,
+   "acum_ops_var": 0.006,
+   "blob": "1576856793644"
+  },
+  "2016-01": {
+   "pax": 732499,
+   "pax_var": 0.1361,
+   "ops": 6321,
+   "ops_var": 0.0944,
+   "estado": "definitivo",
+   "blob": "1576856791894"
+  },
+  "2016-02": {
+   "pax": 794683,
+   "pax_var": 0.1779,
+   "ops": 6326,
+   "ops_var": 0.1448,
+   "estado": "definitivo",
+   "acum_pax": 1527182,
+   "acum_pax_var": 0.1574,
+   "acum_ops": 12647,
+   "acum_ops_var": 0.119,
+   "blob": "1576856796892"
+  },
+  "2016-03": {
+   "pax": 1096140,
+   "pax_var": 0.2173,
+   "ops": 8425,
+   "ops_var": 0.2096,
+   "estado": "definitivo",
+   "acum_pax": 2623322,
+   "acum_pax_var": 0.1817,
+   "acum_ops": 21072,
+   "acum_ops_var": 0.1536,
+   "blob": "1576856797576"
+  },
+  "2016-04": {
+   "pax": 1446131,
+   "pax_var": 0.1174,
+   "ops": 10536,
+   "ops_var": 0.0798,
+   "estado": "definitivo",
+   "acum_pax": 4069453,
+   "acum_pax_var": 0.1581,
+   "acum_ops": 31608,
+   "acum_ops_var": 0.1279,
+   "blob": "1576856791650"
+  },
+  "2016-05": {
+   "pax": 1626519,
+   "pax_var": 0.1224,
+   "ops": 11814,
+   "ops_var": 0.0928,
+   "estado": "definitivo",
+   "acum_pax": 5695972,
+   "acum_pax_var": 0.1476,
+   "acum_ops": 43422,
+   "acum_ops_var": 0.1181,
+   "blob": "1576856796148"
+  },
+  "2016-06": {
+   "pax": 1688474,
+   "pax_var": 0.1422,
+   "ops": 12095,
+   "ops_var": 0.1216,
+   "estado": "definitivo",
+   "acum_pax": 7384446,
+   "acum_pax_var": 0.1464,
+   "acum_ops": 55517,
+   "acum_ops_var": 0.1189,
+   "blob": "1576856797636"
+  },
+  "2016-07": {
+   "pax": 1967271,
+   "pax_var": 0.1537,
+   "ops": 14131,
+   "ops_var": 0.1231,
+   "estado": "definitivo",
+   "acum_pax": 9351717,
+   "acum_pax_var": 0.1479,
+   "acum_ops": 69648,
+   "acum_ops_var": 0.1197,
+   "blob": "1576856792002"
+  },
+  "2016-08": {
+   "pax": 1952266,
+   "pax_var": 0.124,
+   "ops": 14099,
+   "ops_var": 0.1014,
+   "estado": "definitivo",
+   "acum_pax": 11303983,
+   "acum_pax_var": 0.1437,
+   "acum_ops": 83747,
+   "acum_ops_var": 0.1166,
+   "blob": "1576856796928"
+  },
+  "2016-09": {
+   "pax": 1779487,
+   "pax_var": 0.1593,
+   "ops": 12402,
+   "ops_var": 0.147,
+   "estado": "definitivo",
+   "acum_pax": 13083470,
+   "acum_pax_var": 0.1458,
+   "acum_ops": 96149,
+   "acum_ops_var": 0.1204,
+   "blob": "1576856791748"
+  },
+  "2016-10": {
+   "pax": 1711802,
+   "pax_var": 0.1957,
+   "ops": 12095,
+   "ops_var": 0.181,
+   "estado": "definitivo",
+   "acum_pax": 14795272,
+   "acum_pax_var": 0.1514,
+   "acum_ops": 108244,
+   "acum_ops_var": 0.1269,
+   "blob": "1576856794890"
+  },
+  "2016-11": {
+   "pax": 965310,
+   "pax_var": 0.2071,
+   "ops": 7824,
+   "ops_var": 0.1952,
+   "estado": "definitivo",
+   "acum_pax": 15760582,
+   "acum_pax_var": 0.1546,
+   "acum_ops": 116068,
+   "acum_ops_var": 0.1312,
+   "blob": "1576856796636"
+  },
+  "2016-12": {
+   "pax": 912569,
+   "pax_var": 0.2098,
+   "ops": 7647,
+   "ops_var": 0.2125,
+   "estado": "definitivo",
+   "acum_pax": 16673151,
+   "acum_pax_var": 0.1575,
+   "acum_ops": 123715,
+   "acum_ops_var": 0.1359,
+   "blob": "1576856794682"
+  },
+  "2017-01": {
+   "pax": 867386,
+   "pax_var": 0.1841,
+   "ops": 7288,
+   "ops_var": 0.153,
+   "estado": "definitivo",
+   "blob": "1576856798290"
+  },
+  "2017-02": {
+   "pax": 914000,
+   "pax_var": 0.1501,
+   "ops": 7367,
+   "ops_var": 0.1646,
+   "estado": "definitivo",
+   "acum_pax": 1781386,
+   "acum_pax_var": 0.1665,
+   "acum_ops": 14655,
+   "acum_ops_var": 0.1588,
+   "blob": "1576856795194"
+  },
+  "2017-03": {
+   "pax": 1199855,
+   "pax_var": 0.0946,
+   "ops": 9146,
+   "ops_var": 0.0856,
+   "estado": "definitivo",
+   "acum_pax": 2981241,
+   "acum_pax_var": 0.1364,
+   "acum_ops": 23801,
+   "acum_ops_var": 0.1295,
+   "blob": "1576856791662"
+  },
+  "2017-04": {
+   "pax": 1696169,
+   "pax_var": 0.1729,
+   "ops": 11983,
+   "ops_var": 0.1373,
+   "estado": "definitivo",
+   "acum_pax": 4677410,
+   "acum_pax_var": 0.1494,
+   "acum_ops": 35784,
+   "acum_ops_var": 0.1321,
+   "blob": "1576856793524"
+  },
+  "2017-05": {
+   "pax": 1809418,
+   "pax_var": 0.1124,
+   "ops": 13148,
+   "ops_var": 0.1129,
+   "estado": "definitivo",
+   "acum_pax": 6486828,
+   "acum_pax_var": 0.1388,
+   "acum_ops": 48932,
+   "acum_ops_var": 0.1269,
+   "blob": "1576856794046"
+  },
+  "2017-06": {
+   "pax": 1907192,
+   "pax_var": 0.1295,
+   "ops": 13551,
+   "ops_var": 0.1204,
+   "estado": "definitivo",
+   "acum_pax": 8394020,
+   "acum_pax_var": 0.1367,
+   "acum_ops": 62483,
+   "acum_ops_var": 0.1255,
+   "blob": "1576856798770"
+  },
+  "2017-07": {
+   "pax": 2187120,
+   "pax_var": 0.1118,
+   "ops": 15631,
+   "ops_var": 0.1061,
+   "estado": "definitivo",
+   "acum_pax": 10581140,
+   "acum_pax_var": 0.1315,
+   "acum_ops": 78114,
+   "acum_ops_var": 0.1216,
+   "blob": "1576856798450"
+  },
+  "2017-08": {
+   "pax": 2172930,
+   "pax_var": 0.113,
+   "ops": 15490,
+   "ops_var": 0.0987,
+   "estado": "definitivo",
+   "acum_pax": 12754070,
+   "acum_pax_var": 0.1283,
+   "acum_ops": 93604,
+   "acum_ops_var": 0.1177,
+   "blob": "1576856794560"
+  },
+  "2017-09": {
+   "pax": 1974837,
+   "pax_var": 0.1098,
+   "ops": 13699,
+   "ops_var": 0.1046,
+   "estado": "definitivo",
+   "acum_pax": 14728907,
+   "acum_pax_var": 0.1258,
+   "acum_ops": 107303,
+   "acum_ops_var": 0.116,
+   "blob": "1576856793656"
+  },
+  "2017-10": {
+   "pax": 1833616,
+   "pax_var": 0.0712,
+   "ops": 13011,
+   "ops_var": 0.0757,
+   "estado": "definitivo",
+   "acum_pax": 16562523,
+   "acum_pax_var": 0.1194,
+   "acum_ops": 120314,
+   "acum_ops_var": 0.1115,
+   "blob": "1576856792976"
+  },
+  "2017-11": {
+   "pax": 1065001,
+   "pax_var": 0.1033,
+   "ops": 8569,
+   "ops_var": 0.0952,
+   "estado": "definitivo",
+   "acum_pax": 17627524,
+   "acum_pax_var": 0.1185,
+   "acum_ops": 128883,
+   "acum_ops_var": 0.1104,
+   "blob": "1576856792258"
+  },
+  "2017-12": {
+   "pax": 999057,
+   "pax_var": 0.0948,
+   "ops": 8295,
+   "ops_var": 0.0847,
+   "estado": "definitivo",
+   "acum_pax": 18626581,
+   "acum_pax_var": 0.1172,
+   "acum_ops": 137178,
+   "acum_ops_var": 0.1088,
+   "blob": "1576856793728"
+  },
+  "2018-01": {
+   "pax": 935155,
+   "pax_var": 0.0781,
+   "ops": 7786,
+   "ops_var": 0.0683,
+   "estado": "definitivo",
+   "blob": "1576856798746"
+  },
+  "2018-02": {
+   "pax": 963939,
+   "pax_var": 0.0546,
+   "ops": 7673,
+   "ops_var": 0.0415,
+   "estado": "definitivo",
+   "acum_pax": 1899094,
+   "acum_pax_var": 0.0661,
+   "acum_ops": 15459,
+   "acum_ops_var": 0.0549,
+   "blob": "1576856793036"
+  },
+  "2018-03": {
+   "pax": 1294374,
+   "pax_var": 0.0788,
+   "ops": 9948,
+   "ops_var": 0.0877,
+   "estado": "definitivo",
+   "acum_pax": 3193468,
+   "acum_pax_var": 0.0712,
+   "acum_ops": 25407,
+   "acum_ops_var": 0.0675,
+   "blob": "1576856791602"
+  },
+  "2018-04": {
+   "pax": 1697759,
+   "pax_var": 0.0009,
+   "ops": 12311,
+   "ops_var": 0.0274,
+   "estado": "definitivo",
+   "acum_pax": 4891227,
+   "acum_pax_var": 0.0457,
+   "acum_ops": 37718,
+   "acum_ops_var": 0.054,
+   "blob": "1576856794364"
+  },
+  "2018-05": {
+   "pax": 1836655,
+   "pax_var": 0.0151,
+   "ops": 13189,
+   "ops_var": 0.0031,
+   "estado": "definitivo",
+   "acum_pax": 6727882,
+   "acum_pax_var": 0.0372,
+   "acum_ops": 50907,
+   "acum_ops_var": 0.0404,
+   "blob": "1576856795340"
+  },
+  "2018-06": {
+   "pax": 1930947,
+   "pax_var": 0.0125,
+   "ops": 13869,
+   "ops_var": 0.0235,
+   "estado": "definitivo",
+   "acum_pax": 8658829,
+   "acum_pax_var": 0.0315,
+   "acum_ops": 64776,
+   "acum_ops_var": 0.0367,
+   "blob": "1576856797612"
+  },
+  "2018-07": {
+   "pax": 2146968,
+   "pax_var": -0.0184,
+   "ops": 15511,
+   "ops_var": -0.0077,
+   "estado": "definitivo",
+   "acum_pax": 10805797,
+   "acum_pax_var": 0.0212,
+   "acum_ops": 80287,
+   "acum_ops_var": 0.0278,
+   "blob": "1576856792356"
+  },
+  "2018-08": {
+   "pax": 2118619,
+   "pax_var": -0.025,
+   "ops": 15341,
+   "ops_var": -0.0096,
+   "estado": "definitivo",
+   "acum_pax": 12924416,
+   "acum_pax_var": 0.0134,
+   "acum_ops": 95628,
+   "acum_ops_var": 0.0216,
+   "blob": "1576856792318"
+  },
+  "2018-09": {
+   "pax": 1979962,
+   "pax_var": 0.0026,
+   "ops": 13801,
+   "ops_var": 0.0074,
+   "estado": "definitivo",
+   "acum_pax": 14904378,
+   "acum_pax_var": 0.0119,
+   "acum_ops": 109429,
+   "acum_ops_var": 0.0198,
+   "blob": "1576856791918"
+  },
+  "2018-10": {
+   "pax": 1862295,
+   "pax_var": 0.0156,
+   "ops": 13364,
+   "ops_var": 0.0271,
+   "estado": "definitivo",
+   "acum_pax": 16766673,
+   "acum_pax_var": 0.0123,
+   "acum_ops": 122793,
+   "acum_ops_var": 0.0206,
+   "blob": "1576856798302"
+  },
+  "2018-11": {
+   "pax": 1150161,
+   "pax_var": 0.08,
+   "ops": 9336,
+   "ops_var": 0.0895,
+   "estado": "definitivo",
+   "acum_pax": 17916834,
+   "acum_pax_var": 0.0164,
+   "acum_ops": 132129,
+   "acum_ops_var": 0.0252,
+   "blob": "1576856791698"
+  },
+  "2018-12": {
+   "pax": 1104945,
+   "pax_var": 0.106,
+   "ops": 9223,
+   "ops_var": 0.1119,
+   "estado": "definitivo",
+   "acum_pax": 19021779,
+   "acum_pax_var": 0.0212,
+   "acum_ops": 141352,
+   "acum_ops_var": 0.0304,
+   "blob": "1576856792732"
+  },
+  "2019-01": {
+   "pax": 1013422,
+   "pax_var": 0.0837,
+   "ops": 8526,
+   "ops_var": 0.095,
+   "estado": "definitivo",
+   "blob": "1576856796502"
+  },
+  "2019-02": {
+   "pax": 1052776,
+   "pax_var": 0.0922,
+   "ops": 8142,
+   "ops_var": 0.0611,
+   "estado": "definitivo",
+   "acum_pax": 2066198,
+   "acum_pax_var": 0.088,
+   "acum_ops": 16668,
+   "acum_ops_var": 0.0782,
+   "blob": "1576856792404"
+  },
+  "2019-03": {
+   "pax": 1353135,
+   "pax_var": 0.0454,
+   "ops": 9788,
+   "ops_var": -0.0161,
+   "estado": "definitivo",
+   "acum_pax": 3419333,
+   "acum_pax_var": 0.0707,
+   "acum_ops": 26456,
+   "acum_ops_var": 0.0413,
+   "blob": "1576856794902"
+  },
+  "2019-04": {
+   "pax": 1827782,
+   "pax_var": 0.0766,
+   "ops": 13236,
+   "ops_var": 0.0751,
+   "estado": "definitivo",
+   "acum_pax": 5247115,
+   "acum_pax_var": 0.0728,
+   "acum_ops": 39692,
+   "acum_ops_var": 0.0523,
+   "blob": "1576856795660"
+  },
+  "2019-05": {
+   "pax": 1914226,
+   "pax_var": 0.0422,
+   "ops": 13989,
+   "ops_var": 0.0607,
+   "estado": "definitivo",
+   "acum_pax": 7161341,
+   "acum_pax_var": 0.0644,
+   "acum_ops": 53681,
+   "acum_ops_var": 0.0545,
+   "blob": "1576856796318"
+  },
+  "2019-06": {
+   "pax": 2056254,
+   "pax_var": 0.0649,
+   "ops": 14500,
+   "ops_var": 0.0455,
+   "estado": "definitivo",
+   "acum_pax": 9217595,
+   "acum_pax_var": 0.0645,
+   "acum_ops": 68181,
+   "acum_ops_var": 0.0526,
+   "blob": "1576856794376"
+  },
+  "2019-07": {
+   "pax": 2228464,
+   "pax_var": 0.038,
+   "ops": 15892,
+   "ops_var": 0.0246,
+   "estado": "definitivo",
+   "acum_pax": 11446059,
+   "acum_pax_var": 0.0593,
+   "acum_ops": 84073,
+   "acum_ops_var": 0.0472,
+   "blob": "1576856796026"
+  },
+  "2019-08": {
+   "pax": 2205899,
+   "pax_var": 0.0412,
+   "ops": 15644,
+   "ops_var": 0.0198,
+   "estado": "definitivo",
+   "acum_pax": 13651958,
+   "acum_pax_var": 0.0563,
+   "acum_ops": 99717,
+   "acum_ops_var": 0.0428,
+   "blob": "1576856798314"
+  },
+  "2019-09": {
+   "pax": 2026920,
+   "pax_var": 0.0237,
+   "ops": 14039,
+   "ops_var": 0.0172,
+   "estado": "definitivo",
+   "acum_pax": 15678878,
+   "acum_pax_var": 0.052,
+   "acum_ops": 113756,
+   "acum_ops_var": 0.0395,
+   "blob": "1576856795720"
+  },
+  "2019-10": {
+   "pax": 1873246,
+   "pax_var": 0.0059,
+   "ops": 13152,
+   "ops_var": -0.0159,
+   "estado": "definitivo",
+   "acum_pax": 17552124,
+   "acum_pax_var": 0.0468,
+   "acum_ops": 126908,
+   "acum_ops_var": 0.0335,
+   "blob": "1576856795574"
+  },
+  "2019-11": {
+   "pax": 1169845,
+   "pax_var": 0.0171,
+   "ops": 9006,
+   "ops_var": -0.0353,
+   "estado": "definitivo",
+   "acum_pax": 18721969,
+   "acum_pax_var": 0.0449,
+   "acum_ops": 135914,
+   "acum_ops_var": 0.0286,
+   "blob": "1576856791724"
+  },
+  "2019-12": {
+   "pax": 1136687,
+   "pax_var": 0.0287,
+   "ops": 9025,
+   "ops_var": -0.0215,
+   "estado": "definitivo",
+   "acum_pax": 19858656,
+   "acum_pax_var": 0.044,
+   "acum_ops": 144939,
+   "acum_ops_var": 0.0254,
+   "blob": "1576856797648"
+  },
+  "2020-01": {
+   "pax": 1042347,
+   "pax_var": 0.0285,
+   "ops": 8431,
+   "ops_var": -0.0111,
+   "estado": "definitivo",
+   "blob": "1576861981732"
+  },
+  "2020-02": {
+   "pax": 1126766,
+   "pax_var": 0.0703,
+   "ops": 8456,
+   "ops_var": 0.0386,
+   "estado": "definitivo",
+   "acum_pax": 2169113,
+   "acum_pax_var": 0.0498,
+   "acum_ops": 16887,
+   "acum_ops_var": 0.0131,
+   "blob": "1576861981816"
+  },
+  "2020-03": {
+   "pax": 613215,
+   "pax_var": -0.5468,
+   "ops": 6288,
+   "ops_var": -0.3576,
+   "estado": "definitivo",
+   "acum_pax": 2782328,
+   "acum_pax_var": -0.1863,
+   "acum_ops": 23175,
+   "acum_ops_var": -0.124,
+   "blob": "1576861981699"
+  },
+  "2020-04": {
+   "pax": 5107,
+   "pax_var": -0.9972,
+   "ops": 580,
+   "ops_var": -0.9562,
+   "estado": "definitivo",
+   "acum_pax": 2787435,
+   "acum_pax_var": -0.4688,
+   "acum_ops": 23755,
+   "acum_ops_var": -0.4015,
+   "blob": "1576861981688"
+  },
+  "2020-05": {
+   "pax": 6995,
+   "pax_var": -0.9963,
+   "ops": 557,
+   "ops_var": -0.9602,
+   "estado": "definitivo",
+   "acum_pax": 2794430,
+   "acum_pax_var": -0.6098,
+   "acum_ops": 24312,
+   "acum_ops_var": -0.5471,
+   "blob": "1576861981776"
+  },
+  "2020-06": {
+   "pax": 52266,
+   "pax_var": -0.9746,
+   "ops": 1572,
+   "ops_var": -0.8916,
+   "estado": "definitivo",
+   "acum_pax": 2846696,
+   "acum_pax_var": -0.6912,
+   "acum_ops": 25884,
+   "acum_ops_var": -0.6204,
+   "blob": "1576861981666"
+  },
+  "2020-07": {
+   "pax": 575723,
+   "pax_var": -0.7417,
+   "ops": 6939,
+   "ops_var": -0.5634,
+   "estado": "definitivo",
+   "acum_pax": 3422419,
+   "acum_pax_var": -0.701,
+   "acum_ops": 32823,
+   "acum_ops_var": -0.6096,
+   "blob": "1576861981849"
+  },
+  "2020-08": {
+   "pax": 677851,
+   "pax_var": -0.6927,
+   "ops": 8931,
+   "ops_var": -0.4291,
+   "estado": "definitivo",
+   "acum_pax": 4100270,
+   "acum_pax_var": -0.6997,
+   "acum_ops": 41754,
+   "acum_ops_var": -0.5813,
+   "blob": "1576861981642"
+  },
+  "2020-09": {
+   "pax": 366312,
+   "pax_var": -0.8193,
+   "ops": 6232,
+   "ops_var": -0.5561,
+   "estado": "definitivo",
+   "acum_pax": 4466582,
+   "acum_pax_var": -0.7151,
+   "acum_ops": 47986,
+   "acum_ops_var": -0.5782,
+   "blob": "1576861981598"
+  },
+  "2020-10": {
+   "pax": 329337,
+   "pax_var": -0.8242,
+   "ops": 5044,
+   "ops_var": -0.6165,
+   "estado": "definitivo",
+   "acum_pax": 4795919,
+   "acum_pax_var": -0.7268,
+   "acum_ops": 53030,
+   "acum_ops_var": -0.5821,
+   "blob": "1576861981754"
+  },
+  "2020-11": {
+   "pax": 157089,
+   "pax_var": -0.8657,
+   "ops": 3167,
+   "ops_var": -0.6483,
+   "estado": "definitivo",
+   "acum_pax": 4953008,
+   "acum_pax_var": -0.7354,
+   "acum_ops": 56197,
+   "acum_ops_var": -0.5865,
+   "blob": "1576861981576"
+  },
+  "2020-12": {
+   "pax": 208235,
+   "pax_var": -0.8168,
+   "ops": 3473,
+   "ops_var": -0.6152,
+   "estado": "definitivo",
+   "acum_pax": 5161243,
+   "acum_pax_var": -0.7401,
+   "acum_ops": 59670,
+   "acum_ops_var": -0.5883,
+   "blob": "1576861981838"
+  },
+  "2021-01": {
+   "pax": 168111,
+   "pax_var": -0.8387,
+   "ops": 2895,
+   "ops_var": -0.6566,
+   "estado": "definitivo",
+   "blob": "1576866309111"
+  },
+  "2021-02": {
+   "pax": 105260,
+   "pax_var": -0.9066,
+   "ops": 2195,
+   "ops_var": -0.7404,
+   "estado": "definitivo",
+   "acum_pax": 273371,
+   "acum_pax_var": -0.874,
+   "acum_ops": 5090,
+   "acum_ops_var": -0.6986,
+   "blob": "1576860495889"
+  },
+  "2021-03": {
+   "pax": 166889,
+   "pax_var": -0.7278,
+   "ops": 3015,
+   "ops_var": -0.5205,
+   "estado": "definitivo",
+   "acum_pax": 440260,
+   "acum_pax_var": -0.8418,
+   "acum_ops": 8105,
+   "acum_ops_var": -0.6503,
+   "blob": "1576860495944"
+  },
+  "2021-04": {
+   "pax": 209654,
+   "pax_var": 40.0523,
+   "ops": 3593,
+   "ops_var": 5.1948,
+   "estado": "definitivo",
+   "acum_pax": 649914,
+   "acum_pax_var": -0.7668,
+   "acum_ops": 11698,
+   "acum_ops_var": -0.5076,
+   "blob": "1576860495933"
+  },
+  "2021-05": {
+   "pax": 375716,
+   "pax_var": 52.7121,
+   "ops": 5318,
+   "ops_var": 8.5476,
+   "estado": "definitivo",
+   "acum_pax": 1025630,
+   "acum_pax_var": -0.633,
+   "acum_ops": 17016,
+   "acum_ops_var": -0.3001,
+   "blob": "1576860495911"
+  },
+  "2021-06": {
+   "pax": 645820,
+   "pax_var": 11.3564,
+   "ops": 7917,
+   "ops_var": 4.0363,
+   "estado": "definitivo",
+   "acum_pax": 1671450,
+   "acum_pax_var": -0.4128,
+   "acum_ops": 24933,
+   "acum_ops_var": -0.0367,
+   "blob": "1576860496124"
+  },
+  "2021-07": {
+   "pax": 1139012,
+   "pax_var": 0.9784,
+   "ops": 11801,
+   "ops_var": 0.7007,
+   "estado": "definitivo",
+   "acum_pax": 2810462,
+   "acum_pax_var": -0.1788,
+   "acum_ops": 36734,
+   "acum_ops_var": 0.1192,
+   "blob": "1576860496517"
+  },
+  "2021-08": {
+   "pax": 1400183,
+   "pax_var": 1.0656,
+   "ops": 13034,
+   "ops_var": 0.4594,
+   "estado": "definitivo",
+   "acum_pax": 4210645,
+   "acum_pax_var": 0.0269,
+   "acum_ops": 49768,
+   "acum_ops_var": 0.1919,
+   "blob": "1576860496539"
+  },
+  "2021-09": {
+   "pax": 1338487,
+   "pax_var": 2.654,
+   "ops": 12097,
+   "ops_var": 0.9411,
+   "estado": "definitivo",
+   "acum_pax": 5549132,
+   "acum_pax_var": 0.2424,
+   "acum_ops": 61865,
+   "acum_ops_var": 0.2892,
+   "blob": "1576860496135"
+  },
+  "2021-10": {
+   "pax": 1521553,
+   "pax_var": 3.62,
+   "ops": 12757,
+   "ops_var": 1.5291,
+   "estado": "definitivo",
+   "acum_pax": 7070685,
+   "acum_pax_var": 0.4743,
+   "acum_ops": 74622,
+   "acum_ops_var": 0.4072,
+   "blob": "1576860496227"
+  },
+  "2021-11": {
+   "pax": 987322,
+   "pax_var": 5.2851,
+   "ops": 8900,
+   "ops_var": 1.8102,
+   "estado": "definitivo",
+   "acum_pax": 8058007,
+   "acum_pax_var": 0.6269,
+   "acum_ops": 83522,
+   "acum_ops_var": 0.4862,
+   "blob": "1576860496261"
+  },
+  "2021-12": {
+   "pax": 816628,
+   "pax_var": 2.9217,
+   "ops": 8726,
+   "ops_var": 1.5125,
+   "estado": "definitivo",
+   "acum_pax": 8874635,
+   "acum_pax_var": 0.7195,
+   "acum_ops": 92248,
+   "acum_ops_var": 0.546,
+   "blob": "1576860494269"
+  },
+  "2022-01": {
+   "pax": 696049,
+   "pax_var": 3.1404,
+   "ops": 7684,
+   "ops_var": 1.6542,
+   "estado": "definitivo",
+   "blob": "1576864315187"
+  },
+  "2022-02": {
+   "pax": 871474,
+   "pax_var": 7.2793,
+   "ops": 7808,
+   "ops_var": 2.5572,
+   "estado": "definitivo",
+   "acum_pax": 1567523,
+   "acum_pax_var": 4.7341,
+   "acum_ops": 15492,
+   "acum_ops_var": 2.0436,
+   "blob": "1576864315209"
+  },
+  "2022-03": {
+   "pax": 1178925,
+   "pax_var": 6.0641,
+   "ops": 9678,
+   "ops_var": 2.21,
+   "estado": "definitivo",
+   "acum_pax": 2746448,
+   "acum_pax_var": 5.2382,
+   "acum_ops": 25170,
+   "acum_ops_var": 2.1055,
+   "blob": "1576864315231"
+  },
+  "2022-04": {
+   "pax": 1660066,
+   "pax_var": 6.9181,
+   "ops": 12976,
+   "ops_var": 2.6115,
+   "estado": "definitivo",
+   "acum_pax": 4406514,
+   "acum_pax_var": 5.7801,
+   "acum_ops": 38146,
+   "acum_ops_var": 2.2609,
+   "blob": "1576864315253"
+  },
+  "2022-05": {
+   "pax": 1852224,
+   "pax_var": 3.9299,
+   "ops": 14150,
+   "ops_var": 1.6608,
+   "estado": "definitivo",
+   "acum_pax": 6258738,
+   "acum_pax_var": 5.1023,
+   "acum_ops": 52296,
+   "acum_ops_var": 2.0733,
+   "blob": "1576864315275"
+  },
+  "2022-06": {
+   "pax": 1907296,
+   "pax_var": 1.9533,
+   "ops": 14064,
+   "ops_var": 0.7764,
+   "estado": "definitivo",
+   "acum_pax": 8166034,
+   "acum_pax_var": 3.8856,
+   "acum_ops": 66360,
+   "acum_ops_var": 1.6615,
+   "blob": "1576864315297"
+  },
+  "2022-07": {
+   "pax": 2065177,
+   "pax_var": 0.8131,
+   "ops": 15462,
+   "ops_var": 0.3102,
+   "estado": "definitivo",
+   "acum_pax": 10231211,
+   "acum_pax_var": 2.6404,
+   "acum_ops": 81822,
+   "acum_ops_var": 1.2274,
+   "blob": "1576864315319"
+  },
+  "2022-08": {
+   "pax": 2053331,
+   "pax_var": 0.4665,
+   "ops": 15162,
+   "ops_var": 0.1633,
+   "estado": "definitivo",
+   "acum_pax": 12284542,
+   "acum_pax_var": 1.9175,
+   "acum_ops": 96984,
+   "acum_ops_var": 0.9487,
+   "blob": "1576864315343"
+  },
+  "2022-09": {
+   "pax": 1889147,
+   "pax_var": 0.4114,
+   "ops": 13731,
+   "ops_var": 0.1351,
+   "estado": "definitivo",
+   "acum_pax": 14173689,
+   "acum_pax_var": 1.5542,
+   "acum_ops": 110715,
+   "acum_ops_var": 0.7896,
+   "blob": "1576864315365"
+  },
+  "2022-10": {
+   "pax": 1891761,
+   "pax_var": 0.2433,
+   "ops": 14110,
+   "ops_var": 0.1061,
+   "estado": "definitivo",
+   "acum_pax": 16065450,
+   "acum_pax_var": 1.2721,
+   "acum_ops": 124825,
+   "acum_ops_var": 0.6728,
+   "blob": "1576864315387"
+  },
+  "2022-11": {
+   "pax": 1202899,
+   "pax_var": 0.2183,
+   "ops": 9558,
+   "ops_var": 0.0739,
+   "estado": "definitivo",
+   "acum_pax": 17268349,
+   "acum_pax_var": 1.143,
+   "acum_ops": 134383,
+   "acum_ops_var": 0.609,
+   "blob": "1576864315425"
+  },
+  "2022-12": {
+   "pax": 1189657,
+   "pax_var": 0.4568,
+   "ops": 9740,
+   "ops_var": 0.1162,
+   "estado": "definitivo",
+   "acum_pax": 18458006,
+   "acum_pax_var": 1.0799,
+   "acum_ops": 144123,
+   "acum_ops_var": 0.5623,
+   "blob": "1576864315447"
+  },
+  "2023-01": {
+   "pax": 1120167,
+   "pax_var": 0.6093,
+   "ops": 9023,
+   "ops_var": 0.1743,
+   "estado": "definitivo",
+   "blob": "1576869791650"
+  },
+  "2023-02": {
+   "pax": 1123164,
+   "pax_var": 0.2888,
+   "ops": 8572,
+   "ops_var": 0.0978,
+   "estado": "definitivo",
+   "acum_pax": 2243331,
+   "acum_pax_var": 0.4311,
+   "acum_ops": 17595,
+   "acum_ops_var": 0.1357,
+   "blob": "1576869791672"
+  },
+  "2023-03": {
+   "pax": 1475066,
+   "pax_var": 0.2512,
+   "ops": 10910,
+   "ops_var": 0.1273,
+   "estado": "definitivo",
+   "acum_pax": 3718397,
+   "acum_pax_var": 0.3539,
+   "acum_ops": 28505,
+   "acum_ops_var": 0.1325,
+   "blob": "1576869791694"
+  },
+  "2023-04": {
+   "pax": 2020881,
+   "pax_var": 0.2173,
+   "ops": 14503,
+   "ops_var": 0.1177,
+   "estado": "definitivo",
+   "acum_pax": 5739278,
+   "acum_pax_var": 0.3025,
+   "acum_ops": 43008,
+   "acum_ops_var": 0.1275,
+   "blob": "1576869791716"
+  },
+  "2023-05": {
+   "pax": 2151259,
+   "pax_var": 0.1614,
+   "ops": 15230,
+   "ops_var": 0.0763,
+   "estado": "definitivo",
+   "acum_pax": 7890537,
+   "acum_pax_var": 0.2607,
+   "acum_ops": 58238,
+   "acum_ops_var": 0.1136,
+   "blob": "1576869791738"
+  },
+  "2023-06": {
+   "pax": 2179575,
+   "pax_var": 0.1428,
+   "ops": 15452,
+   "ops_var": 0.0987,
+   "estado": "definitivo",
+   "acum_pax": 10070112,
+   "acum_pax_var": 0.2332,
+   "acum_ops": 73690,
+   "acum_ops_var": 0.1105,
+   "blob": "1576869791760"
+  },
+  "2023-07": {
+   "pax": 2432409,
+   "pax_var": 0.1778,
+   "ops": 17325,
+   "ops_var": 0.1205,
+   "estado": "definitivo",
+   "acum_pax": 12502521,
+   "acum_pax_var": 0.222,
+   "acum_ops": 91015,
+   "acum_ops_var": 0.1124,
+   "blob": "1576869791782"
+  },
+  "2023-08": {
+   "pax": 2419072,
+   "pax_var": 0.1781,
+   "ops": 16953,
+   "ops_var": 0.1181,
+   "estado": "definitivo",
+   "acum_pax": 14921593,
+   "acum_pax_var": 0.2147,
+   "acum_ops": 107968,
+   "acum_ops_var": 0.1133,
+   "blob": "1576869791804"
+  },
+  "2023-09": {
+   "pax": 2267087,
+   "pax_var": 0.2001,
+   "ops": 15847,
+   "ops_var": 0.1541,
+   "estado": "definitivo",
+   "acum_pax": 17188680,
+   "acum_pax_var": 0.2127,
+   "acum_ops": 123815,
+   "acum_ops_var": 0.1183,
+   "blob": "1576869791826"
+  },
+  "2023-10": {
+   "pax": 2215922,
+   "pax_var": 0.1714,
+   "ops": 15592,
+   "ops_var": 0.105,
+   "estado": "definitivo",
+   "acum_pax": 19404602,
+   "acum_pax_var": 0.2078,
+   "acum_ops": 139407,
+   "acum_ops_var": 0.1168,
+   "blob": "1576869791848"
+  },
+  "2023-11": {
+   "pax": 1474200,
+   "pax_var": 0.2255,
+   "ops": 11003,
+   "ops_var": 0.1512,
+   "estado": "definitivo",
+   "acum_pax": 20878802,
+   "acum_pax_var": 0.2091,
+   "acum_ops": 150410,
+   "acum_ops_var": 0.1193,
+   "blob": "1576869791886"
+  },
+  "2023-12": {
+   "pax": 1465459,
+   "pax_var": 0.2318,
+   "ops": 11306,
+   "ops_var": 0.1608,
+   "estado": "definitivo",
+   "acum_pax": 22344261,
+   "acum_pax_var": 0.2105,
+   "acum_ops": 161716,
+   "acum_ops_var": 0.1221,
+   "blob": "1576869791908"
+  },
+  "2024-01": {
+   "pax": 1344716,
+   "pax_var": 0.2005,
+   "ops": 10330,
+   "ops_var": 0.1449,
+   "estado": "definitivo",
+   "blob": "1576871817080"
+  },
+  "2024-02": {
+   "pax": 1423453,
+   "pax_var": 0.2674,
+   "ops": 10120,
+   "ops_var": 0.1806,
+   "estado": "definitivo",
+   "acum_pax": 2768169,
+   "acum_pax_var": 0.234,
+   "acum_ops": 20450,
+   "acum_ops_var": 0.1623,
+   "blob": "1576871817106"
+  },
+  "2024-03": {
+   "pax": 1752619,
+   "pax_var": 0.1882,
+   "ops": 12117,
+   "ops_var": 0.1106,
+   "estado": "definitivo",
+   "acum_pax": 4520788,
+   "acum_pax_var": 0.2158,
+   "acum_ops": 32567,
+   "acum_ops_var": 0.1425,
+   "blob": "1576871817128"
+  },
+  "2024-04": {
+   "pax": 2162313,
+   "pax_var": 0.07,
+   "ops": 15196,
+   "ops_var": 0.0478,
+   "estado": "definitivo",
+   "acum_pax": 6683101,
+   "acum_pax_var": 0.1644,
+   "acum_ops": 47763,
+   "acum_ops_var": 0.1106,
+   "blob": "1576871817150"
+  },
+  "2024-05": {
+   "pax": 2378112,
+   "pax_var": 0.1055,
+   "ops": 16344,
+   "ops_var": 0.0731,
+   "estado": "definitivo",
+   "acum_pax": 9061213,
+   "acum_pax_var": 0.1484,
+   "acum_ops": 64107,
+   "acum_ops_var": 0.1008,
+   "blob": "1576871817172"
+  },
+  "2024-06": {
+   "pax": 2433242,
+   "pax_var": 0.1164,
+   "ops": 16677,
+   "ops_var": 0.0793,
+   "estado": "definitivo",
+   "acum_pax": 11494455,
+   "acum_pax_var": 0.1414,
+   "acum_ops": 80784,
+   "acum_ops_var": 0.0963,
+   "blob": "1576871817194"
+  },
+  "2024-07": {
+   "pax": 2659167,
+   "pax_var": 0.0932,
+   "ops": 18401,
+   "ops_var": 0.0621,
+   "estado": "definitivo",
+   "acum_pax": 14153622,
+   "acum_pax_var": 0.1321,
+   "acum_ops": 99185,
+   "acum_ops_var": 0.0898,
+   "blob": "1576871817216"
+  },
+  "2024-08": {
+   "pax": 2652017,
+   "pax_var": 0.0963,
+   "ops": 18087,
+   "ops_var": 0.0669,
+   "estado": "definitivo",
+   "acum_pax": 16805639,
+   "acum_pax_var": 0.1263,
+   "acum_ops": 117272,
+   "acum_ops_var": 0.0862,
+   "blob": "1576871817238"
+  },
+  "2024-09": {
+   "pax": 2502378,
+   "pax_var": 0.1038,
+   "ops": 16892,
+   "ops_var": 0.0659,
+   "estado": "definitivo",
+   "acum_pax": 19308017,
+   "acum_pax_var": 0.1233,
+   "acum_ops": 134164,
+   "acum_ops_var": 0.0836,
+   "blob": "1576871817260"
+  },
+  "2024-10": {
+   "pax": 2429369,
+   "pax_var": 0.0963,
+   "ops": 16765,
+   "ops_var": 0.0752,
+   "estado": "definitivo",
+   "acum_pax": 21737386,
+   "acum_pax_var": 0.1202,
+   "acum_ops": 150929,
+   "acum_ops_var": 0.0827,
+   "blob": "1576871817282"
+  },
+  "2024-11": {
+   "pax": 1612790,
+   "pax_var": 0.094,
+   "ops": 12068,
+   "ops_var": 0.0968,
+   "estado": "definitivo",
+   "acum_pax": 23350176,
+   "acum_pax_var": 0.1184,
+   "acum_ops": 162997,
+   "acum_ops_var": 0.0837,
+   "blob": "1576871817320"
+  },
+  "2024-12": {
+   "pax": 1574043,
+   "pax_var": 0.0741,
+   "ops": 11922,
+   "ops_var": 0.0545,
+   "estado": "definitivo",
+   "acum_pax": 24924219,
+   "acum_pax_var": 0.1155,
+   "acum_ops": 174919,
+   "acum_ops_var": 0.0816,
+   "blob": "1576871817342"
+  },
+  "2025-01": {
+   "pax": 1369854,
+   "pax_var": 0.0187,
+   "ops": 10423,
+   "ops_var": 0.009,
+   "estado": "definitivo",
+   "blob": "1576875161843"
+  },
+  "2025-02": {
+   "pax": 1522401,
+   "pax_var": 0.0695,
+   "ops": 10934,
+   "ops_var": 0.0804,
+   "estado": "definitivo",
+   "acum_pax": 2892255,
+   "acum_pax_var": 0.0448,
+   "acum_ops": 21357,
+   "acum_ops_var": 0.0444,
+   "blob": "1576875161865"
+  },
+  "2025-03": {
+   "pax": 1897929,
+   "pax_var": 0.0829,
+   "ops": 13490,
+   "ops_var": 0.1133,
+   "estado": "definitivo",
+   "acum_pax": 4790184,
+   "acum_pax_var": 0.0596,
+   "acum_ops": 34847,
+   "acum_ops_var": 0.07,
+   "blob": "1576875161887"
+  },
+  "2025-04": {
+   "pax": 2387487,
+   "pax_var": 0.1041,
+   "ops": 16572,
+   "ops_var": 0.0906,
+   "estado": "definitivo",
+   "acum_pax": 7177671,
+   "acum_pax_var": 0.074,
+   "acum_ops": 51419,
+   "acum_ops_var": 0.0765,
+   "blob": "1576875161909"
+  },
+  "2025-05": {
+   "pax": 2584634,
+   "pax_var": 0.0868,
+   "ops": 17979,
+   "ops_var": 0.1,
+   "estado": "definitivo",
+   "acum_pax": 9762305,
+   "acum_pax_var": 0.0774,
+   "acum_ops": 69398,
+   "acum_ops_var": 0.0825,
+   "blob": "1576875161931"
+  },
+  "2025-06": {
+   "pax": 2632380,
+   "pax_var": 0.0818,
+   "ops": 18046,
+   "ops_var": 0.0821,
+   "estado": "definitivo",
+   "acum_pax": 12394685,
+   "acum_pax_var": 0.0783,
+   "acum_ops": 87444,
+   "acum_ops_var": 0.0824,
+   "blob": "1576875161942"
+  },
+  "2025-07": {
+   "pax": 2866644,
+   "pax_var": 0.078,
+   "ops": 19820,
+   "ops_var": 0.0771,
+   "estado": "definitivo",
+   "acum_pax": 15261329,
+   "acum_pax_var": 0.0783,
+   "acum_ops": 107264,
+   "acum_ops_var": 0.0815,
+   "blob": "1576875162084"
+  },
+  "2025-08": {
+   "pax": 2862342,
+   "pax_var": 0.0793,
+   "ops": 19292,
+   "ops_var": 0.0666,
+   "estado": "definitivo",
+   "acum_pax": 18123671,
+   "acum_pax_var": 0.0784,
+   "acum_ops": 126556,
+   "acum_ops_var": 0.0792,
+   "blob": "1576875162106"
+  },
+  "2025-09": {
+   "pax": 2626559,
+   "pax_var": 0.0496,
+   "ops": 17660,
+   "ops_var": 0.0455,
+   "estado": "definitivo",
+   "acum_pax": 20750230,
+   "acum_pax_var": 0.0747,
+   "acum_ops": 144216,
+   "acum_ops_var": 0.0749,
+   "blob": "1576875162128"
+  },
+  "2025-10": {
+   "pax": 2576731,
+   "pax_var": 0.0607,
+   "ops": 17420,
+   "ops_var": 0.0391,
+   "estado": "definitivo",
+   "acum_pax": 23326961,
+   "acum_pax_var": 0.0731,
+   "acum_ops": 161636,
+   "acum_ops_var": 0.0709,
+   "blob": "1576875162150"
+  },
+  "2025-11": {
+   "pax": 1752410,
+   "pax_var": 0.0866,
+   "ops": 12726,
+   "ops_var": 0.0545,
+   "estado": "definitivo",
+   "acum_pax": 25079371,
+   "acum_pax_var": 0.0741,
+   "acum_ops": 174362,
+   "acum_ops_var": 0.0697,
+   "blob": "1576875162237"
+  },
+  "2025-12": {
+   "pax": 1681268,
+   "pax_var": 0.0681,
+   "ops": 12659,
+   "ops_var": 0.0618,
+   "estado": "definitivo",
+   "acum_pax": 26760639,
+   "acum_pax_var": 0.0737,
+   "acum_ops": 187021,
+   "acum_ops_var": 0.0692,
+   "blob": "1576875162259"
+  },
+  "2026-01": {
+   "pax": 1440294,
+   "pax_var": 0.0514,
+   "ops": 10830,
+   "ops_var": 0.039,
+   "estado": "provisional",
+   "blob": "1576873282373"
+  },
+  "2026-02": {
+   "pax": 1575859,
+   "pax_var": 0.0352,
+   "ops": 11144,
+   "ops_var": 0.0195,
+   "estado": "provisional",
+   "acum_pax": 3016153,
+   "acum_pax_var": 0.0429,
+   "acum_ops": 21974,
+   "acum_ops_var": 0.029,
+   "blob": "1576873491064"
+  },
+  "2026-03": {
+   "pax": 2076522,
+   "pax_var": 0.0941,
+   "ops": 14222,
+   "ops_var": 0.0543,
+   "estado": "provisional",
+   "acum_pax": 5092675,
+   "acum_pax_var": 0.0632,
+   "acum_ops": 36196,
+   "acum_ops_var": 0.0388,
+   "blob": "1576873761596"
+  },
+  "2026-04": {
+   "pax": 2613939,
+   "pax_var": 0.0948,
+   "ops": 17681,
+   "ops_var": 0.0671,
+   "estado": "provisional",
+   "acum_pax": 7706614,
+   "acum_pax_var": 0.0737,
+   "acum_ops": 53877,
+   "acum_ops_var": 0.0479,
+   "blob": "1576873996874"
+  },
+  "2026-05": {
+   "pax": 2748494,
+   "pax_var": 0.0634,
+   "ops": 18473,
+   "ops_var": 0.0276,
+   "estado": "provisional",
+   "acum_pax": 10455108,
+   "acum_pax_var": 0.071,
+   "acum_ops": 72350,
+   "acum_ops_var": 0.0427,
+   "blob": "1576874341349"
+  },
+  "2026-06": {
+   "pax": 2771417,
+   "pax_var": 0.0528,
+   "ops": 19038,
+   "ops_var": 0.055,
+   "estado": "provisional",
+   "acum_pax": 13226525,
+   "acum_pax_var": 0.0671,
+   "acum_ops": 91388,
+   "acum_ops_var": 0.0452,
+   "blob": "1576874656844"
+  },
+  "2026-07": {
+   "pax": 3046818,
+   "pax_var": 0.0629,
+   "ops": 20839,
+   "ops_var": 0.0517,
+   "estado": "provisional",
+   "acum_pax": 16273343,
+   "acum_pax_var": 0.0663,
+   "acum_ops": 112227,
+   "acum_ops_var": 0.0464,
+   "blob": "1576874747198"
+  },
+  "2026-08": {
+   "pax": 3050841,
+   "pax_var": 0.0658,
+   "ops": 20312,
+   "ops_var": 0.0532,
+   "estado": "provisional",
+   "acum_pax": 19324184,
+   "acum_pax_var": 0.0662,
+   "acum_ops": 132539,
+   "acum_ops_var": 0.0475,
+   "blob": "1576874982299"
+  },
+  "2026-09": {
+   "pax": 2805764,
+   "pax_var": 0.0682,
+   "ops": 18766,
+   "ops_var": 0.0626,
+   "estado": "provisional",
+   "acum_pax": 22129948,
+   "acum_pax_var": 0.0665,
+   "acum_ops": 151305,
+   "acum_ops_var": 0.0492,
+   "blob": "1576875161438"
+  }
+ },
+ "anual": {
+  "2015": {
+   "pax": 14404206,
+   "pax_var": 0.0477,
+   "ops": 108909,
+   "ops_var": 0.006,
+   "hasta": "2015-12",
+   "completo": true
+  },
+  "2016": {
+   "pax": 16673151,
+   "pax_var": 0.1575,
+   "ops": 123715,
+   "ops_var": 0.1359,
+   "hasta": "2016-12",
+   "completo": true
+  },
+  "2017": {
+   "pax": 18626581,
+   "pax_var": 0.1172,
+   "ops": 137178,
+   "ops_var": 0.1088,
+   "hasta": "2017-12",
+   "completo": true
+  },
+  "2018": {
+   "pax": 19021779,
+   "pax_var": 0.0212,
+   "ops": 141352,
+   "ops_var": 0.0304,
+   "hasta": "2018-12",
+   "completo": true
+  },
+  "2019": {
+   "pax": 19858656,
+   "pax_var": 0.044,
+   "ops": 144939,
+   "ops_var": 0.0254,
+   "hasta": "2019-12",
+   "completo": true
+  },
+  "2020": {
+   "pax": 5161243,
+   "pax_var": -0.7401,
+   "ops": 59670,
+   "ops_var": -0.5883,
+   "hasta": "2020-12",
+   "completo": true
+  },
+  "2021": {
+   "pax": 8874635,
+   "pax_var": 0.7195,
+   "ops": 92248,
+   "ops_var": 0.546,
+   "hasta": "2021-12",
+   "completo": true
+  },
+  "2022": {
+   "pax": 18458006,
+   "pax_var": 1.0799,
+   "ops": 144123,
+   "ops_var": 0.5623,
+   "hasta": "2022-12",
+   "completo": true
+  },
+  "2023": {
+   "pax": 22344261,
+   "pax_var": 0.2105,
+   "ops": 161716,
+   "ops_var": 0.1221,
+   "hasta": "2023-12",
+   "completo": true
+  },
+  "2024": {
+   "pax": 24924219,
+   "pax_var": 0.1155,
+   "ops": 174919,
+   "ops_var": 0.0816,
+   "hasta": "2024-12",
+   "completo": true
+  },
+  "2025": {
+   "pax": 26760639,
+   "pax_var": 0.0737,
+   "ops": 187021,
+   "ops_var": 0.0692,
+   "hasta": "2025-12",
+   "completo": true
+  },
+  "2026": {
+   "pax": 22129948,
+   "pax_var": 0.0665,
+   "ops": 151305,
+   "ops_var": 0.0492,
+   "hasta": "2026-09",
+   "completo": false
+  }
+ },
+ "notas": {
+  "2024-01": {
+   "url": "https://www.aena.es/doc/detalleprensa/240212-agp-estadisticas-enero.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 250185
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 94532
+    },
+    {
+     "pais": "Alemania",
+     "pax": 94430
+    },
+    {
+     "pais": "Italia",
+     "pax": 72821
+    },
+    {
+     "pais": "Francia",
+     "pax": 61264
+    }
+   ]
+  },
+  "2024-02": {
+   "url": "https://www.aena.es/doc/detalleprensa/240312-agp-estadisticas-febrero.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 293867
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 97875
+    },
+    {
+     "pais": "Alemania",
+     "pax": 94116
+    },
+    {
+     "pais": "Italia",
+     "pax": 70975
+    },
+    {
+     "pais": "Francia",
+     "pax": 64644
+    }
+   ]
+  },
+  "2024-03": {
+   "url": "https://www.aena.es/doc/detalleprensa/240412-agp-estadisticas-marzo.pdf",
+   "tipo": "acumulado",
+   "meses": 3,
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 915855
+    },
+    {
+     "pais": "Alemania",
+     "pax": 315194
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 304624
+    },
+    {
+     "pais": "Italia",
+     "pax": 232519
+    },
+    {
+     "pais": "Francia",
+     "pax": 207466
+    }
+   ]
+  },
+  "2024-04": {
+   "url": "https://www.aena.es/doc/detalleprensa/240513-agp-estadisticas-abril.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 507515
+    },
+    {
+     "pais": "Alemania",
+     "pax": 165082
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 136394
+    },
+    {
+     "pais": "Italia",
+     "pax": 118237
+    },
+    {
+     "pais": "Francia",
+     "pax": 115425
+    }
+   ]
+  },
+  "2024-05": {
+   "url": "https://www.aena.es/doc/detalleprensa/240612-agp-estadisticas-mayo.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 571211
+    },
+    {
+     "pais": "Alemania",
+     "pax": 202426
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 143201
+    },
+    {
+     "pais": "Francia",
+     "pax": 135309
+    },
+    {
+     "pais": "Italia",
+     "pax": 122626
+    }
+   ]
+  },
+  "2024-06": {
+   "url": "https://www.aena.es/doc/detalleprensa/240712-agp-estadisticas-junio.pdf",
+   "tipo": "acumulado",
+   "meses": 6,
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 2602204
+    },
+    {
+     "pais": "Alemania",
+     "pax": 881119
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 723313
+    },
+    {
+     "pais": "Francia",
+     "pax": 602938
+    },
+    {
+     "pais": "Italia",
+     "pax": 588881
+    }
+   ]
+  },
+  "2024-07": {
+   "url": "https://www.aena.es/doc/detalleprensa/240812-agp-estadisticas-julio.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 623402
+    },
+    {
+     "pais": "Alemania",
+     "pax": 212292
+    },
+    {
+     "pais": "Francia",
+     "pax": 159584
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 131900
+    },
+    {
+     "pais": "Italia",
+     "pax": 128412
+    }
+   ]
+  },
+  "2024-08": {
+   "url": "https://www.aena.es/doc/detalleprensa/240912-agp-estadisticas-agosto.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 644776
+    },
+    {
+     "pais": "Alemania",
+     "pax": 217810
+    },
+    {
+     "pais": "Francia",
+     "pax": 172912
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 135690
+    },
+    {
+     "pais": "Italia",
+     "pax": 135690
+    }
+   ]
+  },
+  "2024-09": {
+   "url": "https://www.aena.es/doc/detalleprensa/241014-agp-estadisticas-septiembre.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 619396
+    },
+    {
+     "pais": "Alemania",
+     "pax": 214040
+    },
+    {
+     "pais": "Francia",
+     "pax": 147559
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 139006
+    },
+    {
+     "pais": "Italia",
+     "pax": 129118
+    }
+   ]
+  },
+  "2024-10": {
+   "url": "https://www.aena.es/doc/detalleprensa/241112-agp-estadisticas-octubre.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 567236
+    },
+    {
+     "pais": "Alemania",
+     "pax": 214841
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 148987
+    },
+    {
+     "pais": "Francia",
+     "pax": 132258
+    },
+    {
+     "pais": "Italia",
+     "pax": 126917
+    }
+   ]
+  },
+  "2024-11": {
+   "url": "https://www.aena.es/doc/detalleprensa/241212-agp-estadisticas-noviembre.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 329644
+    },
+    {
+     "pais": "Alemania",
+     "pax": 115894
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 108031
+    },
+    {
+     "pais": "Italia",
+     "pax": 88703
+    },
+    {
+     "pais": "Francia",
+     "pax": 70716
+    }
+   ]
+  },
+  "2024-12": {
+   "url": null,
+   "buscado": "2026-10-26"
+  },
+  "2025-01": {
+   "url": "https://www.aena.es/doc/detalleprensa/250212-agp-estadisticas-enero.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 243083
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 95395
+    },
+    {
+     "pais": "Alemania",
+     "pax": 92280
+    },
+    {
+     "pais": "Italia",
+     "pax": 84350
+    }
+   ]
+  },
+  "2025-02": {
+   "url": "https://www.aena.es/doc/detalleprensa/250312-agp-estadisticas-febrero.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 309276
+    },
+    {
+     "pais": "Alemania",
+     "pax": 109633
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 102791
+    },
+    {
+     "pais": "Italia",
+     "pax": 87013
+    }
+   ]
+  },
+  "2025-03": {
+   "url": "https://www.aena.es/doc/detalleprensa/250415-agp-estadisticas-marzo.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 428291
+    },
+    {
+     "pais": "Alemania",
+     "pax": 140450
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 120426
+    },
+    {
+     "pais": "Italia",
+     "pax": 108543
+    }
+   ]
+  },
+  "2025-04": {
+   "url": "https://www.aena.es/doc/detalleprensa/250515-agp-estadisticas-abril.pdf",
+   "tipo": "acumulado",
+   "meses": 4,
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 1556649
+    },
+    {
+     "pais": "Alemania",
+     "pax": 525010
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 461575
+    },
+    {
+     "pais": "Italia",
+     "pax": 410294
+    }
+   ]
+  },
+  "2025-05": {
+   "url": "https://www.aena.es/doc/detalleprensa/250612-agp-estadisticas-mayo.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 630414
+    },
+    {
+     "pais": "Alemania",
+     "pax": 205899
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 157137
+    },
+    {
+     "pais": "Francia",
+     "pax": 153129
+    },
+    {
+     "pais": "Italia",
+     "pax": 138882
+    }
+   ]
+  },
+  "2025-06": {
+   "url": "https://www.aena.es/doc/detalleprensa/250714-agp-estadisticas-junio.pdf",
+   "tipo": "acumulado",
+   "meses": 6,
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 2839152
+    },
+    {
+     "pais": "Alemania",
+     "pax": 926746
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 773669
+    },
+    {
+     "pais": "Italia",
+     "pax": 681537
+    }
+   ]
+  },
+  "2025-07": {
+   "url": "https://www.aena.es/doc/detalleprensa/250812-agp-estadisticas-julio.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 676296
+    },
+    {
+     "pais": "Alemania",
+     "pax": 204219
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 162377
+    },
+    {
+     "pais": "Francia",
+     "pax": 160610
+    },
+    {
+     "pais": "Irlanda",
+     "pax": 139482
+    },
+    {
+     "pais": "Italia",
+     "pax": 135882
+    }
+   ]
+  },
+  "2025-08": {
+   "url": "https://www.aena.es/doc/detalleprensa/250912-agp-estadisticas-agosto.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 698456
+    },
+    {
+     "pais": "Alemania",
+     "pax": 213215
+    },
+    {
+     "pais": "Francia",
+     "pax": 168392
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 159961
+    },
+    {
+     "pais": "Italia",
+     "pax": 140884
+    },
+    {
+     "pais": "Bélgica",
+     "pax": 101696
+    },
+    {
+     "pais": "Polonia",
+     "pax": 86584
+    },
+    {
+     "pais": "Marruecos",
+     "pax": 83404
+    }
+   ]
+  },
+  "2025-09": {
+   "url": "https://www.aena.es/doc/detalleprensa/251013-agp-estadisticas-septiembre.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 639698
+    },
+    {
+     "pais": "Alemania",
+     "pax": 203074
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 160111
+    },
+    {
+     "pais": "Francia",
+     "pax": 138352
+    },
+    {
+     "pais": "Italia",
+     "pax": 130036
+    },
+    {
+     "pais": "Irlanda",
+     "pax": 129028
+    },
+    {
+     "pais": "Bélgica",
+     "pax": 97162
+    }
+   ]
+  },
+  "2025-10": {
+   "url": "https://www.aena.es/doc/detalleprensa/251114-agp-estadisticas-octubre.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 614678
+    },
+    {
+     "pais": "Alemania",
+     "pax": 207809
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 160823
+    },
+    {
+     "pais": "Francia",
+     "pax": 133313
+    },
+    {
+     "pais": "Italia",
+     "pax": 132045
+    },
+    {
+     "pais": "Irlanda",
+     "pax": 119367
+    },
+    {
+     "pais": "Bélgica",
+     "pax": 97536
+    }
+   ]
+  },
+  "2025-11": {
+   "url": "https://www.aena.es/doc/detalleprensa/251212-agp-estadisticas-noviembre.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 353240
+    },
+    {
+     "pais": "Alemania",
+     "pax": 133069
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 114812
+    },
+    {
+     "pais": "Italia",
+     "pax": 84645
+    },
+    {
+     "pais": "Francia",
+     "pax": 78233
+    }
+   ]
+  },
+  "2025-12": {
+   "url": null,
+   "buscado": "2026-10-26"
+  },
+  "2026-01": {
+   "url": "https://www.aena.es/doc/detalleprensa/260212-agp-estadisticas-enero.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 254263
+    },
+    {
+     "pais": "Alemania",
+     "pax": 98415
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 88536
+    },
+    {
+     "pais": "Polonia",
+     "pax": 73434
+    },
+    {
+     "pais": "Italia",
+     "pax": 69469
+    }
+   ]
+  },
+  "2026-02": {
+   "url": "https://www.aena.es/doc/detalleprensa/260312-agp-estadisticas-febrero.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 305060
+    },
+    {
+     "pais": "Alemania",
+     "pax": 115365
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 91431
+    },
+    {
+     "pais": "Polonia",
+     "pax": 77269
+    },
+    {
+     "pais": "Italia",
+     "pax": 74683
+    }
+   ]
+  },
+  "2026-03": {
+   "url": "https://www.aena.es/doc/detalleprensa/260413-agp-estadisticas-marzo.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 435352
+    },
+    {
+     "pais": "Alemania",
+     "pax": 164408
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 123546
+    },
+    {
+     "pais": "Italia",
+     "pax": 98646
+    },
+    {
+     "pais": "Irlanda",
+     "pax": 90722
+    },
+    {
+     "pais": "Polonia",
+     "pax": 88957
+    },
+    {
+     "pais": "Francia",
+     "pax": 87677
+    }
+   ]
+  },
+  "2026-04": {
+   "url": "https://www.aena.es/doc/detalleprensa/260512-agp-estadisticas-abril.pdf",
+   "tipo": "acumulado",
+   "meses": 4,
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 1598401
+    },
+    {
+     "pais": "Alemania",
+     "pax": 577285
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 460499
+    },
+    {
+     "pais": "Italia",
+     "pax": 383182
+    }
+   ]
+  },
+  "2026-05": {
+   "url": "https://www.aena.es/doc/detalleprensa/260612-agp-estadisticas-mayo.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 659628
+    },
+    {
+     "pais": "Alemania",
+     "pax": 213641
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 161372
+    },
+    {
+     "pais": "Francia",
+     "pax": 152611
+    },
+    {
+     "pais": "Italia",
+     "pax": 146786
+    }
+   ]
+  },
+  "2026-06": {
+   "url": "https://www.aena.es/doc/detalleprensa/260714-agp-estadisticas-junio.pdf",
+   "tipo": "acumulado",
+   "meses": 6,
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 2936508
+    },
+    {
+     "pais": "Alemania",
+     "pax": 995389
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 764632
+    },
+    {
+     "pais": "Italia",
+     "pax": 685898
+    }
+   ]
+  },
+  "2026-07": {
+   "url": "https://www.aena.es/doc/detalleprensa/260812-agp-estadisticas-julio.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 702883
+    },
+    {
+     "pais": "Alemania",
+     "pax": 215989
+    },
+    {
+     "pais": "Italia",
+     "pax": 170770
+    },
+    {
+     "pais": "Francia",
+     "pax": 163992
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 149782
+    }
+   ]
+  },
+  "2026-08": {
+   "url": "https://www.aena.es/doc/detalleprensa/260915-agp-estadisticas-agosto.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 747501
+    },
+    {
+     "pais": "Alemania",
+     "pax": 224040
+    },
+    {
+     "pais": "Italia",
+     "pax": 178047
+    },
+    {
+     "pais": "Francia",
+     "pax": 168689
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 152758
+    },
+    {
+     "pais": "Irlanda",
+     "pax": 131958
+    },
+    {
+     "pais": "Polonia",
+     "pax": 114042
+    },
+    {
+     "pais": "Bélgica",
+     "pax": 111734
+    }
+   ]
+  },
+  "2026-09": {
+   "url": "https://www.aena.es/doc/detalleprensa/261013-agp-estadisticas-septiembre.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 670319
+    },
+    {
+     "pais": "Alemania",
+     "pax": 218425
+    },
+    {
+     "pais": "Italia",
+     "pax": 160142
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 156289
+    },
+    {
+     "pais": "Francia",
+     "pax": 148071
+    },
+    {
+     "pais": "Irlanda",
+     "pax": 126677
+    },
+    {
+     "pais": "Polonia",
+     "pax": 108327
+    },
+    {
+     "pais": "Bélgica",
+     "pax": 103476
+    }
+   ]
+  }
+ }
+}

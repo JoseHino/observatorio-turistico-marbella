@@ -1383,14 +1383,32 @@ footer a:hover { color: var(--text); }
   <!-- ── AEROPUERTO AGP ──────────────────────────── -->
   <div id="view-airport" class="view">
     <div class="airport-note">
-      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a2.12 2.12 0 0 0-3-3L13 8 4.8 6.2a1 1 0 0 0-.9 1.7l4.3 3.7-2.6 3.5H3l1.5 2 2 1.5v-2.7l3.5-2.6 3.7 4.3a1 1 0 0 0 1.7-.9z"/></svg>Datos mensuales reales del aeropuerto de Málaga-Costa del Sol (LEMG/AGP) desde <a href="https://ec.europa.eu/eurostat/databrowser/view/avia_par_es" target="_blank" style="color:var(--accent)">Eurostat avia_par_es</a>. Serie histórica combinada con totales anuales de <a href="https://www.aena.es/es/estadisticas/" target="_blank" style="color:var(--accent)">AENA</a>.
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a2.12 2.12 0 0 0-3-3L13 8 4.8 6.2a1 1 0 0 0-.9 1.7l4.3 3.7-2.6 3.5H3l1.5 2 2 1.5v-2.7l3.5-2.6 3.7 4.3a1 1 0 0 0 1.7-.9z"/></svg>Pasajeros, operaciones y primeros mercados del aeropuerto de Málaga-Costa del Sol (LEMG/AGP) según <a href="https://www.aena.es/es/estadisticas/informes-mensuales.html" target="_blank" style="color:var(--accent)">AENA</a> (informe mensual de tráfico y nota de prensa del aeropuerto), actualizados cada mes. El detalle por ruta y aeropuerto de origen es de <a href="https://ec.europa.eu/eurostat/databrowser/view/avia_par_es" target="_blank" style="color:var(--accent)">Eurostat avia_par_es</a>, que va con mucho retraso.
     </div>
-    <div id="airport-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando Eurostat…</div>
+    <div id="airport-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando AENA y Eurostat…</div>
     <div id="kpis-airport" class="grid"></div>
 
     <section>
-      <h2>Pasajeros mensuales en Málaga AGP <span class="pill">Eurostat · últimos 36 meses</span></h2>
+      <h2>Pasajeros mensuales en Málaga AGP <span class="pill">AENA · últimos 36 meses</span></h2>
       <div class="chart-wrap"><canvas id="chAirportMonthly"></canvas></div>
+      <p class="legend-note">Llegadas y salidas, todos los vuelos. La línea discontinua es el mismo mes del año anterior. Los últimos meses son datos provisionales de AENA.</p>
+    </section>
+
+    <section>
+      <h2>Principales mercados internacionales <span class="pill">AENA · nota de prensa mensual</span></h2>
+      <div class="month-picker" style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+        <label style="font-size:12px;color:var(--muted);font-weight:600">Mes:</label>
+        <select id="aena-mercados-mes" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
+        <span id="aena-mercados-info" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+      <div class="chart-wrap" style="height:320px"><canvas id="chAenaMercados"></canvas></div>
+      <p class="legend-note">Pasajeros en vuelos con cada país (llegadas y salidas). AENA solo cita en su nota los 4–8 primeros mercados, y algunos meses los da acumulados del año en lugar del mes: se indica junto al selector. Las barras grises son el mismo periodo del año anterior, cuando la nota de entonces lo recoge.</p>
+    </section>
+
+    <section>
+      <h2>Evolución de los primeros mercados <span class="pill">AENA · meses con dato mensual</span></h2>
+      <div class="chart-wrap" style="height:340px"><canvas id="chAenaMercadosEvol"></canvas></div>
+      <p class="legend-note">Solo los meses en que la nota de AENA da la cifra del mes. Los huecos son meses en los que dio el acumulado del año o en los que el país no salió entre los citados.</p>
     </section>
 
     <section>
@@ -1399,7 +1417,7 @@ footer a:hover { color: var(--text); }
     </section>
 
     <section>
-      <h2>Top rutas por país <span class="pill">Eurostat · año + mes seleccionables</span></h2>
+      <h2>Top rutas por país <span class="pill">Eurostat · hasta dic-2024</span></h2>
       <div class="month-picker" style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
         <label style="font-size:12px;color:var(--muted);font-weight:600">Año:</label>
         <select id="airport-year" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
@@ -1411,7 +1429,7 @@ footer a:hover { color: var(--text); }
     </section>
 
     <section>
-      <h2>Top 10 aeropuertos emisores <span class="pill">Eurostat · mes seleccionable</span></h2>
+      <h2>Top 10 aeropuertos emisores <span class="pill">Eurostat · hasta dic-2024</span></h2>
       <div class="chart-wrap" style="height:340px"><canvas id="chAirportTop10"></canvas></div>
       <p class="legend-note">Rutas domésticas agregadas bidireccionalmente (arribos + salidas) para evitar duplicados. Nombre completo del aeropuerto entre paréntesis con su código ICAO.</p>
     </section>
@@ -1422,7 +1440,7 @@ footer a:hover { color: var(--text); }
     </section>
 
     <section>
-      <h2>Evolución mensual por mercado <span class="pill">Top 6 países · rango configurable</span></h2>
+      <h2>Evolución mensual por mercado <span class="pill">Eurostat · hasta dic-2024</span></h2>
       <div class="month-picker" style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
         <label style="font-size:12px;color:var(--muted);font-weight:600">Desde:</label>
         <select id="origen-evol-from" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:13px;font-family:var(--mono)"></select>
@@ -2433,67 +2451,90 @@ function fmtMonth(ym) {
 // ═══════════════════════════════════════════════════════════════════════════
 async function loadAirport() {
     const est = document.getElementById("airport-estado");
-    est.textContent = "Consultando Eurostat…";
-    try {
-        // Ventana ampliada a 84 meses (~7 años) para permitir navegación 2019–2026
-        const sinceMonth = new Date(); sinceMonth.setMonth(sinceMonth.getMonth() - 84);
-        const since = `${sinceMonth.getFullYear()}-${String(sinceMonth.getMonth()+1).padStart(2,"0")}`;
-        const j     = await fetchEurostatLEMG(since);
-        const rows  = parseEurostatLEMG(j);
-        const agg   = aggregateByCountry(rows);
-        AIRPORT_DATA = { rows, agg };
-        est.textContent = `Eurostat OK · ${fmt0.format(rows.length)} registros mensuales (${Object.keys(agg.byCountryTotal).length} países)`;
-        est.style.color = "var(--good)";
-        renderAirport(agg, rows);
-    } catch (e) {
-        console.error(e);
-        est.textContent = "Error Eurostat: " + e.message + ". Mostrando datos anuales AENA únicamente.";
-        est.style.color = "var(--bad)";
-        renderAirport(null, null);
-    }
+    est.textContent = "Consultando AENA y Eurostat…";
+    // AENA: JSON que deja la Action actualizar-aena.yml (AENA no admite CORS).
+    const aenaP = fetch("data/aena_agp.json", { cache: "no-cache" })
+        .then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)));
+    // Eurostat: detalle por ruta (va con mucho retraso). Ventana de 84 meses.
+    const sinceMonth = new Date(); sinceMonth.setMonth(sinceMonth.getMonth() - 84);
+    const since = `${sinceMonth.getFullYear()}-${String(sinceMonth.getMonth()+1).padStart(2,"0")}`;
+    const euroP = fetchEurostatLEMG(since).then(j => {
+        const rows = parseEurostatLEMG(j);
+        return { rows, agg: aggregateByCountry(rows) };
+    });
+    const [aenaR, euroR] = await Promise.allSettled([aenaP, euroP]);
+    const aena = aenaR.status === "fulfilled" ? aenaR.value : null;
+    if (euroR.status === "fulfilled") AIRPORT_DATA = euroR.value;
+    else console.error(euroR.reason);
+    if (!aena) console.error(aenaR.reason);
+
+    const partes = [];
+    partes.push(aena ? `AENA OK · último mes ${fmtMonth(aena.ultimo_mes)}` : "Error AENA: " + aenaR.reason.message);
+    if (AIRPORT_DATA) {
+        const ms = listAvailableMonths(AIRPORT_DATA.agg);
+        partes.push(`Eurostat (rutas) hasta ${fmtMonth(ms.at(-1))}`);
+    } else partes.push("Error Eurostat: " + euroR.reason.message);
+    est.textContent = partes.join(" · ");
+    est.style.color = aena ? "var(--good)" : "var(--bad)";
+
+    renderAirport(AIRPORT_DATA?.agg || null, AIRPORT_DATA?.rows || null, aena);
     renderOrigenAeropuerto(); // "Evolución mensual por mercado" (movida desde Nacionalidades)
 }
 
-function renderAirport(agg, rows) {
-    // KPIs dinámicos
-    const years   = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
-    const paxAENA = [13.7, 16.2, 18.7, 19.0, 19.7, 5.6, 9.7, 19.1, 22.7, 24.9];
-    const ops     = [120843, 139264, 155832, 158740, 161500, 47200, 80600, 157900, 161600, 174915];
+const fmtPct = v => v == null ? "—" : (v >= 0 ? "+" : "") + fmt.format(Math.round(v * 1000) / 10) + "%";
+const shiftYM = (ym, n) => { const [y, m] = ym.split("-").map(Number); const d = new Date(y, m - 1 + n, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; };
+// Texto del periodo de una nota de AENA: "Sep 2026" o "Ene–Jun 2026 (acumulado)"
+function periodoNota(ym, nota) {
+    if (nota.tipo !== "acumulado") return fmtMonth(ym);
+    const [y, m] = ym.split("-").map(Number);
+    return `${MESES[0]}–${MESES[m - 1]} ${y} (acumulado)`;
+}
 
-    let kpisHtml = "";
-    if (agg) {
-        const { last, list } = lastMonthPaxByCountry(agg.byCountryTime);
-        const totalLast = list.reduce((a, [,v]) => a+v, 0);
-        const top       = list.slice(0, 3);
-        const [t1, t2, t3] = top;
-        kpisHtml = [
-            { lbl: "Total pax · último mes",  val: fmt0.format(totalLast),   sub: last || "—",                                  cls: "" },
-            { lbl: "1º mercado",              val: COUNTRY_NAMES[t1[0]] || t1[0],  sub: fmt0.format(t1[1]) + " pax",             cls: "" },
-            { lbl: "2º mercado",              val: COUNTRY_NAMES[t2[0]] || t2[0],  sub: fmt0.format(t2[1]) + " pax",             cls: " gold" },
-            { lbl: "3er mercado",             val: COUNTRY_NAMES[t3[0]] || t3[0],  sub: fmt0.format(t3[1]) + " pax",             cls: " green" },
-            { lbl: "Pasajeros 2024 (AENA)",   val: "24,9 M",                  sub: "+11,5% vs 2023",                              cls: "" },
-            { lbl: "Operaciones 2024",        val: "174.915",                 sub: "+8,2% vs 2023",                                cls: " gold" },
-        ].map(k => `<div class="kpi${k.cls}"><div class="lbl">${k.lbl}</div><div class="val">${k.val}</div><div class="sub">${k.sub}</div></div>`).join("");
+function renderAirport(agg, rows, aena) {
+    // KPIs: AENA (mes más reciente); si no carga, los últimos totales anuales conocidos.
+    let kpis;
+    if (aena && aena.ultimo_mes) {
+        const ym = aena.ultimo_mes, r = aena.meses[ym];
+        const [y, m] = ym.split("-").map(Number);
+        const notaYm = Object.keys(aena.notas).filter(k => aena.notas[k].paises?.length).sort().at(-1);
+        const nota = notaYm ? aena.notas[notaYm] : null;
+        const top = nota ? nota.paises : [];
+        const sub = p => `${fmt0.format(p.pax)} pax · ${periodoNota(notaYm, nota)}`;
+        kpis = [
+            { lbl: "Pasajeros · " + fmtMonth(ym), val: fmt0.format(r.pax), sub: fmtPct(r.pax_var) + " interanual", cls: "" },
+            { lbl: "Operaciones · " + fmtMonth(ym), val: fmt0.format(r.ops), sub: fmtPct(r.ops_var) + " interanual", cls: " gold" },
+            { lbl: `Acumulado ${MESES[0]}–${MESES[m - 1]} ${y}`, val: fmt.format(Math.round(r.acum_pax / 1e5) / 10) + " M", sub: fmtPct(r.acum_pax_var) + " pasajeros", cls: " green" },
+            ...top.slice(0, 3).map((p, i) => ({ lbl: ["1er", "2º", "3er"][i] + " mercado", val: p.pais, sub: sub(p), cls: ["", " gold", " green"][i] })),
+        ];
     } else {
-        kpisHtml = [
-            { lbl: "Pasajeros 2024", val: "24,9 M",   sub: "+11,5% vs 2023",            cls: "" },
-            { lbl: "Operaciones 2024", val: "174.915", sub: "+8,2% vs 2023",            cls: " gold" },
-            { lbl: "1er mercado",     val: "Reino Unido", sub: "~5,7M pax",             cls: "" },
-            { lbl: "2º mercado",      val: "Alemania",    sub: "mayor crecimiento",      cls: " gold" },
-        ].map(k => `<div class="kpi${k.cls}"><div class="lbl">${k.lbl}</div><div class="val">${k.val}</div><div class="sub">${k.sub}</div></div>`).join("");
+        kpis = [
+            { lbl: "Pasajeros 2024", val: "24,9 M",   sub: "+11,5% vs 2023", cls: "" },
+            { lbl: "Operaciones 2024", val: "174.915", sub: "+8,2% vs 2023", cls: " gold" },
+        ];
     }
-    document.getElementById("kpis-airport").innerHTML = kpisHtml;
+    document.getElementById("kpis-airport").innerHTML = kpis
+        .map(k => `<div class="kpi${k.cls}"><div class="lbl">${k.lbl}</div><div class="val">${k.val}</div><div class="sub">${k.sub}</div></div>`).join("");
 
-    // Evolución mensual total
-    if (agg) {
-        const times = Object.keys(agg.totalByTime).sort();
-        const data  = times.map(t => ({ x: new Date(t + "-01T00:00:00"), y: agg.totalByTime[t] }));
+    // Serie anual: diciembre acumulado de AENA (años completos)
+    const anual = aena ? Object.entries(aena.anual).filter(([, a]) => a.completo) : [];
+    const years   = anual.length ? anual.map(([y]) => +y) : [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
+    const paxAENA = anual.length ? anual.map(([, a]) => Math.round(a.pax / 1e5) / 10) : [13.7, 16.2, 18.7, 19.0, 19.7, 5.6, 9.7, 19.1, 22.7, 24.9];
+    const ops     = anual.length ? anual.map(([, a]) => a.ops) : [120843, 139264, 155832, 158740, 161500, 47200, 80600, 157900, 161600, 174915];
+
+    // Evolución mensual (AENA, 36 meses) con el mismo mes del año anterior
+    if (aena && aena.ultimo_mes) {
+        const desde = shiftYM(aena.ultimo_mes, -35);
+        const ms = Object.keys(aena.meses).filter(k => k >= desde).sort();
+        const pt = (k, v) => ({ x: new Date(k + "-01T00:00:00"), y: v });
         lineChart("chAirportMonthly", [
-            { label: "Pasajeros mensuales (LEMG)", data, borderColor: C.cyan, backgroundColor: "rgba(6,182,212,.1)", fill: true, tension: .3, pointRadius: 2 },
+            { label: "Pasajeros (AENA)", data: ms.map(k => pt(k, aena.meses[k].pax)), borderColor: C.cyan, backgroundColor: "rgba(6,182,212,.1)", fill: true, tension: .3, pointRadius: 2 },
+            { label: "Mismo mes año anterior", data: ms.map(k => pt(k, aena.meses[shiftYM(k, -12)]?.pax ?? null)), borderColor: C.gold, borderDash: [5, 4], fill: false, tension: .3, pointRadius: 0 },
         ]);
     } else {
         destroyChart("chAirportMonthly");
     }
+
+    renderAenaMercados(aena);
 
     // Barras anuales AENA
     destroyChart("chAirportPax");
@@ -2583,6 +2624,95 @@ function renderAirport(agg, rows) {
             }
         }
     });
+}
+
+// Primeros mercados según la nota de prensa mensual de AENA (data/aena_agp.json)
+const AENA_PAIS_COLOR = {};
+const colorPais = p => AENA_PAIS_COLOR[p] ||= COUNTRY_COLORS[Object.keys(AENA_PAIS_COLOR).length % COUNTRY_COLORS.length];
+
+function renderAenaMercados(aena) {
+    const sel = document.getElementById("aena-mercados-mes");
+    const conNota = aena ? Object.keys(aena.notas).filter(k => aena.notas[k].paises?.length).sort().reverse() : [];
+    if (!conNota.length) {
+        destroyChart("chAenaMercados"); destroyChart("chAenaMercadosEvol");
+        document.getElementById("aena-mercados-info").textContent = aena ? "Sin notas de AENA con mercados." : "No se pudo cargar AENA.";
+        return;
+    }
+    // Orden de colores fijo por importancia (último mes con nota)
+    aena.notas[conNota[0]].paises.forEach(p => colorPais(p.pais));
+    sel.innerHTML = conNota.map(k => `<option value="${k}">${periodoNota(k, aena.notas[k])}</option>`).join("");
+    sel.value = conNota[0];
+    sel.onchange = () => pintarMes(sel.value);
+
+    function pintarMes(ym) {
+        const nota = aena.notas[ym];
+        const prev = aena.notas[shiftYM(ym, -12)];
+        // Solo se compara si el año anterior la nota es del mismo tipo (mes con mes, acumulado con acumulado)
+        const comparable = prev && prev.tipo === nota.tipo && prev.paises?.length;
+        const prevPax = p => comparable ? (prev.paises.find(q => q.pais === p)?.pax ?? null) : null;
+        const tot = nota.paises.reduce((a, p) => a + p.pax, 0);
+        const r = aena.meses[ym];
+        const base = nota.tipo === "acumulado" ? null : r?.pax;
+        document.getElementById("aena-mercados-info").innerHTML =
+            `${nota.paises.length} mercados citados · ${fmt0.format(tot)} pax` +
+            (base ? ` (${fmt.format(Math.round(tot / base * 1000) / 10)} % del total del mes)` : "") +
+            ` · <a href="${nota.url}" target="_blank" style="color:var(--accent)">nota de AENA</a>`;
+        const ds = [{
+            label: periodoNota(ym, nota),
+            data: nota.paises.map(p => p.pax),
+            backgroundColor: nota.paises.map(p => colorPais(p.pais) + "99"),
+            borderColor: nota.paises.map(p => colorPais(p.pais)),
+            borderWidth: 1, borderRadius: 4,
+        }];
+        if (comparable) ds.push({
+            label: periodoNota(shiftYM(ym, -12), prev),
+            data: nota.paises.map(p => prevPax(p.pais)),
+            backgroundColor: "rgba(148,163,184,0.35)", borderColor: "rgba(148,163,184,0.8)",
+            borderWidth: 1, borderRadius: 4,
+        });
+        destroyChart("chAenaMercados");
+        charts.chAenaMercados = new Chart(document.getElementById("chAenaMercados"), {
+            type: "bar",
+            data: { labels: nota.paises.map(p => p.pais), datasets: ds },
+            options: {
+                indexAxis: "y",
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: comparable ? LEGEND_PILLS : { display: false },
+                    tooltip: { callbacks: {
+                        label: ctx => `${ctx.dataset.label}: ${fmt0.format(ctx.parsed.x)} pax`,
+                        afterBody: items => {
+                            const p = nota.paises[items[0].dataIndex], pa = prevPax(p.pais);
+                            return pa ? `Variación: ${fmtPct(p.pax / pa - 1)}` : "";
+                        },
+                    } },
+                },
+                scales: {
+                    x: { ticks: { color: TICKS, callback: v => fmt0.format(v), font: FONT }, grid: { color: GRID } },
+                    y: { ticks: { color: TICKS, font: FONT }, grid: { color: GRID } },
+                }
+            }
+        });
+    }
+    pintarMes(conNota[0]);
+
+    // Evolución: meses con dato mensual, países que salen en al menos un tercio de ellos
+    const mensuales = conNota.filter(k => aena.notas[k].tipo === "mes").sort();
+    const veces = {};
+    mensuales.forEach(k => aena.notas[k].paises.forEach(p => veces[p.pais] = (veces[p.pais] || 0) + 1));
+    const paises = Object.keys(veces).filter(p => veces[p] >= mensuales.length / 3)
+        .sort((a, b) => Object.keys(AENA_PAIS_COLOR).indexOf(a) - Object.keys(AENA_PAIS_COLOR).indexOf(b)).slice(0, 8);
+    const todos = Object.keys(aena.meses).filter(k => k >= mensuales[0]).sort();
+    lineChart("chAenaMercadosEvol", paises.map(p => ({
+        label: p,
+        data: todos.map(k => {
+            const n = aena.notas[k];
+            const v = n && n.tipo === "mes" ? n.paises.find(q => q.pais === p)?.pax : null;
+            return { x: new Date(k + "-01T00:00:00"), y: v ?? null };
+        }),
+        borderColor: colorPais(p), backgroundColor: colorPais(p),
+        fill: false, cubicInterpolationMode: "monotone", pointRadius: 3, spanGaps: false,
+    })));
 }
 
 function renderAirportMonth(month) {

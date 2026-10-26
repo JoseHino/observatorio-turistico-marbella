@@ -88,8 +88,21 @@ Fuente: Observatorio Turístico de Marbella (punto turístico de Marbella del IN
 | Dinamarca | 107 | +21,59 % | 497 | −8,13 % | 0,71 % |
 | Suecia | 118 | +0 % | 443 | −27,61 % | 0,63 % |
 
-### Conectividad aérea (aeropuerto de Málaga)
-Sin datos recientes: Eurostat solo ha publicado hasta diciembre 2024. No se incluye en el análisis del mes.
+### Conectividad aérea · AENA, aeropuerto de Málaga-Costa del Sol · agosto 2026 (datos provisionales; llegadas y salidas)
+Pasajeros del mes: 3.050.841; mismo mes del año anterior: 2.862.342 (+6,58 %).
+Operaciones (aterrizajes y despegues) del mes: 20.312 (+5,32 % interanual).
+Acumulado enero–agosto: 19.324.184 pasajeros (+6,62 %) y 132.539 operaciones (+4,75 %).
+Primeros mercados internacionales citados por AENA en su nota de prensa (pasajeros en vuelos con cada país, del mes; AENA solo cita estos 8):
+| País | Pasajeros | Mismo periodo año anterior | Var. interanual |
+|---|---|---|---|
+| Reino Unido | 747.501 | 698.456 | +7,02 % |
+| Alemania | 224.040 | 213.215 | +5,08 % |
+| Italia | 178.047 | 140.884 | +26,38 % |
+| Francia | 168.689 | 168.392 | +0,18 % |
+| Países Bajos | 152.758 | 159.961 | −4,5 % |
+| Irlanda | 131.958 | n/d | n/d |
+| Polonia | 114.042 | 86.584 | +31,71 % |
+| Bélgica | 111.734 | 101.696 | +9,87 % |
 
 ### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)
 Altas inscritas en agosto 2026: 50; mismo mes del año anterior: 62 (−19,35 %).

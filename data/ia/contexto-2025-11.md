@@ -88,8 +88,18 @@ Fuente: Observatorio Turístico de Marbella (punto turístico de Marbella del IN
 | Suiza | 104 | −16,8 % | 1.105 | −23,26 % | 2,23 % |
 | Suecia | 96 | −29,41 % | 977 | −54,28 % | 1,97 % |
 
-### Conectividad aérea (aeropuerto de Málaga)
-Sin datos recientes: Eurostat solo ha publicado hasta diciembre 2024. No se incluye en el análisis del mes.
+### Conectividad aérea · AENA, aeropuerto de Málaga-Costa del Sol · noviembre 2025 (datos definitivos; llegadas y salidas)
+Pasajeros del mes: 1.752.410; mismo mes del año anterior: 1.612.790 (+8,66 %).
+Operaciones (aterrizajes y despegues) del mes: 12.726 (+5,45 % interanual).
+Acumulado enero–noviembre: 25.079.371 pasajeros (+7,41 %) y 174.362 operaciones (+6,97 %).
+Primeros mercados internacionales citados por AENA en su nota de prensa (pasajeros en vuelos con cada país, del mes; AENA solo cita estos 5):
+| País | Pasajeros | Mismo periodo año anterior | Var. interanual |
+|---|---|---|---|
+| Reino Unido | 353.240 | 329.644 | +7,16 % |
+| Alemania | 133.069 | 115.894 | +14,82 % |
+| Países Bajos | 114.812 | 108.031 | +6,28 % |
+| Italia | 84.645 | 88.703 | −4,57 % |
+| Francia | 78.233 | 70.716 | +10,63 % |
 
 ### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)
 Altas inscritas en noviembre 2025: 48; mismo mes del año anterior: 143 (−66,43 %).

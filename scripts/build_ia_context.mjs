@@ -70,22 +70,6 @@ const BLOQUES = [
     ]},
 ];
 
-// Mismas rutas que la pestaña Aeropuerto (LEMG_ROUTES en el HTML), solo los códigos.
-const LEMG_ROUTES = {
-    UK: ["EGKK","EGLL","EGCC","EGSS","EGGW","EGGD","EGBB","EGNX","EGNM","EGGP","EGAA","EGPF","EGPH"],
-    IE: ["EIDW","EICK"], NL: ["EHAM","EHEH","EHRD"], BE: ["EBBR","EBCI"],
-    FR: ["LFPO","LFPG","LFLL","LFMN","LFBO"], DE: ["EDDF","EDDM","EDDL","EDDB","EDDK","EDDS","EDDH"],
-    CH: ["LSZH","LSGG","LSZB"], AT: ["LOWW"], IT: ["LIRF","LIMC","LIME","LIPZ"], DK: ["EKCH"],
-    SE: ["ESSA","ESGG"], NO: ["ENGM","ENBR","ENZV"], FI: ["EFHK"], PL: ["EPWA","EPKK"], CZ: ["LKPR"],
-    PT: ["LPPT","LPPR"], LU: ["ELLX"], IS: ["BIKF"], US: ["KEWR"], CA: ["CYYZ"], MA: ["GMMN"],
-    ES: ["LEMD","LEBL","LEPA","LEIB","GCLP","GCTS","GCXO","LEBB","LEST","LEVC"],
-};
-const COUNTRY_NAMES = {
-    UK:"Reino Unido", IE:"Irlanda", NL:"Países Bajos", BE:"Bélgica", FR:"Francia", DE:"Alemania",
-    CH:"Suiza", AT:"Austria", IT:"Italia", DK:"Dinamarca", SE:"Suecia", NO:"Noruega", FI:"Finlandia",
-    PL:"Polonia", CZ:"República Checa", PT:"Portugal", LU:"Luxemburgo", IS:"Islandia",
-    US:"Estados Unidos", CA:"Canadá", MA:"Marruecos", ES:"España (doméstico)",
-};
 const CDS_AGREGADOS = new Set([
     "Total", "Extranjero", "España", "Resto de Europa", "Resto de la UE",
     "Resto del mundo", "Resto de América", "Resto de Asia",
@@ -189,49 +173,34 @@ function tablaPaises(cds, ref) {
     return out.join("\n");
 }
 
-async function loadAeropuerto(desde) {
-    const p = new URLSearchParams({ format: "JSON", lang: "EN", freq: "M", unit: "PAS", tra_meas: "PAS_CRD", sinceTimePeriod: desde });
-    Object.entries(LEMG_ROUTES).forEach(([cc, icaos]) => icaos.forEach(icao => {
-        p.append("airp_pr", `ES_LEMG_${cc}_${icao}`);
-        if (cc === "ES") p.append("airp_pr", `${cc}_${icao}_ES_LEMG`);
-    }));
-    const j = await getJSON(`https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/avia_par_es?${p}`);
-    const inv = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [v, k]));
-    const iAirp = j.id.indexOf("airp_pr"), iTime = j.id.indexOf("time");
-    const airp = inv(j.dimension.airp_pr.category.index), time = inv(j.dimension.time.category.index);
-    const strides = j.size.map((_, i) => j.size.slice(i + 1).reduce((a, b) => a * b, 1));
-    const byCountryTime = {}, totalByTime = {};
-    for (const [idx, pax] of Object.entries(j.value || {})) {
-        const parts = j.size.map((sz, i) => Math.floor(+idx / strides[i]) % sz);
-        const code = airp[parts[iAirp]].split("_"), t = time[parts[iTime]];
-        const cc = code[0] === "ES" && code[1] === "LEMG" ? code[2] : code[0];
-        if (!(cc in LEMG_ROUTES)) continue;
-        (byCountryTime[cc] ||= {})[t] = (byCountryTime[cc][t] || 0) + pax;
-        totalByTime[t] = (totalByTime[t] || 0) + pax;
+// Aeropuerto: data/aena_agp.json (Action actualizar-aena.yml, informes y notas de prensa de AENA).
+function tablaAeropuerto(aena, ref) {
+    const t = "### Conectividad aérea · AENA, aeropuerto de Málaga-Costa del Sol";
+    if (!aena?.meses) return `${t}\nNo se pudo cargar data/aena_agp.json.`;
+    const r = aena.meses[ref];
+    if (!r) return `${t}\nAENA aún no ha publicado ${label(ref)}. No se incluye en el análisis del mes.`;
+    const ra = aena.meses[shift(ref, -12)], m = +ref.slice(5);
+    const out = [
+        `${t} · ${label(ref)} (datos ${r.estado === "definitivo" ? "definitivos" : "provisionales"}; llegadas y salidas)`,
+        `Pasajeros del mes: ${fmt0.format(r.pax)}; mismo mes del año anterior: ${ra ? fmt0.format(ra.pax) : "n/d"} (${signed(r.pax_var * 100, " %")}).`,
+        `Operaciones (aterrizajes y despegues) del mes: ${fmt0.format(r.ops)} (${signed(r.ops_var * 100, " %")} interanual).`,
+        `Acumulado enero–${MESES_LARGOS[m - 1]}: ${fmt0.format(r.acum_pax)} pasajeros (${signed(r.acum_pax_var * 100, " %")}) y ${fmt0.format(r.acum_ops)} operaciones (${signed(r.acum_ops_var * 100, " %")}).`,
+    ];
+    const n = aena.notas?.[ref];
+    if (n?.paises?.length) {
+        const na = aena.notas[shift(ref, -12)];
+        const comp = na?.tipo === n.tipo && na.paises?.length;
+        const periodo = n.tipo === "acumulado" ? `acumulado enero–${MESES_LARGOS[m - 1]}` : "del mes";
+        out.push(`Primeros mercados internacionales citados por AENA en su nota de prensa (pasajeros en vuelos con cada país, ${periodo}; AENA solo cita estos ${n.paises.length}):`,
+            "| País | Pasajeros | Mismo periodo año anterior | Var. interanual |\n|---|---|---|---|",
+            ...n.paises.map(p => {
+                const va = comp ? na.paises.find(q => q.pais === p.pais)?.pax : null;
+                return `| ${p.pais} | ${fmt0.format(p.pax)} | ${va ? fmt0.format(va) : "n/d"} | ${signed(pct(p.pax, va), " %")} |`;
+            }));
+    } else {
+        out.push("AENA no ha publicado reparto por países para este mes.");
     }
-    return { byCountryTime, totalByTime };
-}
-
-function tablaAeropuerto(agg, ref) {
-    if (!agg) return "### Conectividad aérea (aeropuerto de Málaga)\nNo se pudo consultar Eurostat.";
-    const tot = agg.totalByTime;
-    const mes = Object.keys(tot).filter(m => m <= ref).sort().at(-1);
-    // Eurostat publica este conjunto con mucho retraso: un dato de hace más de
-    // medio año no describe la coyuntura del mes y se deja fuera.
-    if (!mes || mes < shift(ref, -6))
-        return `### Conectividad aérea (aeropuerto de Málaga)\nSin datos recientes: Eurostat solo ha publicado hasta ${mes ? label(mes) : "un periodo anterior"}. No se incluye en el análisis del mes.`;
-    const ant = shift(mes, -12), [y, m] = mes.split("-").map(Number);
-    let a = 0, b = 0;
-    for (let k = 1; k <= m; k++) { a += tot[`${y}-${pad(k)}`] || 0; b += tot[`${y - 1}-${pad(k)}`] || 0; }
-    const filas = Object.entries(agg.byCountryTime).map(([cc, o]) => [cc, o[mes] || 0, o[ant] || 0])
-        .sort((p, q) => q[1] - p[1]).slice(0, 12)
-        .map(([cc, v, va]) => `| ${COUNTRY_NAMES[cc] || cc} | ${fmt0.format(v)} | ${fmt0.format(va)} | ${signed(pct(v, va), " %")} |`);
-    return [
-        `### Conectividad aérea · Eurostat (avia_par_es), pasajeros en las rutas monitorizadas del aeropuerto de Málaga-Costa del Sol · ${label(mes)}${mes !== ref ? " (último mes publicado por Eurostat)" : ""}`,
-        `Total del mes: ${fmt0.format(tot[mes])} pasajeros; mismo mes del año anterior: ${tot[ant] ? fmt0.format(tot[ant]) : "n/d"} (${signed(pct(tot[mes], tot[ant]), " %")}). Acumulado enero–${MESES_LARGOS[m - 1]}: ${fmt0.format(a)} frente a ${fmt0.format(b)} (${signed(pct(a, b), " %")}).`,
-        "| País de origen/destino | Pasajeros | Mismo mes año anterior | Var. interanual |\n|---|---|---|---|",
-        ...filas,
-    ].join("\n");
+    return out.join("\n");
 }
 
 function tablaRTA(snap, ref) {
@@ -264,8 +233,7 @@ if (!meses.length) throw new Error("El INE no ha devuelto la EOH: no se genera n
 
 const cds  = await readLocal("data/paises_marbella.json");
 const snap = await readLocal("data/rta_vut_marbella.json");
-let aero = null;
-try { aero = await loadAeropuerto(shift(meses.at(-1), -14)); } catch (e) { console.warn("Eurostat:", e.message); }
+const aero = await readLocal("data/aena_agp.json");
 
 await mkdir(OUT, { recursive: true });
 for (const ref of meses) {

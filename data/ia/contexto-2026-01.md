@@ -88,8 +88,18 @@ Fuente: Observatorio Turístico de Marbella (punto turístico de Marbella del IN
 | Austria | 68 | +106,06 % | 610 | +22,49 % | 1,36 % |
 | Bélgica | 121 | −14,79 % | 570 | −11,49 % | 1,27 % |
 
-### Conectividad aérea (aeropuerto de Málaga)
-Sin datos recientes: Eurostat solo ha publicado hasta diciembre 2024. No se incluye en el análisis del mes.
+### Conectividad aérea · AENA, aeropuerto de Málaga-Costa del Sol · enero 2026 (datos provisionales; llegadas y salidas)
+Pasajeros del mes: 1.440.294; mismo mes del año anterior: 1.369.854 (+5,14 %).
+Operaciones (aterrizajes y despegues) del mes: 10.830 (+3,9 % interanual).
+Acumulado enero–enero: NaN pasajeros (−NaN %) y NaN operaciones (−NaN %).
+Primeros mercados internacionales citados por AENA en su nota de prensa (pasajeros en vuelos con cada país, del mes; AENA solo cita estos 5):
+| País | Pasajeros | Mismo periodo año anterior | Var. interanual |
+|---|---|---|---|
+| Reino Unido | 254.263 | 243.083 | +4,6 % |
+| Alemania | 98.415 | 92.280 | +6,65 % |
+| Países Bajos | 88.536 | 95.395 | −7,19 % |
+| Polonia | 73.434 | n/d | n/d |
+| Italia | 69.469 | 84.350 | −17,64 % |
 
 ### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)
 Altas inscritas en enero 2026: 46; mismo mes del año anterior: 133 (−65,41 %).
