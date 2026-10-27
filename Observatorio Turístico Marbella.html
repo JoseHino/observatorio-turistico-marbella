@@ -1141,7 +1141,7 @@ footer a:hover { color: var(--text); }
     <div class="airport-note">
       ℹ️ OAT · <b>Ocupación en Alojamientos Turísticos</b> (experimental INE). Explota datos de plataformas digitales (Airbnb, Booking, Vrbo…) e incluye apartamentos turísticos, VUT, casas rurales y albergues. Complementa a EOH/EOAP cubriendo la economía colaborativa. Serie disponible desde 2020.
       <br><br>
-      <b style="color:var(--warn)"><svg class="nic" style="color:inherit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Calendario INE</b> · OAT se publica con ~3 meses de retardo respecto al mes de referencia (frente al ~1 mes de EOH/EOAP). Por ejemplo, los datos de septiembre 2025 se publican en diciembre 2025; los de enero 2026 estarán disponibles hacia abril 2026. El observatorio descarga automáticamente la última fecha disponible en cuanto el INE la publica — no es posible obtener datos OAT más recientes que los publicados oficialmente. <a href="https://www.ine.es/dyngs/Prensa/OAT0325.htm" target="_blank">Calendario oficial</a>.
+      <b style="color:var(--warn)"><svg class="nic" style="color:inherit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Calendario INE</b> · OAT se publica con ~3 meses de retardo respecto al mes de referencia (frente al ~1 mes de EOH/EOAP). Por ejemplo, los datos de septiembre 2025 se publican en diciembre 2025; los de enero 2026 estarán disponibles hacia abril 2026. El observatorio descarga automáticamente la última fecha disponible en cuanto el INE la publica — no es posible obtener datos OAT más recientes que los publicados oficialmente. <a href="https://ine.es/experimental/ocupacion/experimental_ocupacion.htm" target="_blank">Calendario oficial</a>.
     </div>
     <div id="kpis-oat" class="grid"></div>
     <section>
@@ -1529,7 +1529,7 @@ footer a:hover { color: var(--text); }
     <a href="https://www.ine.es/dynt3/inebase/es/index.htm?padre=238" target="_blank">INE – EOH</a> ·
     <a href="https://www.ine.es/dynt3/inebase/es/index.htm?padre=239" target="_blank">EOAP</a> ·
     <a href="https://www.ine.es/dynt3/inebase/es/index.htm?padre=6357" target="_blank">IRSH</a> ·
-    <a href="https://www.ine.es/dyngs/Prensa/OAT0325.htm" target="_blank">OAT</a> ·
+    <a href="https://ine.es/experimental/ocupacion/experimental_ocupacion.htm" target="_blank">OAT</a> ·
     <a href="https://www.ine.es/dyngs/Prensa/EGATUR0125.htm" target="_blank">EGATUR</a> ·
     <a href="https://www.ine.es/dyngs/Prensa/FRONTUR0125.htm" target="_blank">FRONTUR</a> ·
     <a href="https://ec.europa.eu/eurostat/databrowser/view/avia_par_es" target="_blank">Eurostat</a> ·
@@ -4862,6 +4862,73 @@ window.addEventListener("DOMContentLoaded", () => {
     initChatbot();
     initIA();
 });
+</script>
+<style>.fuente-graf{font-size:11px;opacity:.75;margin:8px 2px 0;line-height:1.4}.fuente-graf a{color:inherit;text-decoration:underline}</style>
+<script>
+const CAJA_GRAFICA = "section";
+const FUENTES_GRAFICAS = {
+  "chPernocEOH": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
+  "chViajEOH": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
+  "chOcupEOH": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
+  "chEstEOH": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
+  "chPersonalEOH": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
+  "chPlantaEOH": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
+  "chPernocEOAP": [["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chViajEOAP": [["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chOcupEOAP": [["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chEstEOAP": [["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chPersonalEOAP": [["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chPlantaEOAP": [["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chOATAloj": [["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
+  "chOATPernoc": [["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
+  "chOATEst": [["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
+  "chOATCuota": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
+  "chRTAStock": [["Junta de Andalucía · Registro de Turismo de Andalucía (OpenRTA)", "https://www.juntadeandalucia.es/datosabiertos/portal/catalogo-datos/turismo"]],
+  "chRTALocalidad": [["Junta de Andalucía · Registro de Turismo de Andalucía (OpenRTA)", "https://www.juntadeandalucia.es/datosabiertos/portal/catalogo-datos/turismo"]],
+  "chCompPernoc": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
+  "chCompViaj": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chCompOcup": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chCompEst": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
+  "chCompPers": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
+  "chCdsRank": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
+  "chCdsEvol": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
+  "chCdsEstancia": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
+  "chCdsCuota": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
+  "chOrigenMix": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
+  "chOrigenCuota": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
+  "chFrontur": [["INE · FRONTUR", "https://www.ine.es/dyngs/Prensa/FRONTUR0125.htm"]],
+  "chGini": [["Elaboración propia con INE · EOH", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
+  "chPresion": [["Elaboración propia con INE · EOH, EOAP y plataformas", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Padrón municipal", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=517"]],
+  "chEgatur": [["INE · EGATUR", "https://www.ine.es/dyngs/Prensa/EGATUR0125.htm"]],
+  "chWeatherTemp": [["Open-Meteo", "https://open-meteo.com/en/docs"]],
+  "chClimaTemp": [["Open-Meteo · Historical Weather API (ERA5)", "https://open-meteo.com/en/docs/historical-weather-api"]],
+  "chClimaPrecip": [["Open-Meteo · Historical Weather API (ERA5)", "https://open-meteo.com/en/docs/historical-weather-api"]],
+  "chAirportMonthly": [["Aena · Estadísticas de tráfico", "https://www.aena.es/es/estadisticas/informes-mensuales.html"]],
+  "chAenaMercados": [["Aena · notas de prensa mensuales del aeropuerto de Málaga", "https://www.aena.es/es/estadisticas/informes-mensuales.html"]],
+  "chAenaMercadosEvol": [["Aena · notas de prensa mensuales del aeropuerto de Málaga", "https://www.aena.es/es/estadisticas/informes-mensuales.html"]],
+  "chAirportPax": [["Aena · Estadísticas de tráfico", "https://www.aena.es/es/estadisticas/informes-mensuales.html"]],
+  "chAirportOps": [["Aena · Estadísticas de tráfico", "https://www.aena.es/es/estadisticas/informes-mensuales.html"]],
+  "chAirportRoutes": [["Eurostat · avia_par_es", "https://ec.europa.eu/eurostat/databrowser/view/avia_par_es/default/table"]],
+  "chAirportTop10": [["Eurostat · avia_par_es", "https://ec.europa.eu/eurostat/databrowser/view/avia_par_es/default/table"]]
+};
+// ─── FUENTE BAJO CADA GRÁFICA ───────────────────────────────────────────────
+// Añade «Fuente: …» con enlace debajo de las gráficas que no la llevan ya.
+(function () {
+  const pon = () => {
+    for (const [id, fuentes] of Object.entries(FUENTES_GRAFICAS)) {
+      const c = document.getElementById(id);
+      if (!c) continue;
+      const caja = c.closest(CAJA_GRAFICA) || c.parentElement;
+      if (!caja || caja.querySelector('.fuente-graf') || /Fuente/i.test(caja.textContent || '')) continue;
+      const p = document.createElement('p');
+      p.className = 'fuente-graf';
+      p.innerHTML = 'Fuente: ' + fuentes.map(([t, u]) => u ? `<a href="${u}" target="_blank" rel="noopener">${t}</a>` : t).join(' · ');
+      caja.appendChild(p);
+    }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pon); else pon();
+  setTimeout(pon, 4000);
+})();
 </script>
 </body>
 </html>
