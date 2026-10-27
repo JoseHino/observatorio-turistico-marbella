@@ -1333,10 +1333,10 @@ footer a:hover { color: var(--text); }
     </section>
 
     <section>
-      <h2>Gasto medio por turista internacional <span class="pill">EGATUR · Andalucía</span></h2>
+      <h2>Gasto medio por turista internacional <span class="pill">EGATUR · España</span></h2>
       <div id="egatur-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando EGATUR…</div>
       <div class="chart-wrap"><canvas id="chEgatur"></canvas></div>
-      <p class="legend-note">Gasto medio por turista y gasto medio diario. EGATUR no publica nivel municipal; se usa el dato de Andalucía como aproximación.</p>
+      <p class="legend-note">Gasto medio por turista y gasto medio diario. EGATUR no publica nivel municipal; se muestra el total nacional como referencia.</p>
     </section>
   </div>
 
@@ -4376,7 +4376,7 @@ function answerQuery(rawQ) {
     // ── Gasto turista (EGATUR) ──
     if (chatMatch(q, ["gasto", "egatur", "ingresos turistico"])) {
         // Cargado en pestaña Origen — leer del Chart si existe sería complejo; usamos texto
-        return "El gasto medio se publica a nivel nacional/Andalucía (EGATUR). Abre la pestaña \"Origen y Gasto\" para verlo en gráfico. EGATUR no publica nivel municipal de Marbella.";
+        return "El gasto medio se muestra a nivel nacional (EGATUR). Abre la pestaña \"Origen y Gasto\" para verlo en gráfico. EGATUR no publica nivel municipal de Marbella.";
     }
 
     // ── Pernoctaciones / Viajeros (intent principal) ──
