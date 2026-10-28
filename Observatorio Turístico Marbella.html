@@ -544,6 +544,19 @@ tbody tr:hover { background: rgba(37,99,235,0.05); }
 .table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 .table-wrap::-webkit-scrollbar-thumb:hover { background: var(--faint); }
 
+/* ── DESCARGAS ────────────────────────────────── */
+.dl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-top: 14px; }
+.dl-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px 6px; background: var(--card); }
+.dl-card h3 { font: 700 13px var(--sans); margin: 0 0 4px; color: var(--accent); }
+.dl-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--border); }
+.dl-card h3 + .dl-item { border-top: 0; }
+.dl-item b { font: 600 12px var(--sans); display: block; color: var(--text); }
+.dl-item small { color: var(--muted); font-size: 11px; display: block; line-height: 1.4; margin-top: 2px; }
+.dl-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.dl-btns button { font: 600 11px var(--mono); padding: 6px 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--card); color: var(--text); cursor: pointer; }
+.dl-btns button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.dl-btns button:disabled { opacity: .5; cursor: wait; }
+
 /* ── PAÍSES MES A MES (Costa del Sol Big Data) ─── */
 .cds-barra { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
 .cds-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; background: var(--card); }
@@ -1073,7 +1086,7 @@ footer a:hover { color: var(--text); }
   <button data-view="comp">Comparativa</button>
   <button data-view="origen">Nacionalidades</button>
   <button data-view="econ">Economía</button>
-  <button data-view="table">Tabla</button>
+  <button data-view="table">Descargas</button>
   <button data-view="weather">Clima</button>
   <button data-view="airport">Aeropuerto AGP</button>
 </div>
@@ -1378,9 +1391,11 @@ footer a:hover { color: var(--text); }
   <!-- ── TABLA ───────────────────────────────────── -->
   <div id="view-table" class="view">
     <section>
-      <h2>Tabla consolidada (Hoteles + Apartamentos)</h2>
-      <div class="table-wrap"><table id="tbl"></table></div>
-      <p class="legend-note">Los valores en gris con asterisco (*) son provisionales o avance según publica el INE.</p>
+      <h2>Descarga de datos por pestaña</h2>
+      <p class="legend-note">Cada conjunto se descarga por separado, en Excel o en CSV (separado por «;», se abre directamente en Excel).
+        Las series del INE (hoteles, apartamentos, rentabilidad y plataformas) abarcan el rango elegido arriba en <b>Range</b>.
+        Los conjuntos marcados «una hoja por gráfica» recogen exactamente lo que dibujan las gráficas de esa pestaña.</p>
+      <div id="descargas" class="dl-grid"></div>
     </section>
   </div>
 
@@ -1676,7 +1691,6 @@ async function loadAll() {
         renderChartsEOAP();
         renderChartsOAT();
         renderChartsComp();
-        renderTable();
         const last = DATA.eoh_pernoc_esp?.at(-1)?.fecha;
         const lbl  = last ? `${MESES[last.getMonth()]} ${last.getFullYear()}` : "n/d";
         setStatus(`Datos cargados · Último mes INE disponible: ${lbl}`, "ready");
@@ -2085,33 +2099,6 @@ function renderChartsComp() {
 }
 
 // ─── TABLE ────────────────────────────────────────────────────────────────
-function renderTable() {
-    const tbl  = document.getElementById("tbl");
-    const keys = Object.keys(ALL_SERIES);
-    const allDates = new Set();
-    keys.forEach(k => (DATA[k] || []).forEach(p => allDates.add(p.fecha.getTime())));
-    const dates = [...allDates].sort((a, b) => b - a);
-    const idx = {};
-    keys.forEach(k => { idx[k] = {}; (DATA[k] || []).forEach(p => { idx[k][p.fecha.getTime()] = p; }); });
-    const groupLabel = k =>
-        k.startsWith("eoh_")  ? "Hoteles" :
-        k.startsWith("eoap_") ? "Apartamentos" :
-        k.startsWith("irsh_") ? "Rentabilidad IRSH" :
-        k.startsWith("oat_")  ? "Plataformas OAT" : "Marbella";
-    const head = `<thead><tr><th rowspan="2">Mes</th>${
-        keys.map(k => `<th title="${ALL_SERIES[k].cod}">${groupLabel(k)} – ${ALL_SERIES[k].label}</th>`).join("")
-    }</tr></thead>`;
-    const rows = dates.map(t => {
-        const d = new Date(t);
-        return `<tr><td>${MESES[d.getMonth()]} ${d.getFullYear()}</td>${keys.map(k => {
-            const p = idx[k][t];
-            if (!p || p.valor == null) return `<td>—</td>`;
-            return `<td style="${p.provisional ? 'color:#7db9e8' : ''}">${fmt.format(p.valor)}${p.provisional ? ' *' : ''}</td>`;
-        }).join("")}</tr>`;
-    }).join("");
-    tbl.innerHTML = head + `<tbody>${rows}</tbody>`;
-}
-
 // ─── WEATHER (Open-Meteo) ─────────────────────────────────────────────────
 const wsvg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const WICON = {
@@ -2270,47 +2257,255 @@ function buildWide(seriesMap) {
     return { header, rows };
 }
 
-function exportXLSX() {
-    const wb = XLSX.utils.book_new();
-    const sheets = [
-        ["Marbella_EOH",  SERIES_EOH],
-        ["Marbella_EOAP", SERIES_EOAP],
-        ["Marbella_IRSH", SERIES_IRSH],
-        ["Marbella_OAT",  SERIES_OAT],
-    ];
-    sheets.forEach(([name, series]) => {
-        const { header, rows } = buildWide(series);
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([header, ...rows]), name);
-    });
-    const groupName = k =>
-        k.startsWith("eoh_")  ? "EOH Hoteles" :
-        k.startsWith("eoap_") ? "EOAP Apartamentos" :
-        k.startsWith("irsh_") ? "IRSH Rentabilidad" :
-        k.startsWith("oat_")  ? "OAT Plataformas" : "Marbella";
-    Object.entries(ALL_SERIES).forEach(([k, meta]) => {
-        const serie = DATA[k] || [];
-        const sh = [
-            ["Serie", meta.cod, meta.label, groupName(k)], [],
-            ["Fecha","Valor","Provisional"],
-            ...serie.map(p => [
-                `${p.fecha.getFullYear()}-${String(p.fecha.getMonth() + 1).padStart(2, "0")}`,
-                p.valor, p.provisional ? "Sí" : "",
-            ]),
-        ];
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sh), meta.cod);
-    });
-    XLSX.writeFile(wb, `INE_Marbella_Turismo_${new Date().toISOString().slice(0, 10)}.xlsx`);
+// ─── DESCARGAS POR PESTAÑA ─────────────────────────────────────────────
+// Cada conjunto de datos se descarga por separado (Excel o CSV). Los que
+// salen de una API en vivo se leen de las propias gráficas de la pestaña,
+// cargándola antes si el usuario aún no la ha abierto.
+let RTA_RECORDS = null;
+
+const dlYM = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+
+function dlSeries(nombre, series) {
+    const { header, rows } = buildWide(series);
+    return [{ name: nombre, aoa: [header, ...rows] }];
 }
 
-function exportCSV() {
-    const { header, rows } = buildWide(ALL_SERIES);
-    const lines = [header.join(";"), ...rows.map(r => r.map(v => v ?? "").join(";"))];
-    const blob  = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const a     = document.createElement("a");
+function dlPaises(tipo) {
+    if (!CDS_PAIS) return [];
+    const d = CDS_PAIS.datos[tipo] || {};
+    const mercados = [...new Set([...Object.keys(d.Viajeros || {}), ...Object.keys(d.Pernoctaciones || {})])];
+    const clase = m => m === "Total" ? "Total" : m === "Extranjero" ? "Subtotal" : CDS_AGREGADOS.has(m) && m !== "España" ? "Grupo" : "País";
+    const orden = { "País": 0, "Grupo": 1, "Subtotal": 2, "Total": 3 };
+    mercados.sort((a, b) => orden[clase(a)] - orden[clase(b)] || a.localeCompare(b, "es"));
+    const rows = [];
+    CDS_PAIS.meses.forEach((m, i) => mercados.forEach(p => {
+        const v = d.Viajeros?.[p]?.[i], n = d.Pernoctaciones?.[p]?.[i];
+        if (v != null || n != null) rows.push([m, p, clase(p), v ?? null, n ?? null]);
+    }));
+    return [{ name: tipo === "Hoteles" ? "Países hoteles" : "Países apartamentos",
+              aoa: [["Mes", "País de residencia", "Tipo", "Viajeros", "Pernoctaciones"], ...rows] }];
+}
+
+async function dlRTAregistros() {
+    if (!RTA_RECORDS) {
+        const r = await fetch(RTA_SNAPSHOT_URLS[0], { cache: "no-cache" });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        RTA_RECORDS = (await r.json()).records || [];
+    }
+    return RTA_RECORDS;
+}
+
+async function dlRTA() {
+    // Sin el nombre del titular: basta el código de registro para identificar la vivienda.
+    const cols = [["registration_code", "Código de registro"], ["registration_date", "Fecha de inscripción"],
+        ["activity_start_date", "Inicio de actividad"], ["group", "Tipo"], ["tot_gen_places", "Plazas"],
+        ["tot_gen_ua", "Unidades de alojamiento"], ["establishment_address", "Dirección"],
+        ["postal_code", "Código postal"], ["locality", "Localidad"], ["catastral_ref", "Referencia catastral"],
+        ["coord_x", "Coordenada X (UTM)"], ["coord_y", "Coordenada Y (UTM)"]];
+    const recs = await dlRTAregistros();
+    return [{ name: "VUT registradas", aoa: [cols.map(c => c[1]), ...recs.map(r => cols.map(([k]) => r[k] ?? null))] }];
+}
+
+async function dlRTAaltas() {
+    const recs = await dlRTAregistros();
+    const por = {};
+    recs.forEach(r => {
+        const d = r.registration_date || r.activity_start_date;
+        if (!d || !/^\d{4}-\d{2}/.test(d)) return;
+        const k = d.slice(0, 7), o = por[k] || (por[k] = [0, 0]);
+        o[0]++; o[1] += parseInt(r.tot_gen_places, 10) || 0;
+    });
+    const rows = Object.keys(por).sort().map(k => [k, por[k][0], por[k][1]]);
+    return [{ name: "Altas VUT por mes", aoa: [["Mes", "VUT dadas de alta", "Plazas dadas de alta"], ...rows] }];
+}
+
+async function dlAENA() {
+    const r = await fetch("data/aena_agp.json", { cache: "no-cache" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+}
+
+async function dlAENAmensual() {
+    const a = await dlAENA();
+    const pct = v => v == null ? null : Math.round(v * 1000) / 10;
+    const rows = Object.keys(a.meses).sort().map(m => {
+        const o = a.meses[m];
+        return [m, o.pax ?? null, pct(o.pax_var), o.ops ?? null, pct(o.ops_var), o.estado || ""];
+    });
+    return [{ name: "AENA mensual", aoa: [["Mes", "Pasajeros", "Var. pasajeros (%)", "Operaciones", "Var. operaciones (%)", "Estado"], ...rows] }];
+}
+
+async function dlAENAmercados() {
+    const a = await dlAENA();
+    const rows = [];
+    Object.keys(a.notas).sort().forEach(m => (a.notas[m].paises || []).forEach(p =>
+        rows.push([m, a.notas[m].tipo === "acumulado" ? "Acumulado del año" : "Mes", p.pais, p.pax])));
+    return [{ name: "AENA mercados", aoa: [["Mes", "Periodo", "País", "Pasajeros"], ...rows] }];
+}
+
+// ── Datos leídos de las gráficas de una pestaña ──
+function dlCargarVista(view) {
+    if (view === "weather" && !LOADED.weather) { loadWeather(); loadHistoricalWeather(); LOADED.weather = true; }
+    if (view === "airport" && !LOADED.airport) { loadAirport(); LOADED.airport = true; }
+    if (view === "origen"  && !LOADED.origen)  { loadOrigen();  LOADED.origen  = true; }
+    if (view === "econ"    && !LOADED.econ)    { loadEcon();    LOADED.econ    = true; }
+    if (view === "rta"     && !LOADED.rta)     { loadRTA();     LOADED.rta     = true; }
+}
+
+function dlGraficasDe(view) {
+    return [...document.querySelectorAll(`#view-${view} canvas`)].map(c => Chart.getChart(c)).filter(Boolean);
+}
+
+async function dlEsperarGraficas(view) {
+    // Espera a que el número de gráficas deje de crecer (las APIs responden a destiempo).
+    let n = -1, estable = 0;
+    for (let t = 0; t < 50 && estable < 5; t++) {
+        const k = dlGraficasDe(view).length;
+        estable = (k === n && k > 0) ? estable + 1 : 0;
+        n = k;
+        await new Promise(r => setTimeout(r, 500));
+    }
+}
+
+function dlValorX(x) {
+    if (x instanceof Date) return x.getDate() === 1 ? dlYM(x) : x.toISOString().slice(0, 10);
+    if (typeof x === "number" && x > 1e11) return dlValorX(new Date(x));
+    return x;
+}
+
+function dlGrafica(ch) {
+    const ds = ch.data.datasets || [];
+    const porPuntos = ds.some(d => (d.data || []).some(v => v && typeof v === "object" && "x" in v));
+    const header = [porPuntos ? "Fecha" : "Categoría", ...ds.map((d, i) => d.label || `Serie ${i + 1}`)];
+    let rows;
+    if (porPuntos) {
+        const xs = new Map();
+        ds.forEach((d, j) => (d.data || []).forEach(p => {
+            if (!p || typeof p !== "object") return;
+            const k = dlValorX(p.x);
+            if (!xs.has(k)) xs.set(k, Array(ds.length).fill(null));
+            xs.get(k)[j] = p.y ?? null;
+        }));
+        rows = [...xs.keys()].sort().map(k => [k, ...xs.get(k)]);
+    } else {
+        rows = (ch.data.labels || []).map((l, i) => [Array.isArray(l) ? l.join(" ") : dlValorX(l),
+            ...ds.map(d => { const v = d.data?.[i]; return v && typeof v === "object" ? (v.y ?? v.x ?? null) : (v ?? null); })]);
+    }
+    const h2 = ch.canvas.closest("section")?.querySelector("h2")?.childNodes[0]?.textContent.trim() || ch.canvas.id;
+    const h3 = ch.canvas.closest("section div:has(> h3)")?.querySelector(":scope > h3");
+    const titulo = h3 ? `${h3.textContent.trim()} · ${h2}` : h2;
+    return { name: titulo, aoa: [header, ...rows] };
+}
+
+async function dlGraficas(view) {
+    dlCargarVista(view);
+    await dlEsperarGraficas(view);
+    const out = dlGraficasDe(view).map(dlGrafica).filter(s => s.aoa.length > 1);
+    if (!out.length) throw new Error("La pestaña no tiene datos cargados todavía");
+    return out;
+}
+
+const DESCARGAS = [
+    { tab: "Hoteles · EOH", items: [
+        { t: "Hoteles (EOH)", d: "Viajeros y pernoctaciones por residencia, ocupación, estancia media, establecimientos, plazas y personal. INE.", f: "hoteles-eoh", b: () => dlSeries("Hoteles EOH", SERIES_EOH) },
+        { t: "Rentabilidad hotelera (IRSH)", d: "ADR y RevPAR con su variación interanual. INE.", f: "rentabilidad-irsh", b: () => dlSeries("Rentabilidad IRSH", SERIES_IRSH) },
+    ] },
+    { tab: "Apartamentos · EOAP", items: [
+        { t: "Apartamentos turísticos (EOAP)", d: "Viajeros y pernoctaciones por residencia, ocupación, estancia media, apartamentos, plazas y personal. INE.", f: "apartamentos-eoap", b: () => dlSeries("Apartamentos EOAP", SERIES_EOAP) },
+    ] },
+    { tab: "Plataformas · OAT", items: [
+        { t: "Plataformas digitales (OAT)", d: "Alojamientos ocupados, pernoctaciones y estancia media en viviendas de plataformas. INE (experimental).", f: "plataformas-oat", b: () => dlSeries("Plataformas OAT", SERIES_OAT) },
+    ] },
+    { tab: "VUT · RTA", items: [
+        { t: "Viviendas turísticas registradas", d: "Una fila por VUT de Marbella: código, fechas, plazas, dirección y referencia catastral (sin el nombre del titular). Junta de Andalucía.", f: "vut-registro", b: dlRTA },
+        { t: "Altas de VUT por mes", d: "Viviendas y plazas inscritas cada mes.", f: "vut-altas-mensuales", b: dlRTAaltas },
+    ] },
+    { tab: "Comparativa", items: [
+        { t: "Gráficas de la comparativa", d: "Hoteles, apartamentos y plataformas lado a lado; una hoja por gráfica.", f: "comparativa", b: () => dlGraficas("comp") },
+    ] },
+    { tab: "Nacionalidades", items: [
+        { t: "Países · hoteles", d: "Viajeros y pernoctaciones por país de residencia y mes, desde 2019. Turismo Costa del Sol (microdato EOH).", f: "paises-hoteles", b: () => dlPaises("Hoteles") },
+        { t: "Países · apartamentos turísticos", d: "Lo mismo para apartamentos turísticos (EOAP).", f: "paises-apartamentos", b: () => dlPaises("Apartamentos") },
+        { t: "Resto de gráficas de la pestaña", d: "España frente a extranjero, cuotas y FRONTUR; una hoja por gráfica.", f: "nacionalidades-graficas", b: () => dlGraficas("origen") },
+    ] },
+    { tab: "Economía", items: [
+        { t: "Gráficas de economía", d: "Tipos de cambio (BCE), estacionalidad, presión turística y gasto (EGATUR); una hoja por gráfica.", f: "economia", b: () => dlGraficas("econ") },
+    ] },
+    { tab: "Clima", items: [
+        { t: "Clima", d: "Previsión y climatología mensual de Marbella (Open-Meteo); una hoja por gráfica.", f: "clima", b: () => dlGraficas("weather") },
+    ] },
+    { tab: "Aeropuerto AGP", items: [
+        { t: "Pasajeros y operaciones (AENA)", d: "Serie mensual del aeropuerto de Málaga-Costa del Sol desde 2015.", f: "aeropuerto-aena", b: dlAENAmensual },
+        { t: "Pasajeros por país (AENA)", d: "Principales mercados según las notas de prensa mensuales.", f: "aeropuerto-mercados", b: dlAENAmercados },
+        { t: "Resto de gráficas del aeropuerto", d: "Rutas y mercados por país (Eurostat, histórico) y demás gráficas de la pestaña; una hoja por gráfica.", f: "aeropuerto-graficas", b: () => dlGraficas("airport") },
+    ] },
+];
+
+function dlNombreHoja(n, usados) {
+    let s = String(n).replace(/[\[\]:*?\/\\]/g, " ").replace(/\s+/g, " ").trim().slice(0, 31) || "Datos";
+    let k = 2, base = s;
+    while (usados.has(s)) s = `${base.slice(0, 28)} ${k++}`;
+    usados.add(s);
+    return s;
+}
+
+function dlGuardarCSV(sheets, fichero) {
+    const cel = v => {
+        if (v == null) return "";
+        if (typeof v === "number") return String(v).replace(".", ",");
+        const s = String(v);
+        return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const bloques = sheets.map(s => (sheets.length > 1 ? [[s.name]] : []).concat(s.aoa).map(r => r.map(cel).join(";")).join("\r\n"));
+    const blob = new Blob(["﻿" + bloques.join("\r\n\r\n")], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `INE_Marbella_Turismo_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    a.download = fichero + ".csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function dlGuardarXLSX(sheets, fichero) {
+    const wb = XLSX.utils.book_new(), usados = new Set();
+    sheets.forEach(s => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s.aoa), dlNombreHoja(s.name, usados)));
+    XLSX.writeFile(wb, fichero + ".xlsx");
+}
+
+function renderDescargas() {
+    const cont = document.getElementById("descargas");
+    if (!cont || cont.childElementCount) return;
+    cont.innerHTML = DESCARGAS.map((g, gi) => `
+      <div class="dl-card"><h3>${g.tab}</h3>
+        ${g.items.map((it, ii) => `
+          <div class="dl-item">
+            <div><b>${it.t}</b><small>${it.d}</small><small class="dl-estado" id="dl-est-${gi}-${ii}"></small></div>
+            <div class="dl-btns">
+              <button data-g="${gi}" data-i="${ii}" data-fmt="xlsx">Excel</button>
+              <button data-g="${gi}" data-i="${ii}" data-fmt="csv">CSV</button>
+            </div>
+          </div>`).join("")}
+      </div>`).join("");
+    cont.addEventListener("click", async e => {
+        const b = e.target.closest("button[data-fmt]");
+        if (!b) return;
+        const it = DESCARGAS[+b.dataset.g].items[+b.dataset.i];
+        const est = document.getElementById(`dl-est-${b.dataset.g}-${b.dataset.i}`);
+        const btns = b.parentElement.querySelectorAll("button");
+        btns.forEach(x => x.disabled = true);
+        est.textContent = "Preparando…"; est.style.color = "var(--muted)";
+        try {
+            const sheets = await it.b();
+            if (!sheets.length || sheets.every(s => s.aoa.length < 2)) throw new Error("Sin datos cargados todavía");
+            const fichero = `marbella_${it.f}_${new Date().toISOString().slice(0, 10)}`;
+            (b.dataset.fmt === "xlsx" ? dlGuardarXLSX : dlGuardarCSV)(sheets, fichero);
+            est.textContent = "";
+        } catch (err) {
+            console.error(err);
+            est.textContent = "No se pudo descargar: " + err.message; est.style.color = "var(--bad)";
+        } finally {
+            btns.forEach(x => x.disabled = false);
+        }
+    });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3499,6 +3694,7 @@ async function loadRTA() {
             const r = await fetch(url, { cache: "no-cache" });
             if (!r.ok) continue;
             const snap = await r.json();
+            RTA_RECORDS = snap.records || [];
             renderRTA(snap.records || [], snap.total || (snap.records || []).length);
             est.textContent = `RTA OK · ${fmt0.format((snap.records || []).length)} VUT · datos del ${snap.fetched_at || "snapshot local"} (volcado oficial OpenRTA)`;
             est.style.color = "var(--good)";
@@ -4994,8 +5190,10 @@ function initIA() {
 // ─── INIT ─────────────────────────────────────────────────────────────────
 document.getElementById("refresh").addEventListener("click", loadAll);
 document.getElementById("nult").addEventListener("change", loadAll);
-document.getElementById("xlsx").addEventListener("click", exportXLSX);
-document.getElementById("csv").addEventListener("click", exportCSV);
+// Excel/CSV de la cabecera: llevan a la pestaña de descargas por conjunto.
+["xlsx", "csv"].forEach(id => document.getElementById(id).addEventListener("click", () =>
+    document.querySelector('#tabs button[data-view="table"]').click()));
+renderDescargas();
 window.addEventListener("DOMContentLoaded", () => {
     loadAll();
     initChatbot();
