@@ -567,10 +567,7 @@ tbody tr:hover { background: rgba(37,99,235,0.05); }
 .cds-nav { font: 600 11px/1 var(--mono); height: 28px; min-width: 30px; border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 4px; cursor: pointer; }
 .cds-nav:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .cds-nav:disabled { opacity: .35; cursor: default; }
-.cds-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 860px) { .cds-duo { grid-template-columns: 1fr; } }
-.cds-h3 { font: 600 12px var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin: 0 0 6px; }
-.chart-wrap.cds-alto { height: 600px; }
+.kpi.red .val { color: var(--bad); }
 
 /* ── WEATHER ──────────────────────────────────── */
 .weather-top {
@@ -1263,22 +1260,12 @@ footer a:hover { color: var(--text); }
 
   <!-- ── ORIGEN & GASTO ─────────────────────────── -->
   <div id="view-origen" class="view">
-    <div class="airport-note">
-      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Pernoctaciones y viajeros de Marbella por nacionalidad, con todo el histórico disponible, en 3 capas:
-      <b>(1)</b> <b style="color:var(--accent)">País de residencia real de los viajeros alojados, por tipo de alojamiento (Turismo Costa del Sol · microdato EOH del INE)</b>,
-      <b>(2)</b> Split España vs Extranjero (EOH + OAT, sin EOAP para evitar doble conteo),
-      <b>(3)</b> Llegadas internacionales a España por país (FRONTUR, referencia nacional).
-      <br><span style="color:var(--muted);font-size:11px">Los datos de aeropuerto (AENA / Eurostat) están en la pestaña <b>Aeropuerto</b>; el gasto del turista, en <b>Economía</b>.</span>
-    </div>
-    <div id="kpis-origen" class="grid"></div>
-
-    <!-- ── PAÍS DE RESIDENCIA (Costa del Sol Big Data) ───────────── -->
     <div class="airport-note" style="border-left:3px solid var(--accent)">
-      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><b>Dato directo por país.</b> El INE no publica el desglose por país a nivel municipal
-      (solo España/Extranjero). Turismo Costa del Sol sí publica una tabulación a medida del
-      microdato de la Encuesta de Ocupación Hotelera con ese cruce.
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+      <b style="color:var(--accent)">País de residencia de los viajeros alojados en Marbella</b>, en hoteles y apartamentos turísticos.
+      El INE solo publica España/Extranjero por municipio; el desglose por país es una tabulación del microdato de la EOH/EOAP que publica Turismo Costa del Sol.
       <span id="cds-validacion"></span>
-      <br><span style="color:var(--muted);font-size:11px">Serie por país desde enero de 2019: el reparto por mercado de la fuente no es consistente en años anteriores (el total España/Extranjero sí lo es y se ve en la gráfica de más abajo).</span>
+      <br><span style="color:var(--muted);font-size:11px">Serie por país desde enero de 2019 (antes el reparto por mercado de la fuente no es fiable). Los datos del aeropuerto están en <b>Aeropuerto</b> y el gasto del turista en <b>Economía</b>.</span>
     </div>
 
     <div class="month-picker cds-barra">
@@ -1290,60 +1277,29 @@ footer a:hover { color: var(--text); }
       <div class="cds-seg" id="cds-aloj">
         <button data-v="Ambos">Hoteles + AT</button><button data-v="Hoteles">Hoteles</button><button data-v="Apartamentos">Apart. turísticos</button>
       </div>
-      <label>Indicador</label>
+      <label>Medir por</label>
       <div class="cds-seg" id="cds-ind">
         <button data-v="Pernoctaciones">Pernoctaciones</button><button data-v="Viajeros">Viajeros</button>
       </div>
     </div>
 
     <section>
-      <h2>Países que visitan Marbella <span class="pill" id="cds-pill-mes">Marbella</span></h2>
-      <div id="cds-resumen" class="legend-hint" style="margin-bottom:12px;font-size:12px"></div>
-      <div class="cds-duo">
-        <div>
-          <h3 class="cds-h3">Viajeros</h3>
-          <div class="chart-wrap cds-alto"><canvas id="chCdsMesViaj"></canvas></div>
-        </div>
-        <div>
-          <h3 class="cds-h3">Pernoctaciones</h3>
-          <div class="chart-wrap cds-alto"><canvas id="chCdsMesPernoc"></canvas></div>
-        </div>
-      </div>
+      <h2>Quién visita Marbella <span class="pill" id="cds-pill-mes">Marbella</span></h2>
+      <div id="cds-resumen" class="grid" style="margin-bottom:14px"></div>
+      <p class="legend-note" style="margin:0 0 8px">Al final de cada barra: <b>pernoctaciones · viajeros · noches por viajero · variación</b> frente al mismo mes del año anterior (con «Medir por: Viajeros» se invierte el orden de las dos primeras cifras).</p>
+      <div class="chart-wrap" id="cds-mes-wrap"><canvas id="chCdsMes"></canvas></div>
       <p class="legend-note">
-        Cada barra es un país de residencia; en azul los hoteles (EOH) y en naranja los apartamentos turísticos (EOAP, «AT»).
-        Sumar ambos no duplica: son establecimientos distintos. Pasa el ratón por una barra para ver el detalle y la estancia media.
-        No se dibujan los grupos que la fuente da sin desglosar («Resto de…», «Países africanos»). China solo figura en hoteles.
-        <button class="cds-nav" id="cds-csv" style="width:auto;padding:0 10px;margin-left:6px;font-size:11px">Descargar CSV del mes</button>
+        Un país por barra, de mayor a menor. Sumar hoteles y apartamentos no duplica: son establecimientos distintos.
+        La variación se omite cuando la base del año anterior es muy pequeña. No se dibujan los grupos que la fuente da sin desglosar
+        («Resto de…», «Países africanos»); sí cuentan en los totales de arriba. Para descargar los datos, pestaña <b>Descargas</b>.
       </p>
     </section>
 
     <section>
-      <h2>Variación interanual por país <span class="pill" id="cds-pill-var">Pernoctaciones</span></h2>
-      <div class="chart-wrap cds-alto"><canvas id="chCdsVar"></canvas></div>
-      <p class="legend-note">Cambio frente al mismo mes del año anterior, con el alojamiento y el indicador elegidos arriba. Se omiten los países con una base muy pequeña el año anterior (menos de 300 viajeros o 1.000 pernoctaciones), donde el porcentaje no dice nada.</p>
-    </section>
-
-    <section>
-      <h2>Evolución mensual por país <span class="pill" id="cds-pill-evol">Serie mensual · desde 2019</span></h2>
+      <h2>Evolución por país <span class="pill" id="cds-pill-evol">Serie mensual · desde 2019</span></h2>
       <div id="cds-paises" class="legend-hint" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
       <div class="chart-wrap"><canvas id="chCdsEvol"></canvas></div>
-      <p class="legend-note">Haz clic en un país para añadirlo o quitarlo de la gráfica. Usa el alojamiento y el indicador elegidos arriba.</p>
-    </section>
-
-    <section>
-      <h2>Cuota nacional vs internacional <span class="pill" id="cds-pill-cuota">% de viajeros</span></h2>
-      <div class="chart-wrap" style="height:280px"><canvas id="chCdsCuota"></canvas></div>
-    </section>
-
-    <section>
-      <h2>Pernoctaciones en Marbella: España vs Extranjero <span class="pill">EOH + OAT</span></h2>
-      <div class="chart-wrap"><canvas id="chOrigenMix"></canvas></div>
-      <p class="legend-note">Suma de pernoctaciones en hoteles (EOH) y plataformas digitales (OAT), desglosada por residencia. Se excluye EOAP para evitar doble conteo, ya que una parte significativa de los apartamentos reglados también se comercializa en plataformas (Airbnb, Booking, Vrbo).</p>
-    </section>
-
-    <section>
-      <h2>Cuota % de extranjeros sobre el total de pernoctaciones</h2>
-      <div class="chart-wrap" style="height:280px"><canvas id="chOrigenCuota"></canvas></div>
+      <p class="legend-note">Pulsa un país para añadirlo o quitarlo; incluye España para comparar con el mercado nacional. Sigue el alojamiento y el indicador elegidos arriba.</p>
     </section>
 
     <section>
@@ -2426,7 +2382,7 @@ const DESCARGAS = [
     { tab: "Nacionalidades", items: [
         { t: "Países · hoteles", d: "Viajeros y pernoctaciones por país de residencia y mes, desde 2019. Turismo Costa del Sol (microdato EOH).", f: "paises-hoteles", b: () => dlPaises("Hoteles") },
         { t: "Países · apartamentos turísticos", d: "Lo mismo para apartamentos turísticos (EOAP).", f: "paises-apartamentos", b: () => dlPaises("Apartamentos") },
-        { t: "Resto de gráficas de la pestaña", d: "España frente a extranjero, cuotas y FRONTUR; una hoja por gráfica.", f: "nacionalidades-graficas", b: () => dlGraficas("origen") },
+        { t: "Gráficas de la pestaña", d: "Países del mes elegido, evolución por país y llegadas a España (FRONTUR); una hoja por gráfica.", f: "nacionalidades-graficas", b: () => dlGraficas("origen") },
     ] },
     { tab: "Economía", items: [
         { t: "Gráficas de economía", d: "Tipos de cambio (BCE), estacionalidad, presión turística y gasto (EGATUR); una hoja por gráfica.", f: "economia", b: () => dlGraficas("econ") },
@@ -3007,7 +2963,6 @@ function renderAirportMonth(month) {
 // ORIGEN & GASTO
 // ═══════════════════════════════════════════════════════════════════════════
 async function loadOrigen() {
-    renderOrigenLocal(); // EOH + EOAP + OAT already loaded
     initCdsPais();       // país de residencia (Turismo Costa del Sol · microdato EOH)
     loadFrontur();       // referencia nacional (llegadas por país)
     // Nota: las rutas de aeropuerto (Eurostat) están ahora en la pestaña Aeropuerto,
@@ -3106,7 +3061,6 @@ function initCdsPais() {
     seg("cds-aloj", "aloj");
     seg("cds-ind", "ind");
 
-    document.getElementById("cds-csv").addEventListener("click", descargarCdsMes);
 
     document.getElementById("cds-validacion").innerHTML =
         ` Serie mensual <b>${meta.desde}</b> → <b>${M[ultimo]}</b>, ${meta.paises.length} países. ` +
@@ -3128,15 +3082,11 @@ function renderCdsPais() {
     [["cds-aloj", aloj], ["cds-ind", ind]].forEach(([id, v]) =>
         document.querySelectorAll(`#${id} button`).forEach(b => b.classList.toggle("on", b.dataset.v === v)));
     document.getElementById("cds-pill-mes").textContent = `${cdsMesTxt(CDS_PAIS.meses[mes])} · ${CDS_ALOJ_TXT[aloj]}`;
-    document.getElementById("cds-pill-var").textContent = `${ind} · ${CDS_ALOJ_TXT[aloj]}`;
     document.getElementById("cds-pill-evol").textContent = `${ind} · ${CDS_ALOJ_TXT[aloj]}`;
-    document.getElementById("cds-pill-cuota").textContent = `% de ${ind.toLowerCase()} · ${CDS_ALOJ_TXT[aloj]}`;
 
     renderCdsMes();
-    renderCdsVar();
     renderCdsChips();
     renderCdsEvol();
-    renderCdsCuota();
 }
 
 function cdsFila(mercado, i) {
@@ -3162,138 +3112,138 @@ function cdsFila(mercado, i) {
 
 const CDS_COL = { Hoteles: "#2563eb", Apartamentos: "#f59e0b" };
 
-function renderCdsMes() {
-    const { mes, aloj } = cdsState;
-    const i = mes;
-    const tipos = CDS_ALOJ[aloj];
-    const mercados = [...CDS_PAIS.meta.paises, "España"];
-
-    // Orden común a las dos gráficas: por pernoctaciones del alojamiento elegido.
-    const filas = mercados.map(p => cdsFila(p, i))
-        .filter(r => cdsValAloj(aloj, "Pernoctaciones", r.mercado, i) != null || cdsValAloj(aloj, "Viajeros", r.mercado, i) != null)
-        .sort((a, b) => (cdsValAloj(aloj, "Pernoctaciones", b.mercado, i) || 0) - (cdsValAloj(aloj, "Pernoctaciones", a.mercado, i) || 0));
-    const labels = filas.map(r => r.mercado);
-
-    const totSel = cdsValAloj(aloj, "Pernoctaciones", "Total", i);
-    const extSel = cdsValAloj(aloj, "Pernoctaciones", "Extranjero", i);
-    const sv = cdsValAloj(aloj, "Viajeros", "Total", i);
-    const lider = filas.find(r => r.mercado !== "España");
-    document.getElementById("cds-resumen").innerHTML =
-        `<b>${cdsMesTxt(CDS_PAIS.meses[i])}</b> · ${CDS_ALOJ_TXT[aloj]}: ` +
-        `<b>${sv != null ? fmt0.format(sv) : "–"}</b> viajeros y <b>${totSel != null ? fmt0.format(totSel) : "–"}</b> pernoctaciones` +
-        (totSel && extSel != null ? ` · extranjeros: <b>${fmt1.format(extSel / totSel * 100)} %</b> de las pernoctaciones` : "") +
-        (lider ? ` · primer mercado extranjero: <b>${lider.mercado}</b>` : "");
-
-    const dibujar = (id, ind) => {
-        const unidad = ind.toLowerCase();
-        const datasets = tipos.map(tipo => ({
-            label: tipo === "Hoteles" ? "Hoteles" : "Apartamentos turísticos",
-            data: filas.map(r => cdsVal(tipo, ind, r.mercado, i)),
-            backgroundColor: filas.map(r => CDS_COL[tipo] + (r.mercado === "España" ? "66" : "cc")),
-            borderColor: CDS_COL[tipo], borderWidth: 0, borderRadius: 3, barPercentage: 0.85,
-        }));
-        destroyChart(id);
-        charts[id] = new Chart(document.getElementById(id), {
-            type: "bar",
-            data: { labels, datasets },
-            options: {
-                indexAxis: "y",
-                responsive: true, maintainAspectRatio: false,
-                interaction: { mode: "index", axis: "y", intersect: false },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: {
-                        label: ctx => ctx.parsed.x != null ? ` ${ctx.dataset.label}: ${fmt0.format(ctx.parsed.x)} ${unidad}` : null,
-                        footer: items => {
-                            const r = filas[items[0].dataIndex];
-                            const tot = cdsValAloj(aloj, ind, r.mercado, i);
-                            const out = [];
-                            if (tipos.length > 1 && tot != null) out.push(`Total: ${fmt0.format(tot)} ${unidad}`);
-                            if (r.est) out.push(`Estancia media: ${fmt1.format(r.est)} noches`);
-                            const totM = cdsValAloj(aloj, ind, "Total", i);
-                            if (tot != null && totM) out.push(`Cuota: ${fmt1.format(tot / totM * 100)} % del total`);
-                            return out;
-                        },
-                    } },
-                },
-                scales: {
-                    x: { stacked: true, ticks: { color: TICKS, callback: v => fmt0.format(v), font: FONT_MONO }, grid: { color: GRID } },
-                    y: { stacked: true, ticks: { color: TICKS, font: FONT, autoSkip: false }, grid: { display: false } },
-                },
-            },
-        });
-    };
-    dibujar("chCdsMesViaj", "Viajeros");
-    dibujar("chCdsMesPernoc", "Pernoctaciones");
+function cdsVarTxt(a, b, minBase) {
+    // Variación interanual en %, o null si la base es demasiado pequeña.
+    return a != null && b != null && b >= minBase ? (a / b - 1) * 100 : null;
 }
 
-function renderCdsVar() {
+function renderCdsMes() {
     const { mes, aloj, ind } = cdsState;
-    const j = cdsMesAnterior(mes);
+    const i = mes, j = cdsMesAnterior(mes);
+    const tipos = CDS_ALOJ[aloj];
+    const otro = ind === "Pernoctaciones" ? "Viajeros" : "Pernoctaciones";
     const minBase = ind === "Viajeros" ? 300 : 1000;
-    const filas = [...CDS_PAIS.meta.paises, "España"].map(p => {
-        const a = cdsValAloj(aloj, ind, p, mes), b = j >= 0 ? cdsValAloj(aloj, ind, p, j) : null;
-        return (a != null && b != null && b >= minBase) ? { p, v: (a / b - 1) * 100, a, b } : null;
-    }).filter(Boolean).sort((x, y) => y.v - x.v);
 
-    const unidad = ind.toLowerCase();
-    const mesPrev = j >= 0 ? cdsMesTxt(CDS_PAIS.meses[j]) : "";
-    destroyChart("chCdsVar");
-    charts.chCdsVar = new Chart(document.getElementById("chCdsVar"), {
+    // ── Cifras del mes (todos los mercados, grupos incluidos) ──
+    const tot = m => cdsValAloj(aloj, ind, m, i);
+    const T = tot("Total"), Tprev = j >= 0 ? cdsValAloj(aloj, ind, "Total", j) : null;
+    const tv = cdsValAloj(aloj, "Viajeros", "Total", i), tp = cdsValAloj(aloj, "Pernoctaciones", "Total", i);
+    const ext = tot("Extranjero");
+    const vT = cdsVarTxt(T, Tprev, 1);
+    const kpi = (lbl, val, sub, cls = "") => `<div class="kpi${cls}"><div class="lbl">${lbl}</div><div class="val">${val}</div><div class="sub">${sub}</div></div>`;
+    document.getElementById("cds-resumen").innerHTML = [
+        kpi("Pernoctaciones", tp != null ? fmt0.format(tp) : "–", CDS_ALOJ_TXT[aloj]),
+        kpi("Viajeros", tv != null ? fmt0.format(tv) : "–", CDS_ALOJ_TXT[aloj]),
+        kpi("Noches por viajero", tv && tp ? fmt1.format(tp / tv) : "–", "estancia media"),
+        kpi("Extranjeros", T && ext != null ? fmt1.format(ext / T * 100) + " %" : "–", `de las ${ind.toLowerCase()}`, " gold"),
+        kpi(`Variación ${ind.toLowerCase()}`, vT != null ? (vT >= 0 ? "+" : "") + fmt1.format(vT) + " %" : "–",
+            j >= 0 ? `frente a ${cdsMesTxt(CDS_PAIS.meses[j])}` : "sin año anterior", vT == null ? "" : vT >= 0 ? " green" : " red"),
+    ].join("");
+
+    // ── Una barra por país, ordenadas por el indicador elegido ──
+    const filas = [...CDS_PAIS.meta.paises, "España"].map(p => {
+        const a = tot(p);
+        if (a == null) return null;
+        const b = cdsValAloj(aloj, otro, p, i);
+        const v = cdsValAloj(aloj, "Viajeros", p, i), n = cdsValAloj(aloj, "Pernoctaciones", p, i);
+        return { p, a, b, est: v && n ? n / v : null,
+                 vari: j >= 0 ? cdsVarTxt(a, cdsValAloj(aloj, ind, p, j), minBase) : null,
+                 cuota: T ? a / T * 100 : null };
+    }).filter(Boolean).sort((x, y) => y.a - x.a);
+
+    const uA = ind === "Pernoctaciones" ? "noches" : "viajeros", uB = ind === "Pernoctaciones" ? "viajeros" : "noches";
+    const etiqueta = (f, corta) => {
+        const base = corta ? fmt0.format(f.a) : `${fmt0.format(f.a)} ${uA} · ${f.b != null ? fmt0.format(f.b) : "–"} ${uB}` +
+                                                (f.est ? ` · ${fmt1.format(f.est)} n/v` : "");
+        const v = f.vari == null ? "" : ` ${f.vari >= 0 ? "▲" : "▼"} ${fmt0.format(Math.abs(f.vari))} %`;
+        return [base, v, f.vari];
+    };
+
+    // Dibuja el texto al final de cada barra (sin librerías extra).
+    const pluginEtiquetas = {
+        id: "cdsEtiquetas",
+        afterDatasetsDraw(chart) {
+            const { ctx } = chart;
+            const corta = chart.width < 640;
+            ctx.save();
+            ctx.font = "500 11px 'JetBrains Mono', monospace";
+            ctx.textBaseline = "middle";
+            filas.forEach((f, k) => {
+                let x = 0, y = 0;
+                chart.data.datasets.forEach((_, d) => {
+                    if (!chart.isDatasetVisible(d)) return;
+                    const bar = chart.getDatasetMeta(d).data[k];
+                    if (bar && chart.data.datasets[d].data[k] != null) { x = Math.max(x, bar.x); y = bar.y; }
+                });
+                if (!y) return;
+                const [base, v, vari] = etiqueta(f, corta);
+                ctx.fillStyle = f.p === "España" ? "#8a94a3" : "#334155";
+                ctx.fillText(base, x + 6, y);
+                if (v) {
+                    ctx.fillStyle = vari >= 0 ? "#059669" : "#dc2626";
+                    ctx.fillText(v, x + 6 + ctx.measureText(base).width, y);
+                }
+            });
+            ctx.restore();
+        },
+    };
+
+    const wrap = document.getElementById("cds-mes-wrap");
+    wrap.style.height = Math.max(320, filas.length * 26 + 40) + "px";
+
+    destroyChart("chCdsMes");
+    charts.chCdsMes = new Chart(document.getElementById("chCdsMes"), {
         type: "bar",
         data: {
             labels: filas.map(f => f.p),
-            datasets: [{
-                label: "Variación interanual",
-                data: filas.map(f => f.v),
-                backgroundColor: filas.map(f => (f.v >= 0 ? C.green : "#dc2626") + "cc"),
-                borderRadius: 3, barPercentage: 0.8,
-            }],
+            datasets: tipos.map(tipo => ({
+                label: tipo === "Hoteles" ? "Hoteles" : "Apartamentos turísticos",
+                data: filas.map(f => cdsVal(tipo, ind, f.p, i)),
+                backgroundColor: filas.map(f => CDS_COL[tipo] + (f.p === "España" ? "55" : "dd")),
+                borderColor: CDS_COL[tipo], borderWidth: 0, borderRadius: 3, barPercentage: 0.78, categoryPercentage: 0.9,
+            })),
         },
+        plugins: [pluginEtiquetas],
         options: {
             indexAxis: "y",
             responsive: true, maintainAspectRatio: false,
+            layout: { padding: { right: ctx => ctx.chart.width < 640 ? 110 : 330 } },
+            interaction: { mode: "index", axis: "y", intersect: false },
             plugins: {
                 legend: { display: false },
                 tooltip: { callbacks: {
-                    label: ctx => {
-                        const f = filas[ctx.dataIndex];
-                        return [` ${f.v >= 0 ? "+" : ""}${fmt1.format(f.v)} %`,
-                                ` ${fmt0.format(f.a)} ${unidad} (${fmt0.format(f.b)} en ${mesPrev})`];
-                    } } },
+                    label: ctx => ctx.parsed.x != null ? ` ${ctx.dataset.label}: ${fmt0.format(ctx.parsed.x)} ${ind.toLowerCase()}` : null,
+                    footer: items => {
+                        const f = filas[items[0].dataIndex], out = [];
+                        if (tipos.length > 1) out.push(`Total: ${fmt0.format(f.a)} ${ind.toLowerCase()}`);
+                        if (f.b != null) out.push(`${otro}: ${fmt0.format(f.b)}`);
+                        if (f.est) out.push(`Noches por viajero: ${fmt1.format(f.est)}`);
+                        if (f.cuota != null) out.push(`Cuota: ${fmt1.format(f.cuota)} % del total`);
+                        if (f.vari != null) out.push(`Variación interanual: ${f.vari >= 0 ? "+" : ""}${fmt1.format(f.vari)} %`);
+                        return out;
+                    },
+                } },
             },
             scales: {
-                x: { ticks: { color: TICKS, callback: v => (v > 0 ? "+" : "") + fmt0.format(v) + " %", font: FONT_MONO }, grid: { color: GRID } },
-                y: { ticks: { color: TICKS, font: FONT, autoSkip: false }, grid: { display: false } },
+                x: { stacked: true, display: false, grid: { display: false } },
+                y: { stacked: true, ticks: { color: TICKS, font: FONT, autoSkip: false }, grid: { display: false }, border: { display: false } },
             },
         },
     });
 }
 
-function descargarCdsMes() {
-    const i = cdsState.mes, m = CDS_PAIS.meses[i];
-    const mercados = [...CDS_PAIS.meta.paises, ...cdsGrupos(), "Extranjero", "España", "Total"];
-    const n = v => v == null ? "" : String(v);
-    const lineas = [["País", "Hoteles viajeros", "Hoteles pernoctaciones", "AT viajeros", "AT pernoctaciones",
-                     "Total viajeros", "Total pernoctaciones"].join(";")];
-    mercados.forEach(p => {
-        const r = cdsFila(p, i);
-        lineas.push([p, n(r.hv), n(r.hp), n(r.av), n(r.ap), n(r.tv), n(r.tp)].join(";"));
-    });
-    const blob = new Blob(["﻿" + lineas.join("\r\n")], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `marbella-paises-${m}.csv`;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+function cdsColorPais(p) {
+    if (p === "España") return "#64748b";
+    const i = CDS_PAIS.meta.paises.indexOf(p);
+    return COUNTRY_COLORS[i % COUNTRY_COLORS.length];
 }
 
 function renderCdsChips() {
     const cont = document.getElementById("cds-paises");
     cont.innerHTML = "";
-    CDS_PAIS.meta.paises.forEach((p, i) => {
+    [...CDS_PAIS.meta.paises, "España"].forEach((p, i) => {
         const on = cdsState.paisesSel.includes(p);
-        const col = COUNTRY_COLORS[i % COUNTRY_COLORS.length];
+        const col = cdsColorPais(p);
         const chip = document.createElement("button");
         chip.textContent = p;
         chip.style.cssText =
@@ -3314,8 +3264,7 @@ function renderCdsEvol() {
     const { aloj, ind } = cdsState;
     const meses = CDS_PAIS.meses;
     const datasets = cdsState.paisesSel.map(p => {
-        const i = CDS_PAIS.meta.paises.indexOf(p);
-        const col = COUNTRY_COLORS[i % COUNTRY_COLORS.length];
+        const col = cdsColorPais(p);
         return {
             label: p,
             data: meses.map((m, k) => ({ x: m + "-01", y: cdsValAloj(aloj, ind, p, k) })),
@@ -3324,83 +3273,6 @@ function renderCdsEvol() {
         };
     });
     lineChart("chCdsEvol", datasets);
-}
-
-function renderCdsCuota() {
-    // Serie % de internacionales sobre el total, por mes.
-    const { aloj, ind } = cdsState;
-    const meses = CDS_PAIS.meses;
-    const pct = meses.map((m, k) => {
-        const t = cdsValAloj(aloj, ind, "Total", k);
-        if (!t) return { x: m + "-01", y: null };
-        const ext = cdsValAloj(aloj, ind, "Extranjero", k);
-        const e = ext != null ? ext : (t - (cdsValAloj(aloj, ind, "España", k) || 0));
-        return { x: m + "-01", y: e / t * 100 };
-    });
-    lineChart("chCdsCuota", [{
-        label: "% internacional",
-        data: pct,
-        borderColor: C.purple, backgroundColor: C.purple + "22",
-        borderWidth: 2, pointRadius: 0, tension: 0.25, fill: true, spanGaps: true,
-    }], {
-        ticks: { color: TICKS, callback: v => fmt0.format(v) + "%", font: FONT },
-        grid: { color: GRID }, min: 0, max: 100,
-    });
-}
-
-function renderOrigenLocal() {
-    // España vs Extranjero consolidado (hoteles EOH + plataformas OAT).
-    // Se excluye EOAP porque muchos apartamentos reglados también se comercializan
-    // en plataformas digitales (Airbnb/Booking), por lo que sumar EOAP + OAT
-    // duplicaría pernoctaciones. Ver nota INE sobre solapamiento OAT–EOAP.
-    const esp = sumSeries([DATA.eoh_pernoc_esp, DATA.oat_pernoc_esp]);
-    const ext = sumSeries([DATA.eoh_pernoc_ext, DATA.oat_pernoc_ext]);
-
-    // KPIs
-    const lastEsp = esp.at(-1), lastExt = ext.at(-1);
-    const total   = (lastEsp?.valor || 0) + (lastExt?.valor || 0);
-    const pctExt  = total ? (lastExt.valor / total) * 100 : 0;
-    const pctEsp  = total ? (lastEsp.valor / total) * 100 : 0;
-    const mes     = lastEsp ? `${MESES[lastEsp.fecha.getMonth()]} ${lastEsp.fecha.getFullYear()}` : "";
-
-    // YTD
-    const yearOf = last => last?.fecha?.getFullYear();
-    const ytdSum = (serie) => {
-        if (!serie?.length) return 0;
-        const y = yearOf(serie.at(-1));
-        return serie.filter(p => p.fecha.getFullYear() === y).reduce((a,p) => a + (p.valor || 0), 0);
-    };
-    const ytdEsp = ytdSum(esp), ytdExt = ytdSum(ext);
-
-    document.getElementById("kpis-origen").innerHTML = [
-        { lbl: "Pernoctaciones extranjero (mes)", val: fmt0.format(lastExt?.valor || 0), sub: mes,                              cls: " gold" },
-        { lbl: "Pernoctaciones España (mes)",     val: fmt0.format(lastEsp?.valor || 0), sub: mes,                              cls: "" },
-        { lbl: "Cuota extranjeros",               val: fmt.format(pctExt) + " %",         sub: "% sobre total del mes",          cls: " gold" },
-        { lbl: "Cuota nacionales",                val: fmt.format(pctEsp) + " %",         sub: "% sobre total del mes",          cls: " green" },
-        { lbl: "YTD extranjeros",                 val: fmt0.format(ytdExt),              sub: "Acumulado año en curso",         cls: " gold" },
-        { lbl: "YTD nacionales",                  val: fmt0.format(ytdEsp),              sub: "Acumulado año en curso",         cls: " green" },
-    ].map(k => `<div class="kpi${k.cls}"><div class="lbl">${k.lbl}</div><div class="val">${k.val}</div><div class="sub">${k.sub}</div></div>`).join("");
-
-    lineChart("chOrigenMix", [
-        { label: "Residentes en España",      data: P(esp), borderColor: C.green, backgroundColor: "rgba(16,185,129,.2)",  fill: true, tension: .3 },
-        { label: "Residentes en el Extranjero", data: P(ext), borderColor: C.gold,  backgroundColor: "rgba(217,119,6,.2)",  fill: true, tension: .3 },
-    ]);
-
-    // % extranjeros por mes
-    const idx = {};
-    esp.forEach(p => { idx[p.fecha.getTime()] = { esp: p.valor, ext: 0, fecha: p.fecha }; });
-    ext.forEach(p => {
-        const o = idx[p.fecha.getTime()] || { esp: 0, ext: 0, fecha: p.fecha };
-        o.ext = p.valor;
-        idx[p.fecha.getTime()] = o;
-    });
-    const cuota = Object.values(idx).sort((a,b) => a.fecha - b.fecha).map(r => ({
-        x: r.fecha,
-        y: (r.esp + r.ext) ? (r.ext / (r.esp + r.ext)) * 100 : null,
-    }));
-    lineChart("chOrigenCuota", [
-        { label: "% Extranjeros", data: cuota, borderColor: C.gold, backgroundColor: "rgba(217,119,6,.15)", fill: true, tension: .3 },
-    ], PCT_AXIS);
 }
 
 function renderOrigenAeropuerto() {
@@ -5227,13 +5099,8 @@ const FUENTES_GRAFICAS = {
   "chCompOcup": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
   "chCompEst": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
   "chCompPers": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
-  "chCdsMesViaj": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
-  "chCdsMesPernoc": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
-  "chCdsVar": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
+  "chCdsMes": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
   "chCdsEvol": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
-  "chCdsCuota": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
-  "chOrigenMix": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
-  "chOrigenCuota": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
   "chFrontur": [["INE · FRONTUR", "https://www.ine.es/dyngs/Prensa/FRONTUR0125.htm"]],
   "chGini": [["Elaboración propia con INE · EOH", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
   "chPresion": [["Elaboración propia con INE · EOH, EOAP y plataformas", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Padrón municipal", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=517"]],
