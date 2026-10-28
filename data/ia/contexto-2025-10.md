@@ -55,13 +55,13 @@ Fuente: Observatorio Turístico de Marbella (punto turístico de Marbella del IN
 **Hoteles**
 | Mercado | Viajeros | Var. interanual viajeros | Pernoctaciones | Var. interanual pernoctaciones | Cuota de pernoctaciones |
 |---|---|---|---|---|---|
-| Extranjero | 53.734 | −2,57 % | 212.748 | −0,08 % | 86,4 % |
+| Extranjero | 53.406 | −3,17 % | 213.646 | +0,34 % | 86,76 % |
 | Reino Unido | 10.409 | −10,28 % | 46.698 | +1,48 % | 18,96 % |
-| España | 14.687 | −11,74 % | 33.485 | −17,56 % | 13,6 % |
+| España | 14.236 | −14,45 % | 32.596 | −19,75 % | 13,24 % |
 | Países Bajos | 3.122 | −28,21 % | 20.588 | −16,18 % | 8,36 % |
 | Alemania | 3.875 | −18,54 % | 17.465 | −30,67 % | 7,09 % |
 | Francia | 3.835 | +35,99 % | 15.727 | +80,46 % | 6,39 % |
-| Irlanda | 3.507 | −13,9 % | 15.008 | −21,56 % | 6,1 % |
+| Irlanda | 3.507 | −13,9 % | 15.008 | −21,56 % | 6,09 % |
 | Estados Unidos | 3.211 | +41,02 % | 11.226 | +64 % | 4,56 % |
 | Bélgica | 1.838 | −16,53 % | 9.322 | −16,81 % | 3,79 % |
 | Suecia | 2.191 | −4,53 % | 9.081 | +18,71 % | 3,69 % |
@@ -104,6 +104,6 @@ Primeros mercados internacionales citados por AENA en su nota de prensa (pasajer
 | Bélgica | 97.536 | n/d | n/d |
 
 ### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)
-Altas inscritas en octubre 2025: 31; mismo mes del año anterior: 145 (−78,62 %).
-Altas acumuladas enero–octubre 2025: 1.485 frente a 1.877 en 2024 (−20,88 %).
-Parque inscrito a fecha del volcado (2026-10-26): 15.761 VUT y 92.044 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.
+Altas inscritas en octubre 2025: 31; mismo mes del año anterior: 144 (−78,47 %).
+Altas acumuladas enero–octubre 2025: 1.485 frente a 1.875 en 2024 (−20,8 %).
+Parque inscrito a fecha del volcado (2026-10-28): 15.758 VUT y 92.035 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.

@@ -55,38 +55,38 @@ Fuente: Observatorio Turístico de Marbella (punto turístico de Marbella del IN
 **Hoteles**
 | Mercado | Viajeros | Var. interanual viajeros | Pernoctaciones | Var. interanual pernoctaciones | Cuota de pernoctaciones |
 |---|---|---|---|---|---|
-| Extranjero | 31.161 | +38,11 % | 109.674 | +32,46 % | 81,05 % |
-| España | 10.930 | +16,1 % | 25.646 | +45,97 % | 18,95 % |
-| Reino Unido | 4.542 | +9,55 % | 16.072 | +0,43 % | 11,88 % |
-| Alemania | 2.422 | +36,91 % | 11.582 | +29,41 % | 8,56 % |
-| Estados Unidos | 2.520 | +143,01 % | 10.377 | +162,38 % | 7,67 % |
-| Polonia | 2.322 | +187,02 % | 6.354 | +136,65 % | 4,7 % |
-| Países Bajos | 1.588 | +27,96 % | 5.542 | +10,14 % | 4,1 % |
-| Irlanda | 1.129 | +34,89 % | 5.119 | +31,49 % | 3,78 % |
-| Suecia | 1.229 | +39,98 % | 4.377 | +16,01 % | 3,23 % |
-| Bélgica | 1.100 | +3,38 % | 4.369 | −11,61 % | 3,23 % |
-| Francia | 1.454 | +5,59 % | 4.245 | −3,94 % | 3,14 % |
-| Italia | 1.080 | +2,56 % | 2.820 | −40,15 % | 2,08 % |
-| Noruega | 489 | +46,85 % | 2.704 | +62,7 % | 2 % |
-| Suiza | 568 | −0,53 % | 2.115 | −8,52 % | 1,56 % |
+| Extranjero | 31.086 | +37,77 % | 109.599 | +32,37 % | 78,11 % |
+| España | 11.975 | +27,2 % | 30.722 | +74,86 % | 21,89 % |
+| Reino Unido | 4.542 | +9,55 % | 16.072 | +0,43 % | 11,45 % |
+| Alemania | 2.422 | +36,91 % | 11.582 | +29,41 % | 8,25 % |
+| Estados Unidos | 2.520 | +143,01 % | 10.377 | +162,38 % | 7,4 % |
+| Polonia | 2.322 | +187,02 % | 6.354 | +136,65 % | 4,53 % |
+| Países Bajos | 1.588 | +27,96 % | 5.542 | +10,14 % | 3,95 % |
+| Irlanda | 1.129 | +34,89 % | 5.119 | +31,49 % | 3,65 % |
+| Suecia | 1.229 | +39,98 % | 4.377 | +16,01 % | 3,12 % |
+| Bélgica | 1.100 | +3,38 % | 4.369 | −11,61 % | 3,11 % |
+| Francia | 1.454 | +5,59 % | 4.245 | −3,94 % | 3,03 % |
+| Italia | 1.080 | +2,56 % | 2.820 | −40,15 % | 2,01 % |
+| Noruega | 489 | +46,85 % | 2.704 | +62,7 % | 1,93 % |
+| Suiza | 568 | −0,53 % | 2.115 | −8,52 % | 1,51 % |
 
 **Apartamentos**
 | Mercado | Viajeros | Var. interanual viajeros | Pernoctaciones | Var. interanual pernoctaciones | Cuota de pernoctaciones |
 |---|---|---|---|---|---|
-| Extranjero | 5.400 | −4,29 % | 46.696 | +5,39 % | 94,21 % |
-| Alemania | 994 | +23,17 % | 10.157 | −2,55 % | 20,49 % |
-| Reino Unido | 662 | −41,98 % | 7.069 | −16,48 % | 14,26 % |
-| Estados Unidos | 311 | −73,44 % | 5.058 | −18,52 % | 10,2 % |
-| Noruega | 431 | +205,67 % | 4.087 | +140,84 % | 8,25 % |
-| España | 771 | +28,93 % | 2.869 | +22,87 % | 5,79 % |
-| Países Bajos | 307 | −11,53 % | 2.684 | −2,58 % | 5,42 % |
-| Dinamarca | 307 | +151,64 % | 2.081 | +241,15 % | 4,2 % |
-| Irlanda | 310 | +20,16 % | 1.820 | −36,03 % | 3,67 % |
-| Bélgica | 176 | +44,26 % | 1.431 | +25,2 % | 2,89 % |
-| Polonia | 220 | +12,82 % | 1.174 | +32,96 % | 2,37 % |
-| Francia | 197 | +11,93 % | 1.163 | −2,76 % | 2,35 % |
-| Suiza | 104 | −16,8 % | 1.105 | −23,26 % | 2,23 % |
-| Suecia | 96 | −29,41 % | 977 | −54,28 % | 1,97 % |
+| Extranjero | 6.043 | +7,11 % | 49.983 | +12,81 % | 94,57 % |
+| Alemania | 994 | +23,17 % | 10.157 | −2,55 % | 19,22 % |
+| Reino Unido | 662 | −41,98 % | 7.069 | −16,48 % | 13,38 % |
+| Estados Unidos | 311 | −73,44 % | 5.058 | −18,52 % | 9,57 % |
+| Noruega | 431 | +205,67 % | 4.087 | +140,84 % | 7,73 % |
+| España | 771 | +28,93 % | 2.869 | +22,87 % | 5,43 % |
+| Países Bajos | 307 | −11,53 % | 2.684 | −2,58 % | 5,08 % |
+| Dinamarca | 307 | +151,64 % | 2.081 | +241,15 % | 3,94 % |
+| Irlanda | 310 | +20,16 % | 1.820 | −36,03 % | 3,44 % |
+| Bélgica | 176 | +44,26 % | 1.431 | +25,2 % | 2,71 % |
+| Polonia | 220 | +12,82 % | 1.174 | +32,96 % | 2,22 % |
+| Francia | 197 | +11,93 % | 1.163 | −2,76 % | 2,2 % |
+| Suiza | 104 | −16,8 % | 1.105 | −23,26 % | 2,09 % |
+| Suecia | 96 | −29,41 % | 977 | −54,28 % | 1,85 % |
 
 ### Conectividad aérea · AENA, aeropuerto de Málaga-Costa del Sol · noviembre 2025 (datos definitivos; llegadas y salidas)
 Pasajeros del mes: 1.752.410; mismo mes del año anterior: 1.612.790 (+8,66 %).
@@ -103,5 +103,5 @@ Primeros mercados internacionales citados por AENA en su nota de prensa (pasajer
 
 ### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)
 Altas inscritas en noviembre 2025: 48; mismo mes del año anterior: 143 (−66,43 %).
-Altas acumuladas enero–noviembre 2025: 1.533 frente a 2.020 en 2024 (−24,11 %).
-Parque inscrito a fecha del volcado (2026-10-26): 15.761 VUT y 92.044 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.
+Altas acumuladas enero–noviembre 2025: 1.533 frente a 2.018 en 2024 (−24,03 %).
+Parque inscrito a fecha del volcado (2026-10-28): 15.758 VUT y 92.035 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.

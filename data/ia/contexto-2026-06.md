@@ -50,43 +50,43 @@ Fuente: Observatorio Turístico de Marbella (punto turístico de Marbella del IN
 | Pernoctaciones · residentes en el extranjero | marzo 2026 (último publicado) | 140.917 | 120.360 | **+17,08 %** | 115.399 | +22,11 % | 358.808 | 341.470 | +5,08 % |
 | Estancia media · total (días) | marzo 2026 (último publicado) | 6,8 | 7 | **−2,86 %** | 8 | −15 % |  |  |  |
 
-### Mercados de origen por país de residencia · Turismo Costa del Sol, Big Data (microdato EOH/EOAP del INE) · mayo 2026 (último mes disponible en esta fuente)
+### Mercados de origen por país de residencia · Turismo Costa del Sol, Big Data (microdato EOH/EOAP del INE) · junio 2026
 
 **Hoteles**
 | Mercado | Viajeros | Var. interanual viajeros | Pernoctaciones | Var. interanual pernoctaciones | Cuota de pernoctaciones |
 |---|---|---|---|---|---|
-| Extranjero | 72.822 | +26,08 % | 245.681 | +15,54 % | 84,26 % |
-| Reino Unido | 21.624 | +24,14 % | 82.129 | +16,76 % | 28,17 % |
-| España | 18.600 | +2,3 % | 45.895 | −8,93 % | 15,74 % |
-| Irlanda | 5.219 | +49,28 % | 17.005 | +14,76 % | 5,83 % |
-| Francia | 4.458 | −5,59 % | 15.963 | −1,94 % | 5,47 % |
-| Estados Unidos | 4.606 | +18,13 % | 15.789 | +5,25 % | 5,42 % |
-| Alemania | 4.246 | +78,63 % | 14.150 | +44,33 % | 4,85 % |
-| Países Bajos | 3.218 | +0,12 % | 11.459 | −2,04 % | 3,93 % |
-| Bélgica | 1.910 | +3,52 % | 8.194 | −0,27 % | 2,81 % |
-| Polonia | 1.792 | +4,13 % | 6.704 | −19,86 % | 2,3 % |
-| Suecia | 1.863 | +16,36 % | 6.658 | +26,41 % | 2,28 % |
-| Italia | 2.707 | +15,44 % | 6.112 | +18,47 % | 2,1 % |
-| Suiza | 1.817 | +58,55 % | 5.342 | +21,63 % | 1,83 % |
-| Noruega | 1.278 | +39,22 % | 4.024 | +21,87 % | 1,38 % |
+| Extranjero | 64.037 | +9,33 % | 244.140 | +5,71 % | 84,52 % |
+| Reino Unido | 20.057 | +19,18 % | 83.461 | +16,52 % | 28,9 % |
+| España | 18.261 | +10,43 % | 44.701 | −0,88 % | 15,48 % |
+| Irlanda | 3.392 | +21,75 % | 16.271 | +6,17 % | 5,63 % |
+| Estados Unidos | 4.908 | +13,56 % | 16.220 | −1,31 % | 5,62 % |
+| Alemania | 2.965 | +21,77 % | 12.564 | +12,19 % | 4,35 % |
+| Francia | 3.507 | −2,77 % | 11.525 | −13,07 % | 3,99 % |
+| Países Bajos | 2.454 | +8,58 % | 10.042 | −1,26 % | 3,48 % |
+| Italia | 2.978 | +32,59 % | 9.910 | +24,37 % | 3,43 % |
+| Polonia | 1.504 | +2,31 % | 6.863 | −16,06 % | 2,38 % |
+| Suecia | 1.590 | +42,6 % | 6.803 | +40,94 % | 2,36 % |
+| Bélgica | 1.705 | +28,39 % | 6.782 | −8,73 % | 2,35 % |
+| Noruega | 708 | −16,01 % | 4.128 | +28,12 % | 1,43 % |
+| Portugal | 1.452 | +46,52 % | 4.076 | +24,27 % | 1,41 % |
 
 **Apartamentos**
 | Mercado | Viajeros | Var. interanual viajeros | Pernoctaciones | Var. interanual pernoctaciones | Cuota de pernoctaciones |
 |---|---|---|---|---|---|
-| Extranjero | 11.018 | +7,07 % | 65.568 | +10,63 % | 93,59 % |
-| Reino Unido | 3.268 | −5,3 % | 19.598 | −0,73 % | 27,97 % |
-| Alemania | 1.785 | +140,89 % | 11.829 | +87,46 % | 16,88 % |
-| Países Bajos | 1.385 | +40,32 % | 8.557 | +30,6 % | 12,21 % |
-| Irlanda | 894 | +117,52 % | 6.936 | +95,88 % | 9,9 % |
-| España | 1.325 | −37,23 % | 4.493 | −45,02 % | 6,41 % |
-| Suiza | 339 | −13,52 % | 1.970 | +0,97 % | 2,81 % |
-| Francia | 388 | −26,65 % | 1.720 | −31,09 % | 2,46 % |
-| Italia | 282 | −12,69 % | 1.150 | −31,22 % | 1,64 % |
-| Austria | 145 | +47,96 % | 857 | +59,29 % | 1,22 % |
-| Polonia | 256 | +4,92 % | 823 | −31,42 % | 1,17 % |
-| Noruega | 130 | +49,43 % | 673 | +60,24 % | 0,96 % |
-| Dinamarca | 107 | +21,59 % | 497 | −8,13 % | 0,71 % |
-| Suecia | 118 | +0 % | 443 | −27,61 % | 0,63 % |
+| Extranjero | 14.543 | +33,3 % | 60.532 | −11,9 % | 92,21 % |
+| Reino Unido | 3.375 | +7,42 % | 16.450 | −12,88 % | 25,06 % |
+| Irlanda | 1.905 | +81,6 % | 10.380 | +26,08 % | 15,81 % |
+| Alemania | 2.038 | +118,44 % | 5.736 | +1,11 % | 8,74 % |
+| Estados Unidos | 1.008 | −32,21 % | 5.194 | −45,41 % | 7,91 % |
+| España | 1.299 | −18,04 % | 5.115 | −32,39 % | 7,79 % |
+| Países Bajos | 907 | +6,33 % | 4.248 | −13,85 % | 6,47 % |
+| Italia | 489 | +7,24 % | 1.947 | −36,06 % | 2,97 % |
+| Noruega | 304 | +13,01 % | 1.820 | −21,18 % | 2,77 % |
+| Bélgica | 787 | +64,64 % | 1.737 | −33,19 % | 2,65 % |
+| Francia | 453 | −43,52 % | 1.621 | −49,25 % | 2,47 % |
+| Suecia | 242 | −2,42 % | 1.165 | −16,13 % | 1,77 % |
+| Suiza | 243 | −8,3 % | 1.161 | −33,51 % | 1,77 % |
+| Portugal | 215 | +83,76 % | 777 | +47,16 % | 1,18 % |
 
 ### Conectividad aérea · AENA, aeropuerto de Málaga-Costa del Sol · junio 2026 (datos provisionales; llegadas y salidas)
 Pasajeros del mes: 2.771.417; mismo mes del año anterior: 2.632.380 (+5,28 %).
@@ -103,4 +103,4 @@ Primeros mercados internacionales citados por AENA en su nota de prensa (pasajer
 ### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)
 Altas inscritas en junio 2026: 96; mismo mes del año anterior: 138 (−30,43 %).
 Altas acumuladas enero–junio 2026: 464 frente a 1.269 en 2025 (−63,44 %).
-Parque inscrito a fecha del volcado (2026-10-26): 15.761 VUT y 92.044 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.
+Parque inscrito a fecha del volcado (2026-10-28): 15.758 VUT y 92.035 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.
