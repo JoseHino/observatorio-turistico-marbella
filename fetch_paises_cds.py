@@ -60,8 +60,15 @@ AGREGADOS = {
 }
 
 
-def get_token():
-    """El token de embed caduca; se regenera en cada carga del visor."""
+def get_token(token_file=None):
+    """El token de embed caduca (~1 h); se regenera en cada carga del visor.
+
+    Desde ago-2026 el visor esta tras un filtro anti-bots de AWS (202 con
+    x-amzn-waf-action: challenge) y una peticion de script ya no recibe la
+    pagina: el token se toma del navegador y se pasa con --token-file=RUTA.
+    """
+    if token_file:
+        return Path(token_file).read_text(encoding="utf-8").strip()
     req = urllib.request.Request(VISOR, headers={"User-Agent": "Mozilla/5.0"})
     html = urllib.request.urlopen(req, timeout=60).read().decode("utf-8", "replace")
     m = re.search(r"accessToken:\s*'([^']+)'", html)
@@ -196,7 +203,9 @@ def main():
     html = next((Path(a.split("=", 1)[1]) for a in sys.argv[1:]
                  if a.startswith("--html=")), None)
 
-    token = get_token()
+    token_file = next((a.split("=", 1)[1] for a in sys.argv[1:]
+                       if a.startswith("--token-file=")), None)
+    token = get_token(token_file)
     print("Token de embed obtenido.")
 
     datos = {}

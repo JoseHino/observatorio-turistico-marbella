@@ -34,10 +34,28 @@ Esto:
 3. y reescribe el bloque de datos embebido del HTML (entre los marcadores
    `// <<<CDS_PAIS_INICIO>>>` y `// <<<CDS_PAIS_FIN>>>`).
 
-## Refresco automático (GitHub Actions)
+### Desde agosto de 2026: token desde el navegador
 
-El workflow `.github/workflows/actualizar-paises.yml` lo hace solo el día 8 de
-cada mes y hace commit del HTML actualizado. Requiere que esta carpeta sea un
+El visor está ahora tras un filtro anti-bots de AWS (responde `202` con
+`x-amzn-waf-action: challenge`), así que el script ya no puede leer el token
+por sí solo. Refresco manual, en local:
+
+1. Abrir el visor en Chrome:
+   `https://visor.bigdata.costadelsolmalaga.org/informe?id=viajeros-pernoctaciones&mun=29069`
+2. Copiar el valor de `accessToken: '…'` del código de la página a un fichero
+   de texto fuera del repo (caduca en ~1 h; **no** subirlo a GitHub).
+3. Ejecutar:
+   ```bash
+   python fetch_paises_cds.py "data/paises_marbella.json" --html="Observatorio Turístico Marbella.html" --token-file=RUTA_DEL_TOKEN
+   ```
+4. Comprobar que los totales cuadran con el INE (tabla 75197, Marbella) y
+   hacer commit + push.
+
+## Refresco automático (GitHub Actions) — DESACTIVADO
+
+Hasta julio de 2026 el workflow `.github/workflows/actualizar-paises.yml` lo
+hacía solo el día 8 de cada mes; desde el filtro anti-bots falla (HTTP 405) y su
+programación está desactivada (queda solo el lanzamiento manual). Requiere que esta carpeta sea un
 repositorio de GitHub. Pasos una sola vez:
 
 1. Crear un repo en GitHub (p. ej. `observatorio-turistico-marbella`).
