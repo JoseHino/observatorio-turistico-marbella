@@ -29,17 +29,17 @@ Fuente: Observatorio Turístico de Marbella (punto turístico de Marbella del IN
 ### Apartamentos turísticos · INE, Encuesta de Ocupación en Apartamentos (EOAP)
 | Indicador | Mes | Valor | Mismo mes año anterior | Var. interanual | Mes anterior | Var. mensual | Acumulado del año | Acumulado año anterior | Var. acumulada |
 |---|---|---|---|---|---|---|---|---|---|
-| Pernoctaciones totales | agosto 2026 (último publicado) · provisional | 93.273 | 102.191 | **−8,73 %** | 74.881 | +24,56 % | 534.346 | 538.827 | −0,83 % |
-| Pernoctaciones · residentes en España | agosto 2026 (último publicado) · provisional | 17.099 | 26.365 | **−35,15 %** | 11.336 | +50,84 % | 55.331 | 67.185 | −17,64 % |
-| Pernoctaciones · residentes en el extranjero | agosto 2026 (último publicado) · provisional | 76.174 | 75.826 | **+0,46 %** | 63.545 | +19,87 % | 479.015 | 471.642 | +1,56 % |
-| Viajeros totales | agosto 2026 (último publicado) · provisional | 18.076 | 14.150 | **+27,75 %** | 14.895 | +21,36 % | 89.524 | 86.181 | +3,88 % |
-| Ocupación por plazas (%) | agosto 2026 (último publicado) · provisional | 56,87 | 50,59 | **+6,28 p.p.** | 50,99 | +5,88 p.p. |  |  |  |
-| Ocupación por apartamentos (%) | agosto 2026 (último publicado) · provisional | 91,59 | 71,1 | **+20,49 p.p.** | 84,46 | +7,13 p.p. |  |  |  |
-| Ocupación por apartamentos en fin de semana (%) | agosto 2026 (último publicado) · provisional | 94,35 | 70,63 | **+23,72 p.p.** | 87,86 | +6,49 p.p. |  |  |  |
-| Estancia media (días) | agosto 2026 (último publicado) · provisional | 5,16 | 7,22 | **−28,53 %** | 5,03 | +2,58 % |  |  |  |
-| Apartamentos estimados | agosto 2026 (último publicado) · provisional | 1.294 | 1.660 | **−22,05 %** | 1.294 | +0 % |  |  |  |
-| Plazas estimadas | agosto 2026 (último publicado) · provisional | 5.792 | 6.516 | **−11,11 %** | 5.792 | +0 % |  |  |  |
-| Personal empleado | agosto 2026 (último publicado) · provisional | 525 | 515 | **+1,94 %** | 383 | +37,08 % |  |  |  |
+| Pernoctaciones totales | septiembre 2026 · provisional | 53.658 | 63.576 | **−15,6 %** | 93.273 | −42,47 % | 588.004 | 602.403 | −2,39 % |
+| Pernoctaciones · residentes en España | septiembre 2026 · provisional | 4.768 | 4.094 | **+16,46 %** | 17.099 | −72,12 % | 60.099 | 71.279 | −15,68 % |
+| Pernoctaciones · residentes en el extranjero | septiembre 2026 · provisional | 48.890 | 59.482 | **−17,81 %** | 76.174 | −35,82 % | 527.905 | 531.124 | −0,61 % |
+| Viajeros totales | septiembre 2026 · provisional | 10.658 | 9.424 | **+13,09 %** | 18.076 | −41,04 % | 100.182 | 95.605 | +4,79 % |
+| Ocupación por plazas (%) | septiembre 2026 · provisional | 31 | 32,51 | **−1,51 p.p.** | 56,87 | −25,87 p.p. |  |  |  |
+| Ocupación por apartamentos (%) | septiembre 2026 · provisional | 71,65 | 57,7 | **+13,95 p.p.** | 91,59 | −19,94 p.p. |  |  |  |
+| Ocupación por apartamentos en fin de semana (%) | septiembre 2026 · provisional | 76,3 | 68,12 | **+8,18 p.p.** | 94,35 | −18,05 p.p. |  |  |  |
+| Estancia media (días) | septiembre 2026 · provisional | 5,03 | 6,75 | **−25,48 %** | 5,16 | −2,52 % |  |  |  |
+| Apartamentos estimados | septiembre 2026 · provisional | 1.267 | 1.660 | **−23,67 %** | 1.294 | −2,09 % |  |  |  |
+| Plazas estimadas | septiembre 2026 · provisional | 5.726 | 6.519 | **−12,16 %** | 5.792 | −1,14 % |  |  |  |
+| Personal empleado | septiembre 2026 · provisional | 591 | 511 | **+15,66 %** | 525 | +12,57 % |  |  |  |
 
 ### Plataformas digitales · INE, Ocupación en Alojamientos Turísticos (OAT, experimental: Airbnb, Booking, Vrbo…)
 | Indicador | Mes | Valor | Mismo mes año anterior | Var. interanual | Mes anterior | Var. mensual | Acumulado del año | Acumulado año anterior | Var. acumulada |
@@ -107,4 +107,4 @@ Primeros mercados internacionales citados por AENA en su nota de prensa (pasajer
 ### Viviendas con fines turísticos · Registro de Turismo de Andalucía (RTA, volcado OpenRTA)
 Altas inscritas en septiembre 2026: 31; mismo mes del año anterior: 33 (−6,06 %).
 Altas acumuladas enero–septiembre 2026: 634 frente a 1.454 en 2025 (−56,4 %).
-Parque inscrito a fecha del volcado (2026-11-02): 15.764 VUT y 92.068 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.
+Parque inscrito a fecha del volcado (2026-11-03): 15.764 VUT y 92.068 plazas. Es la foto actual, no la del mes de referencia; el registro no refleja bajas con fecha.
