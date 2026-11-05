@@ -568,6 +568,8 @@ tbody tr:hover { background: rgba(37,99,235,0.05); }
 .cds-nav:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .cds-nav:disabled { opacity: .35; cursor: default; }
 #cds-periodo { font: 500 12px var(--sans); padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--card); color: var(--text); max-width: 100%; }
+.cds-clave { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 11px/1.4 var(--sans); color: var(--muted); margin: 0 0 6px; }
+.cds-clave span { display: inline-flex; align-items: center; gap: 6px; }
 .cds-minis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 @media (max-width: 900px) { .cds-minis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .cds-minis { grid-template-columns: 1fr; } }
@@ -1288,6 +1290,10 @@ footer a:hover { color: var(--text); }
     <div class="month-picker cds-barra">
       <label>Periodo</label>
       <select id="cds-periodo" aria-label="Periodo"></select>
+      <label>Alojamiento</label>
+      <div class="cds-seg" id="cds-aloj">
+        <button data-v="Ambos">Hoteles + AT</button><button data-v="Hoteles">Hoteles</button><button data-v="Apartamentos">Apart. turísticos</button>
+      </div>
       <label>Medir por</label>
       <div class="cds-seg" id="cds-ind">
         <button data-v="Pernoctaciones">Pernoctaciones</button><button data-v="Viajeros">Viajeros</button>
@@ -1297,11 +1303,12 @@ footer a:hover { color: var(--text); }
     <section>
       <h2>Quién visita Marbella <span class="pill" id="cds-pill-mes">Marbella</span></h2>
       <div id="cds-resumen" class="grid" style="margin-bottom:14px"></div>
+      <div id="cds-clave" class="cds-clave"></div>
       <div class="chart-wrap" id="cds-mes-wrap"><canvas id="chCdsMes"></canvas></div>
       <p class="legend-note">
-        Un país por barra, de mayor a menor (hoteles + apartamentos turísticos; desmarca uno en la leyenda y toda la pestaña pasa a mostrar solo el otro).
-        Al final de cada barra, la cifra del periodo y su variación frente al mismo periodo del año anterior; pasa el ratón por encima para ver viajeros, noches por viajero y cuota.
-        La variación se omite si la base es muy pequeña. Los grupos sin desglosar («Resto de…», «Países africanos») no se dibujan, pero cuentan en las cifras de arriba.
+        Un país por fila, de mayor a menor. El punto es el periodo elegido y el círculo hueco, el mismo periodo un año antes: la línea muestra cuánto ha crecido o caído cada mercado.
+        A la derecha, la cifra y la variación. Pasa el ratón por una fila para ver hoteles y apartamentos por separado, viajeros, noches por viajero y cuota.
+        La variación sale en gris si la base del año anterior es muy pequeña. Los grupos sin desglosar («Resto de…», «Países africanos») no se dibujan, pero cuentan en las cifras de arriba.
       </p>
     </section>
 
@@ -3093,7 +3100,7 @@ const CDS_ALOJ_TXT = { Ambos: "Hoteles + AT", Hoteles: "Hoteles", Apartamentos: 
 const CDS_MES_L = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const fmt1 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
-let cdsState = { periodo: "u12", ind: "Pernoctaciones", ultimo: null, aloj: "Ambos" };   // aloj lo fija la leyenda de las barras
+let cdsState = { periodo: "u12", ind: "Pernoctaciones", ultimo: null, aloj: "Ambos" };
 
 function cdsSerie(tipo, ind, mercado) {
     // Devuelve el array alineado a CDS_PAIS.meses, o null.
@@ -3138,8 +3145,11 @@ function cdsRango(periodo) {
         i0 = i1 = +periodo.slice(2);
         txt = cdsMesTxt(M[i0]);
     }
-    const p0 = i0 - 12;
-    return { i0, i1, n: i1 - i0 + 1, txt, prev: p0 >= 0 ? { i0: p0, i1: i1 - 12 } : null };
+    // Sin comparación si el año anterior cae antes de 2020 y entran apartamentos:
+    // la fuente no desglosa los apartamentos por país hasta enero de 2020.
+    const p0 = i0 - 12, iniAT = M.indexOf("2020-01");
+    const comparable = p0 >= 0 && (cdsState.aloj === "Hoteles" || p0 >= iniAT);
+    return { i0, i1, n: i1 - i0 + 1, txt, prev: comparable ? { i0: p0, i1: i1 - 12 } : null };
 }
 function cdsSuma(tipo, ind, mercado, r) {
     // tipo = "Hoteles" | "Apartamentos" | "Ambos"  (las dos primeras también son claves de CDS_ALOJ)
@@ -3180,6 +3190,8 @@ function initCdsPais() {
     sel.addEventListener("change", () => { cdsState.periodo = sel.value; renderCdsPais(); });
     document.querySelectorAll("#cds-ind button").forEach(b =>
         b.addEventListener("click", () => { cdsState.ind = b.dataset.v; renderCdsPais(); }));
+    document.querySelectorAll("#cds-aloj button").forEach(b =>
+        b.addEventListener("click", () => { cdsState.aloj = b.dataset.v; renderCdsPais(); }));
 
     document.getElementById("cds-validacion").innerHTML =
         ` Serie mensual <b>${meta.desde}</b> → <b>${M[ultimo]}</b>, ${meta.paises.length} países. ` +
@@ -3192,6 +3204,7 @@ function renderCdsPais() {
     const { periodo, ind } = cdsState;
     document.getElementById("cds-periodo").value = periodo;
     document.querySelectorAll("#cds-ind button").forEach(b => b.classList.toggle("on", b.dataset.v === ind));
+    document.querySelectorAll("#cds-aloj button").forEach(b => b.classList.toggle("on", b.dataset.v === cdsState.aloj));
     const r = cdsRango(periodo);
     document.getElementById("cds-pill-mes").textContent = `${r.txt} · ${CDS_ALOJ_TXT[cdsState.aloj]}`;
     document.getElementById("cds-pill-evol").textContent = `${ind} · ${CDS_ALOJ_TXT[cdsState.aloj]} · suma de 12 meses`;
@@ -3202,13 +3215,13 @@ function renderCdsPais() {
 const CDS_COL = { Hoteles: "#2563eb", Apartamentos: "#f59e0b" };
 
 function renderCdsMes(r) {
-    const { ind } = cdsState;
+    const { ind, aloj } = cdsState;
     const otro = ind === "Pernoctaciones" ? "Viajeros" : "Pernoctaciones";
     const minBase = (ind === "Viajeros" ? 300 : 1000) * r.n;
     const vsTxt = r.prev ? "frente al año anterior" : "sin año anterior";
 
     // ── Cifras del periodo (todos los mercados, grupos incluidos) ──
-    const S = (i, m, rr = r) => cdsSuma(cdsState.aloj, i, m, rr);
+    const S = (i, m, rr = r) => cdsSuma(aloj, i, m, rr);
     const tp = S("Pernoctaciones", "Total"), tv = S("Viajeros", "Total");
     const tpA = S("Pernoctaciones", "Total", r.prev), tvA = S("Viajeros", "Total", r.prev);
     const ext = S(ind, "Extranjero"), extA = S(ind, "Extranjero", r.prev);
@@ -3227,104 +3240,100 @@ function renderCdsMes(r) {
             antes(TA && extA != null ? fmt1.format(extA / TA * 100) + " %" : "–"), " gold"),
     ].join("");
 
-    // ── Una barra por país (hoteles + apartamentos apilados), de mayor a menor ──
-    const tipos = ["Hoteles", "Apartamentos"];
+    // ── Una fila por país: hace un año (○) → periodo elegido (●) ──
     const filas = [...CDS_PAIS.meta.paises, "España"].map(p => {
-        const cur = {}, prev = {}, curO = {};
-        tipos.forEach(t => { cur[t] = cdsSuma(t, ind, p, r); prev[t] = cdsSuma(t, ind, p, r.prev); curO[t] = cdsSuma(t, otro, p, r); });
-        if (cur.Hoteles == null && cur.Apartamentos == null) return null;
-        const a = CDS_ALOJ[cdsState.aloj].reduce((t, k) => t + (cur[k] ?? 0), 0);
-        return { p, a, cur, prev, curO };
+        const a = cdsSuma(aloj, ind, p, r);
+        if (a == null) return null;
+        const pa = cdsSuma(aloj, ind, p, r.prev);
+        const b = cdsSuma(aloj, otro, p, r);
+        const v = ind === "Viajeros" ? a : b, n = ind === "Viajeros" ? b : a;
+        return { p, a, pa, b,
+                 h: cdsSuma("Hoteles", ind, p, r), ap: cdsSuma("Apartamentos", ind, p, r),
+                 est: v && n ? n / v : null, vari: cdsVarTxt(a, pa, minBase), cuota: T ? a / T * 100 : null };
     }).filter(Boolean).sort((x, y) => y.a - x.a);
 
-    // Cifras de una fila según las series visibles (la leyenda permite quitar hoteles o apartamentos).
-    const totTipo = Object.fromEntries(tipos.map(t => [t, cdsSuma(t, ind, "Total", r) || 0]));
-    const calc = (f, vis) => {
-        const sum = o => vis.reduce((t, k) => o[k] != null ? (t ?? 0) + o[k] : t, null);
-        const a = sum(f.cur), b = sum(f.curO), pa = sum(f.prev);
-        const v = ind === "Viajeros" ? a : b, n = ind === "Viajeros" ? b : a;
-        const totVis = vis.reduce((t, k) => t + totTipo[k], 0);
-        return { a, b, est: v && n ? n / v : null, vari: cdsVarTxt(a, pa, minBase), cuota: totVis && a != null ? a / totVis * 100 : null };
-    };
-    const visibles = chart => tipos.filter((_, d) => chart.isDatasetVisible(d));
-
-    // Texto al final de cada barra: cifra del periodo + variación interanual.
-    const pluginEtiquetas = {
-        id: "cdsEtiquetas",
+    const VERDE = "#059669", ROJO = "#dc2626", GRIS = "#94a3b8";
+    const colorDe = f => f.vari == null ? GRIS : f.vari >= 0 ? VERDE : ROJO;
+    const pesas = {
+        id: "cdsPesas",
         afterDatasetsDraw(chart) {
-            const { ctx } = chart, vis = visibles(chart);
-            if (!vis.length) return;
+            const { ctx, chartArea: ca } = chart, xs = chart.scales.x, ys = chart.scales.y;
+            const W = chart.width, estrecho = W < 560;
             ctx.save();
-            ctx.font = "500 11px 'JetBrains Mono', monospace";
-            ctx.textBaseline = "middle";
             filas.forEach((f, k) => {
-                let x = 0, y = 0;
-                chart.data.datasets.forEach((_, d) => {
-                    if (!chart.isDatasetVisible(d)) return;
-                    const bar = chart.getDatasetMeta(d).data[k];
-                    if (bar && chart.data.datasets[d].data[k] != null) { x = Math.max(x, bar.x); y = bar.y; }
-                });
-                if (!y) return;
-                const c = calc(f, vis);
-                if (c.a == null) return;
-                const base = fmt0.format(c.a);
-                ctx.fillStyle = f.p === "España" ? "#8a94a3" : "#334155";
-                ctx.fillText(base, x + 6, y);
-                if (c.vari != null) {
-                    ctx.fillStyle = c.vari >= 0 ? "#059669" : "#dc2626";
-                    ctx.fillText(` ${c.vari >= 0 ? "▲" : "▼"} ${fmt0.format(Math.abs(c.vari))} %`, x + 6 + ctx.measureText(base).width, y);
+                const y = ys.getPixelForValue(k);
+                // guía de la fila
+                ctx.strokeStyle = "rgba(148,163,184,.18)"; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(ca.left, y); ctx.lineTo(ca.right, y); ctx.stroke();
+                const x1 = xs.getPixelForValue(f.a), col = colorDe(f);
+                if (f.pa != null) {
+                    const x0 = xs.getPixelForValue(f.pa);
+                    ctx.strokeStyle = col + "99"; ctx.lineWidth = 4; ctx.lineCap = "round";
+                    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+                    ctx.fillStyle = "#fff"; ctx.strokeStyle = GRIS; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(x0, y, 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
                 }
+                ctx.fillStyle = col;
+                ctx.beginPath(); ctx.arc(x1, y, 5.5, 0, Math.PI * 2); ctx.fill();
+                // columna de cifras a la derecha
+                ctx.textBaseline = "middle"; ctx.textAlign = "right";
+                ctx.font = "500 11px 'JetBrains Mono', monospace";
+                const xVar = W - 6, xVal = estrecho ? W - 6 : W - 66;
+                if (!estrecho && f.vari != null) {
+                    ctx.fillStyle = col;
+                    ctx.fillText(`${f.vari >= 0 ? "▲" : "▼"} ${fmt0.format(Math.abs(f.vari))} %`, xVar, y);
+                }
+                ctx.fillStyle = f.p === "España" ? "#8a94a3" : "#334155";
+                ctx.fillText(fmt0.format(f.a), xVal, y);
             });
             ctx.restore();
         },
     };
 
+    const prevTxt = r.prev ? "mismo periodo del año anterior" : "sin dato del año anterior";
+    document.getElementById("cds-clave").innerHTML =
+        `<span><svg width="12" height="12"><circle cx="6" cy="6" r="4" fill="#fff" stroke="${GRIS}" stroke-width="1.5"/></svg> ${prevTxt}</span>` +
+        `<span><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#334155"/></svg> ${r.txt}</span>` +
+        `<span><b style="color:${VERDE}">verde</b> sube · <b style="color:${ROJO}">rojo</b> baja · <b style="color:${GRIS}">gris</b> sin comparación fiable</span>`;
+
     const wrap = document.getElementById("cds-mes-wrap");
-    wrap.style.height = Math.max(320, filas.length * 24 + 40) + "px";
+    wrap.style.height = Math.max(320, filas.length * 26 + 50) + "px";
+    const maxX = Math.max(...filas.map(f => Math.max(f.a, f.pa || 0)));
+    const compacto = v => v >= 1e6 ? fmt1.format(v / 1e6) + " M" : v >= 1e3 ? fmt0.format(v / 1e3) + " mil" : fmt0.format(v);
 
     destroyChart("chCdsMes");
     charts.chCdsMes = new Chart(document.getElementById("chCdsMes"), {
         type: "bar",
         data: {
             labels: filas.map(f => f.p),
-            datasets: tipos.map(tipo => ({
-                label: tipo === "Hoteles" ? "Hoteles" : "Apartamentos turísticos",
-                data: filas.map(f => f.cur[tipo]),
-                backgroundColor: filas.map(f => CDS_COL[tipo] + (f.p === "España" ? "55" : "dd")),
-                borderColor: CDS_COL[tipo], borderWidth: 0, borderRadius: 3, barPercentage: 0.78, categoryPercentage: 0.9,
-                hidden: !CDS_ALOJ[cdsState.aloj].includes(tipo),
-            })),
+            // Serie invisible: da las escalas, el tooltip y la descarga; el dibujo lo hace el plugin.
+            datasets: [{ label: `${ind} · ${r.txt}`, data: filas.map(f => f.a), backgroundColor: "rgba(0,0,0,0)", borderWidth: 0 }],
         },
-        plugins: [pluginEtiquetas],
+        plugins: [pesas],
         options: {
             indexAxis: "y",
             responsive: true, maintainAspectRatio: false,
-            layout: { padding: { right: 130 } },
-            // Quitar hoteles o apartamentos en la leyenda filtra toda la pestaña (cifras, orden y tendencia).
-            onVisibilidad: chart => {
-                const vis = visibles(chart);
-                const nuevo = vis.length === 2 ? "Ambos" : vis.length === 1 ? vis[0] : cdsState.aloj;
-                if (!vis.length) { chart.setDatasetVisibility(tipos.indexOf(cdsState.aloj === "Ambos" ? "Hoteles" : cdsState.aloj), true); chart.update(); return; }
-                if (nuevo !== cdsState.aloj) { cdsState.aloj = nuevo; renderCdsPais(); }
-            },
+            layout: { padding: { right: ctx => ctx.chart.width < 560 ? 70 : 130 } },
             interaction: { mode: "index", axis: "y", intersect: false },
             plugins: {
                 legend: { display: false },
                 tooltip: { callbacks: {
-                    label: ctx => ctx.parsed.x != null ? ` ${ctx.dataset.label}: ${fmt0.format(ctx.parsed.x)} ${ind.toLowerCase()}` : null,
-                    footer: items => {
-                        const f = filas[items[0].dataIndex], c = calc(f, visibles(items[0].chart)), out = [];
-                        if (c.b != null) out.push(`${otro}: ${fmt0.format(c.b)}`);
-                        if (c.est) out.push(`Noches por viajero: ${fmt1.format(c.est)}`);
-                        if (c.cuota != null) out.push(`Cuota: ${fmt1.format(c.cuota)} % del total`);
-                        if (c.vari != null) out.push(`Variación interanual: ${cdsSigno(c.vari)}`);
+                    label: ctx => {
+                        const f = filas[ctx.dataIndex], u = ind.toLowerCase(), out = [` ${r.txt}: ${fmt0.format(f.a)} ${u}`];
+                        if (f.pa != null) out.push(` Hace un año: ${fmt0.format(f.pa)} ${u}${f.vari != null ? ` (${cdsSigno(f.vari)})` : ""}`);
+                        if (aloj === "Ambos" && f.h != null && f.ap != null) out.push(` Hoteles ${fmt0.format(f.h)} · Apartamentos ${fmt0.format(f.ap)}`);
+                        if (f.b != null) out.push(` ${otro}: ${fmt0.format(f.b)}`);
+                        if (f.est) out.push(` Noches por viajero: ${fmt1.format(f.est)}`);
+                        if (f.cuota != null) out.push(` Cuota: ${fmt1.format(f.cuota)} % del total`);
                         return out;
                     },
                 } },
             },
             scales: {
-                x: { stacked: true, display: false, grid: { display: false } },
-                y: { stacked: true, ticks: { color: TICKS, font: FONT, autoSkip: false }, grid: { display: false }, border: { display: false } },
+                x: { beginAtZero: true, suggestedMax: maxX * 1.03, position: "top",
+                     ticks: { color: TICKS, font: { ...FONT, size: 10 }, maxTicksLimit: 6, callback: compacto },
+                     grid: { color: GRID }, border: { display: false } },
+                y: { ticks: { color: TICKS, font: FONT, autoSkip: false }, grid: { display: false }, border: { display: false } },
             },
         },
     });
