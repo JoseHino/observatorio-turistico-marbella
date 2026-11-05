@@ -1251,7 +1251,7 @@ footer a:hover { color: var(--text); }
         <button data-v="mes" class="on">Mensual</button><button data-v="m12">Media de 12 meses</button>
       </div>
       <div class="chart-wrap"><canvas id="chCompOcup"></canvas></div>
-      <p class="legend-note">Línea negra = <b>total</b>: suma de la ocupación de hoteles y la de apartamentos. La franja sombreada marca la distancia entre ambos. «Media de 12 meses» quita la estacionalidad para ver la tendencia.</p>
+      <p class="legend-note">La franja sombreada marca la distancia entre ambos. «Media de 12 meses» quita la estacionalidad para ver la tendencia.</p>
     </section>
     <section>
       <h2>Estancia media (días) – Hoteles · Apartamentos · Plataformas</h2>
@@ -2071,10 +2071,8 @@ const RATE_LINE = { borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, cubicIn
 const CONJ_DS = (data, label) => ({ ...TOTAL_DS(data), label, cubicInterpolationMode: "monotone", borderWidth: 3 });
 
 function renderCompOcup() {
-    const conj = combineSeries([DATA.eoh_ocup_plz, DATA.eoap_ocup_plz], v => v.reduce((a, b) => a + b, 0));
     const pct = { ...PCT_AXIS, ticks: { ...PCT_AXIS.ticks, callback: v => v + " %" } };
     lineChart("chCompOcup", [
-        CONJ_DS(compSerie("ocup", conj), "Total"),
         { label: "Hoteles · plazas",      data: P(compSerie("ocup", DATA.eoh_ocup_plz)),  borderColor: C.cyan, backgroundColor: "rgba(8,145,178,.10)", fill: "+1", ...RATE_LINE },
         { label: "Apartamentos · plazas", data: P(compSerie("ocup", DATA.eoap_ocup_plz)), borderColor: C.gold, ...RATE_LINE },
     ], pct);
