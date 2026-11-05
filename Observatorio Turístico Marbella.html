@@ -568,7 +568,7 @@ tbody tr:hover { background: rgba(37,99,235,0.05); }
 .cds-nav { font: 600 11px/1 var(--mono); height: 28px; min-width: 30px; border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 4px; cursor: pointer; }
 .cds-nav:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .cds-nav:disabled { opacity: .35; cursor: default; }
-#cds-periodo { font: 500 12px var(--sans); padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--card); color: var(--text); max-width: 100%; }
+#cds-periodo, .cds-select { font: 500 12px var(--sans); padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--card); color: var(--text); max-width: 100%; }
 .cds-clave { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 11px/1.4 var(--sans); color: var(--muted); margin: 0 0 6px; }
 .cds-clave span { display: inline-flex; align-items: center; gap: 6px; }
 .cds-minis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -1326,6 +1326,10 @@ footer a:hover { color: var(--text); }
 
     <section>
       <h2>Llegadas internacionales a España por país <span class="pill">FRONTUR · referencia nacional</span></h2>
+      <div class="month-picker cds-barra" style="margin-bottom:8px">
+        <label>Periodo</label>
+        <select id="frontur-periodo" class="cds-select" aria-label="Periodo de FRONTUR"><option>Cargando…</option></select>
+      </div>
       <div id="frontur-estado" class="legend-note" style="margin:0 0 14px;color:var(--accent)">Cargando FRONTUR…</div>
       <div class="chart-wrap" style="height:360px"><canvas id="chFrontur"></canvas></div>
       <p class="legend-note">FRONTUR solo se publica a nivel nacional. Sirve de referencia del mix de mercados emisores que alimentan el destino Marbella.</p>
@@ -3465,57 +3469,90 @@ const FRONTUR_COUNTRIES = [
     { nombre: "EE.UU.",         cod: "FREG324" },
 ];
 
+let FRONTUR_DATA = null;   // [{ nombre, serie }] con toda la serie mensual (desde oct-2015)
+
 async function loadFrontur() {
     const est = document.getElementById("frontur-estado");
     try {
-        // Try the national FRONTUR table - more reliable approach: fetch any one known working series
-        // We'll use INE Tempus query for FRONTUR countries.
-        const months = 12;
-        const results = [];
-        for (const { nombre, cod } of FRONTUR_COUNTRIES) {
-            try {
-                const serie = await fetchSerie(cod, months);
-                if (serie && serie.length) results.push({ nombre, serie });
-            } catch (e) { /* skip */ }
-        }
-        if (!results.length) throw new Error("Sin respuesta");
-        est.textContent = `FRONTUR OK · ${results.length} mercados`;
-        est.style.color = "var(--good)";
+        const res = await Promise.all(FRONTUR_COUNTRIES.map(({ nombre, cod }) =>
+            fetchSerie(cod, 400).then(serie => serie && serie.length ? { nombre, serie } : null).catch(() => null)));
+        FRONTUR_DATA = res.filter(Boolean);
+        if (!FRONTUR_DATA.length) throw new Error("Sin respuesta");
 
-        // Aggregate last 12 months by country
-        const totals = results.map(r => ({
-            nombre: r.nombre,
-            total: r.serie.reduce((a,p) => a + (p.valor || 0), 0),
-        })).sort((a,b) => b.total - a.total);
-
-        destroyChart("chFrontur");
-        charts.chFrontur = new Chart(document.getElementById("chFrontur"), {
-            type: "bar",
-            data: {
-                labels: totals.map(t => t.nombre),
-                datasets: [{
-                    label: "Turistas (últimos 12 meses)",
-                    data: totals.map(t => t.total),
-                    backgroundColor: totals.map((_,i) => COUNTRY_COLORS[i % COUNTRY_COLORS.length] + "99"),
-                    borderColor:     totals.map((_,i) => COUNTRY_COLORS[i % COUNTRY_COLORS.length]),
-                    borderWidth: 1, borderRadius: 4,
-                }]
-            },
-            options: {
-                indexAxis: "y",
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmt0.format(ctx.parsed.x) + " turistas" } } },
-                scales: {
-                    x: { ticks: { color: TICKS, callback: v => fmt0.format(v), font: FONT }, grid: { color: GRID } },
-                    y: { ticks: { color: TICKS, font: FONT }, grid: { color: GRID } },
-                }
-            }
-        });
+        // Selector: últimos 12 meses + cada año (el último, parcial, hasta el mes publicado)
+        const fin = new Date(Math.max(...FRONTUR_DATA.flatMap(r => r.serie.map(p => +p.fecha))));
+        const ini = new Date(Math.min(...FRONTUR_DATA.map(r => +r.serie[0].fecha)));
+        const yIni = ini.getMonth() === 0 ? ini.getFullYear() : ini.getFullYear() + 1;   // solo años completos de inicio
+        const mesFin = fin.getMonth(), yFin = fin.getFullYear();
+        const opts = [`<option value="u12">Últimos 12 meses (hasta ${MESES[mesFin].toLowerCase()} ${yFin})</option>`];
+        for (let y = yFin; y >= yIni; y--)
+            opts.push(`<option value="${y}">${y === yFin && mesFin < 11 ? `${y} (ene–${MESES[mesFin].toLowerCase()})` : y}</option>`);
+        const sel = document.getElementById("frontur-periodo");
+        sel.innerHTML = opts.join("");
+        sel.onchange = () => renderFrontur(sel.value);
+        renderFrontur("u12");
     } catch (e) {
         est.textContent = "FRONTUR no disponible en este momento.";
         est.style.color = "var(--warn)";
         destroyChart("chFrontur");
     }
+}
+
+function renderFrontur(periodo) {
+    const est = document.getElementById("frontur-estado");
+    const fin = new Date(Math.max(...FRONTUR_DATA.flatMap(r => r.serie.map(p => +p.fecha))));
+    // Rango [desde, hasta] (meses) y el mismo rango un año antes
+    let desde, hasta, txt;
+    if (periodo === "u12") { hasta = fin; desde = new Date(fin.getFullYear(), fin.getMonth() - 11, 1); txt = "últimos 12 meses"; }
+    else { const y = +periodo; desde = new Date(y, 0, 1); hasta = y === fin.getFullYear() ? fin : new Date(y, 11, 1); txt = periodo; }
+    const enRango = (f, d, h) => f >= d && f <= h;
+    const dAnt = new Date(desde.getFullYear() - 1, desde.getMonth(), 1), hAnt = new Date(hasta.getFullYear() - 1, hasta.getMonth(), 1);
+    const suma = (serie, d, h) => { const pts = serie.filter(p => enRango(p.fecha, d, h) && p.valor != null); return pts.length ? pts.reduce((a, p) => a + p.valor, 0) : null; };
+    const nMeses = (hasta.getFullYear() - desde.getFullYear()) * 12 + hasta.getMonth() - desde.getMonth() + 1;
+
+    const totals = FRONTUR_DATA.map(r => {
+        const total = suma(r.serie, desde, hasta);
+        const meses = r.serie.filter(p => enRango(p.fecha, desde, hasta) && p.valor != null).length;
+        const ant = suma(r.serie, dAnt, hAnt);
+        const antMeses = r.serie.filter(p => enRango(p.fecha, dAnt, hAnt) && p.valor != null).length;
+        return { nombre: r.nombre, total, vari: total != null && ant && antMeses === meses ? (total / ant - 1) * 100 : null, completo: meses === nMeses };
+    }).filter(t => t.total != null).sort((a, b) => b.total - a.total);
+
+    const rango = `${MESES[desde.getMonth()].toLowerCase()} ${desde.getFullYear()} – ${MESES[hasta.getMonth()].toLowerCase()} ${hasta.getFullYear()}`;
+    est.textContent = `FRONTUR · ${totals.length} mercados · ${rango}`;
+    est.style.color = "var(--good)";
+
+    destroyChart("chFrontur");
+    charts.chFrontur = new Chart(document.getElementById("chFrontur"), {
+        type: "bar",
+        data: {
+            labels: totals.map(t => t.nombre),
+            datasets: [{
+                label: `Turistas (${txt})`,
+                data: totals.map(t => t.total),
+                // Color fijo por país (no por posición), para que no cambie al elegir otro año
+                backgroundColor: totals.map(t => COUNTRY_COLORS[FRONTUR_COUNTRIES.findIndex(c => c.nombre === t.nombre) % COUNTRY_COLORS.length] + "99"),
+                borderColor:     totals.map(t => COUNTRY_COLORS[FRONTUR_COUNTRIES.findIndex(c => c.nombre === t.nombre) % COUNTRY_COLORS.length]),
+                borderWidth: 1, borderRadius: 4,
+            }]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: {
+                label: ctx => {
+                    const t = totals[ctx.dataIndex], out = [` ${fmt0.format(ctx.parsed.x)} turistas (${rango})`];
+                    if (t.vari != null) out.push(` Frente al mismo periodo del año anterior: ${t.vari >= 0 ? "+" : ""}${fmt1.format(t.vari)} %`);
+                    if (!t.completo) out.push(" Faltan meses en este periodo");
+                    return out;
+                },
+            } } },
+            scales: {
+                x: { ticks: { color: TICKS, callback: v => fmt0.format(v), font: FONT }, grid: { color: GRID } },
+                y: { ticks: { color: TICKS, font: FONT }, grid: { color: GRID } },
+            }
+        }
+    });
 }
 
 // ─── EGATUR (gasto medio turista internacional) ──────────────────────────
