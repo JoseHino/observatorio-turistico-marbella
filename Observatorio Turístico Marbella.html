@@ -3351,9 +3351,15 @@ function renderCdsMinis(filas) {
     const compacto = v => v >= 1e6 ? fmt1.format(v / 1e6) + " M" : v >= 1e3 ? fmt0.format(v / 1e3) + " mil" : fmt0.format(v);
     filas.forEach((f, k) => {
         const p = f.p, pts = [];
-        // Empieza cuando el país ya tiene 12 meses en la fuente (China, p. ej., no aparece hasta 2021).
+        // Empieza cuando el país tiene 12 meses completos de TODOS los alojamientos elegidos:
+        // los apartamentos por país empiezan en 2020-01 y China no aparece hasta 2021-05.
+        // Así no se mezclan ventanas con solo hoteles y ventanas con hoteles + apartamentos.
         let ini = 0;
-        while (ini <= u && cdsValAloj(cdsState.aloj, ind, p, ini) == null) ini++;
+        CDS_ALOJ[cdsState.aloj].forEach(tipo => {
+            const s = cdsSerie(tipo, ind, p) || [];
+            const i0 = s.findIndex(v => v != null);
+            if (i0 >= 0) ini = Math.max(ini, i0);
+        });
         for (let i = Math.max(11, ini + 11); i <= u; i++) {
             let t = 0;
             for (let j = i - 11; j <= i; j++) t += cdsValAloj(cdsState.aloj, ind, p, j) || 0;   // meses sin dato (cierre de 2020) = 0
