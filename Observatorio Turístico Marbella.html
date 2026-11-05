@@ -1259,7 +1259,7 @@ footer a:hover { color: var(--text); }
         <button data-v="mes" class="on">Mensual</button><button data-v="m12">Media de 12 meses</button>
       </div>
       <div class="chart-wrap"><canvas id="chCompEst"></canvas></div>
-      <p class="legend-note">Línea negra = <b>total</b>: suma de la estancia media de hoteles, apartamentos y plataformas. Se corta donde aún no hay dato de plataformas. «Media de 12 meses» quita la estacionalidad para ver la tendencia.</p>
+      <p class="legend-note">«Media de 12 meses» quita la estacionalidad para ver la tendencia.</p>
     </section>
     <section>
       <h2>Personal empleado – Hoteles vs Apartamentos</h2>
@@ -2051,7 +2051,7 @@ function combineSeries(list, fn) {
 }
 const TOTAL_DS = (data) => ({ label: "Total", data: P(data), borderColor: "#111827", backgroundColor: "#111827", borderWidth: 2.5, pointRadius: 0, tension: .3, order: -1 });
 
-// ─── Comparativa: ocupación y estancia (línea Total = suma de las series) ───
+// ─── Comparativa: ocupación y estancia (sin línea Total) ───
 const COMP_MODO = { ocup: "mes", est: "mes" };
 // Media móvil de 12 meses: solo donde hay 12 meses seguidos con dato
 function rolling12(series) {
@@ -2068,7 +2068,6 @@ function rolling12(series) {
 const compSerie = (key, s) => COMP_MODO[key] === "m12" ? rolling12(s) : (s || []);
 // Línea fina sin puntos y sin rebasar los datos (monotone) para que se lean las tasas
 const RATE_LINE = { borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, cubicInterpolationMode: "monotone" };
-const CONJ_DS = (data, label) => ({ ...TOTAL_DS(data), label, cubicInterpolationMode: "monotone", borderWidth: 3 });
 
 function renderCompOcup() {
     const pct = { ...PCT_AXIS, ticks: { ...PCT_AXIS.ticks, callback: v => v + " %" } };
@@ -2082,9 +2081,7 @@ function renderCompOcup() {
 }
 
 function renderCompEst() {
-    const conj = combineSeries([DATA.eoh_estancia, DATA.eoap_estancia, DATA.oat_estancia_tot], v => v.reduce((a, b) => a + b, 0));
     lineChart("chCompEst", [
-        CONJ_DS(compSerie("est", conj), "Total"),
         { label: "Hoteles",      data: P(compSerie("est", DATA.eoh_estancia)),     borderColor: C.cyan,   ...RATE_LINE },
         { label: "Apartamentos", data: P(compSerie("est", DATA.eoap_estancia)),    borderColor: C.gold,   ...RATE_LINE },
         { label: "Plataformas",  data: P(compSerie("est", DATA.oat_estancia_tot)), borderColor: C.purple, ...RATE_LINE },
