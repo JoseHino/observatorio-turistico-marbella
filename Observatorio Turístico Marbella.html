@@ -567,6 +567,13 @@ tbody tr:hover { background: rgba(37,99,235,0.05); }
 .cds-nav { font: 600 11px/1 var(--mono); height: 28px; min-width: 30px; border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 4px; cursor: pointer; }
 .cds-nav:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .cds-nav:disabled { opacity: .35; cursor: default; }
+#cds-periodo { font: 500 12px var(--sans); padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--card); color: var(--text); max-width: 100%; }
+.cds-minis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 900px) { .cds-minis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .cds-minis { grid-template-columns: 1fr; } }
+.cds-mini { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px 6px; background: var(--card); min-width: 0; }
+.cds-mini h4 { font: 600 12px/1.2 var(--sans); margin: 0 0 6px; color: var(--text); }
+.cds-mini .w { position: relative; height: 120px; }
 .kpi.red .val { color: var(--bad); }
 
 /* ── WEATHER ──────────────────────────────────── */
@@ -1279,14 +1286,8 @@ footer a:hover { color: var(--text); }
     </div>
 
     <div class="month-picker cds-barra">
-      <label>Mes</label>
-      <button class="cds-nav" id="cds-prev" title="Mes anterior" aria-label="Mes anterior">&#9664;</button>
-      <select id="cds-mes" aria-label="Mes"></select>
-      <button class="cds-nav" id="cds-next" title="Mes siguiente" aria-label="Mes siguiente">&#9654;</button>
-      <label>Alojamiento</label>
-      <div class="cds-seg" id="cds-aloj">
-        <button data-v="Ambos">Hoteles + AT</button><button data-v="Hoteles">Hoteles</button><button data-v="Apartamentos">Apart. turísticos</button>
-      </div>
+      <label>Periodo</label>
+      <select id="cds-periodo" aria-label="Periodo"></select>
       <label>Medir por</label>
       <div class="cds-seg" id="cds-ind">
         <button data-v="Pernoctaciones">Pernoctaciones</button><button data-v="Viajeros">Viajeros</button>
@@ -1296,20 +1297,19 @@ footer a:hover { color: var(--text); }
     <section>
       <h2>Quién visita Marbella <span class="pill" id="cds-pill-mes">Marbella</span></h2>
       <div id="cds-resumen" class="grid" style="margin-bottom:14px"></div>
-      <p class="legend-note" style="margin:0 0 8px">Al final de cada barra: <b>pernoctaciones · viajeros · noches por viajero · variación</b> frente al mismo mes del año anterior (con «Medir por: Viajeros» se invierte el orden de las dos primeras cifras).</p>
       <div class="chart-wrap" id="cds-mes-wrap"><canvas id="chCdsMes"></canvas></div>
       <p class="legend-note">
-        Un país por barra, de mayor a menor. Sumar hoteles y apartamentos no duplica: son establecimientos distintos.
-        La variación se omite cuando la base del año anterior es muy pequeña. No se dibujan los grupos que la fuente da sin desglosar
-        («Resto de…», «Países africanos»); sí cuentan en los totales de arriba. Para descargar los datos, pestaña <b>Descargas</b>.
+        Un país por barra, de mayor a menor (hoteles + apartamentos turísticos; desmarca uno en la leyenda y toda la pestaña pasa a mostrar solo el otro).
+        Al final de cada barra, la cifra del periodo y su variación frente al mismo periodo del año anterior; pasa el ratón por encima para ver viajeros, noches por viajero y cuota.
+        La variación se omite si la base es muy pequeña. Los grupos sin desglosar («Resto de…», «Países africanos») no se dibujan, pero cuentan en las cifras de arriba.
       </p>
     </section>
 
     <section>
-      <h2>Evolución por país <span class="pill" id="cds-pill-evol">Serie mensual · desde 2019</span></h2>
-      <div id="cds-paises" class="legend-hint" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
-      <div class="chart-wrap"><canvas id="chCdsEvol"></canvas></div>
-      <p class="legend-note">Pulsa un país para añadirlo o quitarlo; incluye España para comparar con el mercado nacional. Sigue el alojamiento y el indicador elegidos arriba.</p>
+      <h2>Tendencia por país <span class="pill" id="cds-pill-evol">Suma de 12 meses · desde 2019</span></h2>
+      <div id="cds-minis" class="cds-minis"></div>
+      <p class="legend-note">Los mercados principales del periodo elegido y España. Cada punto suma los 12 meses anteriores, así se ve la tendencia sin el vaivén de las temporadas (la caída de 2020-2021 es la pandemia). Cada país tiene su propia escala: compara la forma, no la altura; el tamaño de cada mercado está en las barras de arriba.</p>
+      <p class="fuente-graf">Fuente: <a href="https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069" target="_blank" rel="noopener">Turismo Costa del Sol · Big Data (microdatos EOH del INE)</a></p>
     </section>
 
     <section>
@@ -1814,6 +1814,7 @@ const htmlLegendPlugin = {
                 chart.setDatasetVisibility(i, !chart.isDatasetVisible(i));
                 recomputeTotal(chart);
                 chart.update();
+                if (chart.options.onVisibilidad) setTimeout(() => chart.options.onVisibilidad(chart), 0);
             };
             li.innerHTML = `<span class="chart-legend-box" style="--clr:${color}"></span><span class="chart-legend-text">${ds.label || ""}</span>`;
             ul.appendChild(li);
@@ -2477,7 +2478,7 @@ const DESCARGAS = [
     { tab: "Nacionalidades", items: [
         { t: "Países · hoteles", d: "Viajeros y pernoctaciones por país de residencia y mes, desde 2019. Turismo Costa del Sol (microdato EOH).", f: "paises-hoteles", b: () => dlPaises("Hoteles") },
         { t: "Países · apartamentos turísticos", d: "Lo mismo para apartamentos turísticos (EOAP).", f: "paises-apartamentos", b: () => dlPaises("Apartamentos") },
-        { t: "Gráficas de la pestaña", d: "Países del mes elegido, evolución por país y llegadas a España (FRONTUR); una hoja por gráfica.", f: "nacionalidades-graficas", b: () => dlGraficas("origen") },
+        { t: "Gráficas de la pestaña", d: "Países del periodo elegido, tendencia de cada mercado (suma de 12 meses) y llegadas a España (FRONTUR); una hoja por gráfica.", f: "nacionalidades-graficas", b: () => dlGraficas("origen") },
     ] },
     { tab: "Economía", items: [
         { t: "Gráficas de economía", d: "Tipos de cambio (BCE), estacionalidad, presión turística y gasto (EGATUR); una hoja por gráfica.", f: "economia", b: () => dlGraficas("econ") },
@@ -3092,7 +3093,7 @@ const CDS_ALOJ_TXT = { Ambos: "Hoteles + AT", Hoteles: "Hoteles", Apartamentos: 
 const CDS_MES_L = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const fmt1 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
-let cdsState = { paisesSel: [], mes: null, aloj: "Ambos", ind: "Pernoctaciones" };
+let cdsState = { periodo: "u12", ind: "Pernoctaciones", ultimo: null, aloj: "Ambos" };   // aloj lo fija la leyenda de las barras
 
 function cdsSerie(tipo, ind, mercado) {
     // Devuelve el array alineado a CDS_PAIS.meses, o null.
@@ -3100,10 +3101,9 @@ function cdsSerie(tipo, ind, mercado) {
 }
 function cdsVal(tipo, ind, mercado, i) {
     const s = cdsSerie(tipo, ind, mercado);
-    return s && s[i] != null ? s[i] : null;
+    return s && i >= 0 && i < s.length ? s[i] : null;
 }
 function cdsValAloj(aloj, ind, mercado, i) {
-    // Suma de los tipos de alojamiento elegidos; null si ninguno tiene dato.
     let t = null;
     for (const tipo of CDS_ALOJ[aloj]) {
         const v = cdsVal(tipo, ind, mercado, i);
@@ -3116,15 +3116,46 @@ function cdsMesTxt(m, largo = true) {
     return largo ? `${CDS_MES_L[+mm - 1]} ${y}` : `${MESES[+mm - 1]} ${y.slice(2)}`;
 }
 function cdsMesAnterior(i) {
-    // Mismo mes del año anterior (índice en CDS_PAIS.meses) o -1.
     const [y, mm] = CDS_PAIS.meses[i].split("-");
     return CDS_PAIS.meses.indexOf(`${+y - 1}-${mm}`);
 }
-function cdsGrupos() {
-    const hay = new Set(Object.keys(CDS_PAIS.datos.Hoteles?.Viajeros || {}));
-    Object.values(CDS_PAIS.datos).forEach(t => Object.keys(t.Viajeros || {}).forEach(k => hay.add(k)));
-    return CDS_GRUPOS.filter(g => hay.has(g));
+
+// Periodo elegido → rango de índices [i0, i1] y el mismo rango un año antes.
+// "u12" = últimos 12 meses · "a:AAAA" = año (parcial si aún no ha acabado) · "m:i" = un mes.
+function cdsRango(periodo) {
+    const M = CDS_PAIS.meses, u = cdsState.ultimo;
+    let i0, i1, txt;
+    if (periodo === "u12") {
+        i0 = Math.max(0, u - 11); i1 = u;
+        txt = `${cdsMesTxt(M[i0], false)} – ${cdsMesTxt(M[i1], false)}`;
+    } else if (periodo.startsWith("a:")) {
+        const y = periodo.slice(2);
+        i0 = M.indexOf(`${y}-01`);
+        const dic = M.indexOf(`${y}-12`);
+        i1 = dic >= 0 && dic <= u ? dic : u;
+        txt = i1 - i0 === 11 ? y : `${y} (ene–${CDS_MES_L[+M[i1].slice(5) - 1].slice(0, 3)})`;
+    } else {
+        i0 = i1 = +periodo.slice(2);
+        txt = cdsMesTxt(M[i0]);
+    }
+    const p0 = i0 - 12;
+    return { i0, i1, n: i1 - i0 + 1, txt, prev: p0 >= 0 ? { i0: p0, i1: i1 - 12 } : null };
 }
+function cdsSuma(tipo, ind, mercado, r) {
+    // tipo = "Hoteles" | "Apartamentos" | "Ambos"  (las dos primeras también son claves de CDS_ALOJ)
+    if (!r) return null;
+    let t = null;
+    for (let k = r.i0; k <= r.i1; k++) {
+        const v = CDS_ALOJ[tipo] ? cdsValAloj(tipo, ind, mercado, k) : cdsVal(tipo, ind, mercado, k);
+        if (v != null) t = (t || 0) + v;
+    }
+    return t;
+}
+function cdsVarTxt(a, b, minBase) {
+    // Variación interanual en %, o null si la base es demasiado pequeña.
+    return a != null && b != null && b >= minBase ? (a / b - 1) * 100 : null;
+}
+const cdsSigno = v => (v >= 0 ? "+" : "") + fmt1.format(v) + " %";
 
 function initCdsPais() {
     if (!CDS_PAIS) {
@@ -3132,134 +3163,97 @@ function initCdsPais() {
         if (note) note.textContent = " (datos no embebidos aún · ejecuta fetch_paises_cds.py)";
         return;
     }
-    if (cdsState.mes != null) { renderCdsPais(); return; }
+    if (cdsState.ultimo != null) { renderCdsPais(); return; }
 
     const meta = CDS_PAIS.meta, M = CDS_PAIS.meses;
     let ultimo = M.length - 1;
     while (ultimo > 0 && cdsVal("Hoteles", "Viajeros", "Total", ultimo) == null) ultimo--;
-    cdsState.mes = ultimo;
+    cdsState.ultimo = ultimo;
 
-    const sel = document.getElementById("cds-mes");
-    sel.innerHTML = M.map((m, i) => i <= ultimo ? `<option value="${i}">${cdsMesTxt(m)}</option>` : "")
-                     .reverse().join("");
-    sel.addEventListener("change", () => { cdsState.mes = +sel.value; renderCdsPais(); });
-    const mover = d => {
-        const n = cdsState.mes + d;
-        if (n < 0 || n > ultimo) return;
-        cdsState.mes = n; renderCdsPais();
-    };
-    document.getElementById("cds-prev").addEventListener("click", () => mover(-1));
-    document.getElementById("cds-next").addEventListener("click", () => mover(1));
-
-    const seg = (id, clave) => document.querySelectorAll(`#${id} button`).forEach(b =>
-        b.addEventListener("click", () => { cdsState[clave] = b.dataset.v; renderCdsPais(); }));
-    seg("cds-aloj", "aloj");
-    seg("cds-ind", "ind");
-
+    // Un único selector de periodo: últimos 12 meses, años y meses sueltos.
+    const anios = [...new Set(M.slice(0, ultimo + 1).map(m => m.slice(0, 4)))].reverse();
+    const sel = document.getElementById("cds-periodo");
+    sel.innerHTML =
+        `<option value="u12">Últimos 12 meses (${cdsRango("u12").txt})</option>` +
+        `<optgroup label="Año">${anios.map(y => `<option value="a:${y}">${cdsRango("a:" + y).txt}</option>`).join("")}</optgroup>` +
+        `<optgroup label="Mes">${M.map((m, i) => i <= ultimo ? `<option value="m:${i}">${cdsMesTxt(m)}</option>` : "").reverse().join("")}</optgroup>`;
+    sel.addEventListener("change", () => { cdsState.periodo = sel.value; renderCdsPais(); });
+    document.querySelectorAll("#cds-ind button").forEach(b =>
+        b.addEventListener("click", () => { cdsState.ind = b.dataset.v; renderCdsPais(); }));
 
     document.getElementById("cds-validacion").innerHTML =
         ` Serie mensual <b>${meta.desde}</b> → <b>${M[ultimo]}</b>, ${meta.paises.length} países. ` +
         `Coincide con la EOH del INE al 100% en los totales.`;
-
-    // Selección inicial de la evolución: los 4 mercados líderes de los últimos 12 meses.
-    const suma12 = p => { let t = 0; for (let i = Math.max(0, ultimo - 11); i <= ultimo; i++) t += cdsValAloj("Ambos", "Pernoctaciones", p, i) || 0; return t; };
-    cdsState.paisesSel = meta.paises.map(p => [p, suma12(p)]).sort((a, b) => b[1] - a[1]).slice(0, 4).map(x => x[0]);
-
     renderCdsPais();
 }
 
 function renderCdsPais() {
     if (!CDS_PAIS) return;
-    const { mes, aloj, ind } = cdsState;
-    document.getElementById("cds-mes").value = mes;
-    document.getElementById("cds-prev").disabled = mes <= 0;
-    document.getElementById("cds-next").disabled = mes >= +document.getElementById("cds-mes").options[0].value;
-    [["cds-aloj", aloj], ["cds-ind", ind]].forEach(([id, v]) =>
-        document.querySelectorAll(`#${id} button`).forEach(b => b.classList.toggle("on", b.dataset.v === v)));
-    document.getElementById("cds-pill-mes").textContent = `${cdsMesTxt(CDS_PAIS.meses[mes])} · ${CDS_ALOJ_TXT[aloj]}`;
-    document.getElementById("cds-pill-evol").textContent = `${ind} · ${CDS_ALOJ_TXT[aloj]}`;
-
-    renderCdsMes();
-    renderCdsChips();
-    renderCdsEvol();
-}
-
-function cdsFila(mercado, i) {
-    const { aloj, ind } = cdsState;
-    const r = { mercado };
-    for (const [tipo, k] of [["Hoteles", "h"], ["Apartamentos", "a"]]) {
-        r[k + "v"] = cdsVal(tipo, "Viajeros", mercado, i);
-        r[k + "p"] = cdsVal(tipo, "Pernoctaciones", mercado, i);
-    }
-    r.tv = cdsValAloj("Ambos", "Viajeros", mercado, i);
-    r.tp = cdsValAloj("Ambos", "Pernoctaciones", mercado, i);
-    const sv = cdsValAloj(aloj, "Viajeros", mercado, i), sp = cdsValAloj(aloj, "Pernoctaciones", mercado, i);
-    r.est = sv && sp ? sp / sv : null;
-    const actual = ind === "Viajeros" ? sv : sp;
-    const j = cdsMesAnterior(i);
-    const prev = j >= 0 ? cdsValAloj(aloj, ind, mercado, j) : null;
-    r.vari = actual != null && prev ? (actual / prev - 1) * 100 : null;
-    const tot = cdsValAloj(aloj, ind, "Total", i);
-    r.cuota = actual != null && tot ? actual / tot * 100 : null;
-    r.sel = actual;
-    return r;
+    const { periodo, ind } = cdsState;
+    document.getElementById("cds-periodo").value = periodo;
+    document.querySelectorAll("#cds-ind button").forEach(b => b.classList.toggle("on", b.dataset.v === ind));
+    const r = cdsRango(periodo);
+    document.getElementById("cds-pill-mes").textContent = `${r.txt} · ${CDS_ALOJ_TXT[cdsState.aloj]}`;
+    document.getElementById("cds-pill-evol").textContent = `${ind} · ${CDS_ALOJ_TXT[cdsState.aloj]} · suma de 12 meses`;
+    const filas = renderCdsMes(r);
+    renderCdsMinis(filas);
 }
 
 const CDS_COL = { Hoteles: "#2563eb", Apartamentos: "#f59e0b" };
 
-function cdsVarTxt(a, b, minBase) {
-    // Variación interanual en %, o null si la base es demasiado pequeña.
-    return a != null && b != null && b >= minBase ? (a / b - 1) * 100 : null;
-}
-
-function renderCdsMes() {
-    const { mes, aloj, ind } = cdsState;
-    const i = mes, j = cdsMesAnterior(mes);
-    const tipos = CDS_ALOJ[aloj];
+function renderCdsMes(r) {
+    const { ind } = cdsState;
     const otro = ind === "Pernoctaciones" ? "Viajeros" : "Pernoctaciones";
-    const minBase = ind === "Viajeros" ? 300 : 1000;
+    const minBase = (ind === "Viajeros" ? 300 : 1000) * r.n;
+    const vsTxt = r.prev ? "frente al año anterior" : "sin año anterior";
 
-    // ── Cifras del mes (todos los mercados, grupos incluidos) ──
-    const tot = m => cdsValAloj(aloj, ind, m, i);
-    const T = tot("Total"), Tprev = j >= 0 ? cdsValAloj(aloj, ind, "Total", j) : null;
-    const tv = cdsValAloj(aloj, "Viajeros", "Total", i), tp = cdsValAloj(aloj, "Pernoctaciones", "Total", i);
-    const ext = tot("Extranjero");
-    const vT = cdsVarTxt(T, Tprev, 1);
+    // ── Cifras del periodo (todos los mercados, grupos incluidos) ──
+    const S = (i, m, rr = r) => cdsSuma(cdsState.aloj, i, m, rr);
+    const tp = S("Pernoctaciones", "Total"), tv = S("Viajeros", "Total");
+    const tpA = S("Pernoctaciones", "Total", r.prev), tvA = S("Viajeros", "Total", r.prev);
+    const ext = S(ind, "Extranjero"), extA = S(ind, "Extranjero", r.prev);
+    const T = ind === "Viajeros" ? tv : tp, TA = ind === "Viajeros" ? tvA : tpA;
     const kpi = (lbl, val, sub, cls = "") => `<div class="kpi${cls}"><div class="lbl">${lbl}</div><div class="val">${val}</div><div class="sub">${sub}</div></div>`;
+    const varSub = (a, b) => {
+        const v = cdsVarTxt(a, b, 1);
+        return v == null ? vsTxt : `<b style="color:${v >= 0 ? "#059669" : "#dc2626"}">${v >= 0 ? "▲" : "▼"} ${cdsSigno(v)}</b> ${vsTxt}`;
+    };
+    const antes = txt => r.prev ? `hace un año: ${txt}` : "sin año anterior";
     document.getElementById("cds-resumen").innerHTML = [
-        kpi("Pernoctaciones", tp != null ? fmt0.format(tp) : "–", CDS_ALOJ_TXT[aloj]),
-        kpi("Viajeros", tv != null ? fmt0.format(tv) : "–", CDS_ALOJ_TXT[aloj]),
-        kpi("Noches por viajero", tv && tp ? fmt1.format(tp / tv) : "–", "estancia media"),
-        kpi("Extranjeros", T && ext != null ? fmt1.format(ext / T * 100) + " %" : "–", `de las ${ind.toLowerCase()}`, " gold"),
-        kpi(`Variación ${ind.toLowerCase()}`, vT != null ? (vT >= 0 ? "+" : "") + fmt1.format(vT) + " %" : "–",
-            j >= 0 ? `frente a ${cdsMesTxt(CDS_PAIS.meses[j])}` : "sin año anterior", vT == null ? "" : vT >= 0 ? " green" : " red"),
+        kpi("Pernoctaciones", tp != null ? fmt0.format(tp) : "–", varSub(tp, tpA)),
+        kpi("Viajeros", tv != null ? fmt0.format(tv) : "–", varSub(tv, tvA)),
+        kpi("Noches por viajero", tv && tp ? fmt1.format(tp / tv) : "–", antes(tvA && tpA ? fmt1.format(tpA / tvA) : "–")),
+        kpi(`Extranjeros (${ind.toLowerCase()})`, T && ext != null ? fmt1.format(ext / T * 100) + " %" : "–",
+            antes(TA && extA != null ? fmt1.format(extA / TA * 100) + " %" : "–"), " gold"),
     ].join("");
 
-    // ── Una barra por país, ordenadas por el indicador elegido ──
+    // ── Una barra por país (hoteles + apartamentos apilados), de mayor a menor ──
+    const tipos = ["Hoteles", "Apartamentos"];
     const filas = [...CDS_PAIS.meta.paises, "España"].map(p => {
-        const a = tot(p);
-        if (a == null) return null;
-        const b = cdsValAloj(aloj, otro, p, i);
-        const v = cdsValAloj(aloj, "Viajeros", p, i), n = cdsValAloj(aloj, "Pernoctaciones", p, i);
-        return { p, a, b, est: v && n ? n / v : null,
-                 vari: j >= 0 ? cdsVarTxt(a, cdsValAloj(aloj, ind, p, j), minBase) : null,
-                 cuota: T ? a / T * 100 : null };
+        const cur = {}, prev = {}, curO = {};
+        tipos.forEach(t => { cur[t] = cdsSuma(t, ind, p, r); prev[t] = cdsSuma(t, ind, p, r.prev); curO[t] = cdsSuma(t, otro, p, r); });
+        if (cur.Hoteles == null && cur.Apartamentos == null) return null;
+        const a = CDS_ALOJ[cdsState.aloj].reduce((t, k) => t + (cur[k] ?? 0), 0);
+        return { p, a, cur, prev, curO };
     }).filter(Boolean).sort((x, y) => y.a - x.a);
 
-    const uA = ind === "Pernoctaciones" ? "noches" : "viajeros", uB = ind === "Pernoctaciones" ? "viajeros" : "noches";
-    const etiqueta = (f, corta) => {
-        const base = corta ? fmt0.format(f.a) : `${fmt0.format(f.a)} ${uA} · ${f.b != null ? fmt0.format(f.b) : "–"} ${uB}` +
-                                                (f.est ? ` · ${fmt1.format(f.est)} n/v` : "");
-        const v = f.vari == null ? "" : ` ${f.vari >= 0 ? "▲" : "▼"} ${fmt0.format(Math.abs(f.vari))} %`;
-        return [base, v, f.vari];
+    // Cifras de una fila según las series visibles (la leyenda permite quitar hoteles o apartamentos).
+    const totTipo = Object.fromEntries(tipos.map(t => [t, cdsSuma(t, ind, "Total", r) || 0]));
+    const calc = (f, vis) => {
+        const sum = o => vis.reduce((t, k) => o[k] != null ? (t ?? 0) + o[k] : t, null);
+        const a = sum(f.cur), b = sum(f.curO), pa = sum(f.prev);
+        const v = ind === "Viajeros" ? a : b, n = ind === "Viajeros" ? b : a;
+        const totVis = vis.reduce((t, k) => t + totTipo[k], 0);
+        return { a, b, est: v && n ? n / v : null, vari: cdsVarTxt(a, pa, minBase), cuota: totVis && a != null ? a / totVis * 100 : null };
     };
+    const visibles = chart => tipos.filter((_, d) => chart.isDatasetVisible(d));
 
-    // Dibuja el texto al final de cada barra (sin librerías extra).
+    // Texto al final de cada barra: cifra del periodo + variación interanual.
     const pluginEtiquetas = {
         id: "cdsEtiquetas",
         afterDatasetsDraw(chart) {
-            const { ctx } = chart;
-            const corta = chart.width < 640;
+            const { ctx } = chart, vis = visibles(chart);
+            if (!vis.length) return;
             ctx.save();
             ctx.font = "500 11px 'JetBrains Mono', monospace";
             ctx.textBaseline = "middle";
@@ -3271,12 +3265,14 @@ function renderCdsMes() {
                     if (bar && chart.data.datasets[d].data[k] != null) { x = Math.max(x, bar.x); y = bar.y; }
                 });
                 if (!y) return;
-                const [base, v, vari] = etiqueta(f, corta);
+                const c = calc(f, vis);
+                if (c.a == null) return;
+                const base = fmt0.format(c.a);
                 ctx.fillStyle = f.p === "España" ? "#8a94a3" : "#334155";
                 ctx.fillText(base, x + 6, y);
-                if (v) {
-                    ctx.fillStyle = vari >= 0 ? "#059669" : "#dc2626";
-                    ctx.fillText(v, x + 6 + ctx.measureText(base).width, y);
+                if (c.vari != null) {
+                    ctx.fillStyle = c.vari >= 0 ? "#059669" : "#dc2626";
+                    ctx.fillText(` ${c.vari >= 0 ? "▲" : "▼"} ${fmt0.format(Math.abs(c.vari))} %`, x + 6 + ctx.measureText(base).width, y);
                 }
             });
             ctx.restore();
@@ -3284,7 +3280,7 @@ function renderCdsMes() {
     };
 
     const wrap = document.getElementById("cds-mes-wrap");
-    wrap.style.height = Math.max(320, filas.length * 26 + 40) + "px";
+    wrap.style.height = Math.max(320, filas.length * 24 + 40) + "px";
 
     destroyChart("chCdsMes");
     charts.chCdsMes = new Chart(document.getElementById("chCdsMes"), {
@@ -3293,28 +3289,35 @@ function renderCdsMes() {
             labels: filas.map(f => f.p),
             datasets: tipos.map(tipo => ({
                 label: tipo === "Hoteles" ? "Hoteles" : "Apartamentos turísticos",
-                data: filas.map(f => cdsVal(tipo, ind, f.p, i)),
+                data: filas.map(f => f.cur[tipo]),
                 backgroundColor: filas.map(f => CDS_COL[tipo] + (f.p === "España" ? "55" : "dd")),
                 borderColor: CDS_COL[tipo], borderWidth: 0, borderRadius: 3, barPercentage: 0.78, categoryPercentage: 0.9,
+                hidden: !CDS_ALOJ[cdsState.aloj].includes(tipo),
             })),
         },
         plugins: [pluginEtiquetas],
         options: {
             indexAxis: "y",
             responsive: true, maintainAspectRatio: false,
-            layout: { padding: { right: ctx => ctx.chart.width < 640 ? 110 : 330 } },
+            layout: { padding: { right: 130 } },
+            // Quitar hoteles o apartamentos en la leyenda filtra toda la pestaña (cifras, orden y tendencia).
+            onVisibilidad: chart => {
+                const vis = visibles(chart);
+                const nuevo = vis.length === 2 ? "Ambos" : vis.length === 1 ? vis[0] : cdsState.aloj;
+                if (!vis.length) { chart.setDatasetVisibility(tipos.indexOf(cdsState.aloj === "Ambos" ? "Hoteles" : cdsState.aloj), true); chart.update(); return; }
+                if (nuevo !== cdsState.aloj) { cdsState.aloj = nuevo; renderCdsPais(); }
+            },
             interaction: { mode: "index", axis: "y", intersect: false },
             plugins: {
                 legend: { display: false },
                 tooltip: { callbacks: {
                     label: ctx => ctx.parsed.x != null ? ` ${ctx.dataset.label}: ${fmt0.format(ctx.parsed.x)} ${ind.toLowerCase()}` : null,
                     footer: items => {
-                        const f = filas[items[0].dataIndex], out = [];
-                        if (tipos.length > 1) out.push(`Total: ${fmt0.format(f.a)} ${ind.toLowerCase()}`);
-                        if (f.b != null) out.push(`${otro}: ${fmt0.format(f.b)}`);
-                        if (f.est) out.push(`Noches por viajero: ${fmt1.format(f.est)}`);
-                        if (f.cuota != null) out.push(`Cuota: ${fmt1.format(f.cuota)} % del total`);
-                        if (f.vari != null) out.push(`Variación interanual: ${f.vari >= 0 ? "+" : ""}${fmt1.format(f.vari)} %`);
+                        const f = filas[items[0].dataIndex], c = calc(f, visibles(items[0].chart)), out = [];
+                        if (c.b != null) out.push(`${otro}: ${fmt0.format(c.b)}`);
+                        if (c.est) out.push(`Noches por viajero: ${fmt1.format(c.est)}`);
+                        if (c.cuota != null) out.push(`Cuota: ${fmt1.format(c.cuota)} % del total`);
+                        if (c.vari != null) out.push(`Variación interanual: ${cdsSigno(c.vari)}`);
                         return out;
                     },
                 } },
@@ -3325,49 +3328,47 @@ function renderCdsMes() {
             },
         },
     });
+    return filas;
 }
 
-function cdsColorPais(p) {
-    if (p === "España") return "#64748b";
-    const i = CDS_PAIS.meta.paises.indexOf(p);
-    return COUNTRY_COLORS[i % COUNTRY_COLORS.length];
-}
-
-function renderCdsChips() {
-    const cont = document.getElementById("cds-paises");
-    cont.innerHTML = "";
-    [...CDS_PAIS.meta.paises, "España"].forEach((p, i) => {
-        const on = cdsState.paisesSel.includes(p);
-        const col = cdsColorPais(p);
-        const chip = document.createElement("button");
-        chip.textContent = p;
-        chip.style.cssText =
-            `font:500 11px/1 'Space Grotesk',sans-serif;padding:5px 10px;border-radius:20px;cursor:pointer;` +
-            `border:1px solid ${col};color:${on ? "#fff" : col};background:${on ? col : "transparent"};transition:.15s`;
-        chip.addEventListener("click", () => {
-            const k = cdsState.paisesSel.indexOf(p);
-            if (k >= 0) cdsState.paisesSel.splice(k, 1);
-            else cdsState.paisesSel.push(p);
-            renderCdsChips();
-            renderCdsEvol();
+// Tendencia: una mini gráfica por mercado (8 principales del periodo + España), suma móvil de 12 meses.
+function renderCdsMinis(filas) {
+    const { ind } = cdsState, M = CDS_PAIS.meses, u = cdsState.ultimo;
+    const top = filas.filter(f => f.p !== "España").slice(0, 8).map(f => f.p).concat("España");
+    const cont = document.getElementById("cds-minis");
+    Object.keys(charts).filter(k => k.startsWith("chCdsMini")).forEach(destroyChart);
+    cont.innerHTML = top.map((p, k) => `<div class="cds-mini"><h4>${p}</h4><div class="w"><canvas id="chCdsMini${k}"></canvas></div></div>`).join("");
+    const compacto = v => v >= 1e6 ? fmt1.format(v / 1e6) + " M" : v >= 1e3 ? fmt0.format(v / 1e3) + " mil" : fmt0.format(v);
+    top.forEach((p, k) => {
+        const pts = [];
+        for (let i = 11; i <= u; i++) {
+            let t = 0;
+            for (let j = i - 11; j <= i; j++) t += cdsValAloj(cdsState.aloj, ind, p, j) || 0;   // meses sin dato (cierre de 2020) = 0
+            pts.push({ x: new Date(M[i] + "-01T00:00:00"), y: t });
+        }
+        const col = p === "España" ? "#64748b" : C.blue;
+        const id = `chCdsMini${k}`;
+        charts[id] = new Chart(document.getElementById(id), {
+            type: "line",
+            data: { datasets: [{ label: `${p} · ${ind.toLowerCase()} (suma 12 meses)`, data: pts, borderColor: col, backgroundColor: col + "1f",
+                                 fill: true, borderWidth: 2, pointRadius: 0, pointHoverRadius: 3, tension: 0.25 }] },
+            options: {
+                responsive: true, maintainAspectRatio: false, animation: false,
+                interaction: { mode: "index", intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: {
+                        title: it => `12 meses hasta ${cdsMesTxt(dlYM(new Date(it[0].parsed.x)))}`,
+                        label: it => ` ${fmt0.format(it.parsed.y)} ${ind.toLowerCase()}`,
+                    } },
+                },
+                scales: {
+                    x: { type: "time", time: { unit: "year" }, ticks: { color: TICKS, font: { ...FONT, size: 10 }, maxRotation: 0 }, grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { color: TICKS, font: { ...FONT, size: 10 }, maxTicksLimit: 3, callback: compacto }, grid: { color: GRID } },
+                },
+            },
         });
-        cont.appendChild(chip);
     });
-}
-
-function renderCdsEvol() {
-    const { aloj, ind } = cdsState;
-    const meses = CDS_PAIS.meses;
-    const datasets = cdsState.paisesSel.map(p => {
-        const col = cdsColorPais(p);
-        return {
-            label: p,
-            data: meses.map((m, k) => ({ x: m + "-01", y: cdsValAloj(aloj, ind, p, k) })),
-            borderColor: col, backgroundColor: col + "22",
-            borderWidth: 2, pointRadius: 0, tension: 0.25, spanGaps: true,
-        };
-    });
-    lineChart("chCdsEvol", datasets);
 }
 
 function renderOrigenAeropuerto() {
@@ -5195,7 +5196,6 @@ const FUENTES_GRAFICAS = {
   "chCompEst": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"], ["INE · Ocupación en alojamientos turísticos a partir de plataformas digitales", "https://ine.es/experimental/ocupacion/experimental_ocupacion.htm"]],
   "chCompPers": [["INE · Encuesta de Ocupación Hotelera (puntos turísticos)", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Encuesta de Ocupación en Apartamentos Turísticos", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=239"]],
   "chCdsMes": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
-  "chCdsEvol": [["Turismo Costa del Sol · Big Data (microdatos EOH del INE)", "https://www.costadelsolmalaga.org/bigdata/com1_tc-357990/viajeros-pernoctaciones?mun=29069"]],
   "chFrontur": [["INE · FRONTUR", "https://www.ine.es/dyngs/Prensa/FRONTUR0125.htm"]],
   "chGini": [["Elaboración propia con INE · EOH", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"]],
   "chPresion": [["Elaboración propia con INE · EOH, EOAP y plataformas", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=238"], ["INE · Padrón municipal", "https://www.ine.es/dynt3/inebase/es/index.htm?padre=517"]],
