@@ -1238,23 +1238,27 @@ footer a:hover { color: var(--text); }
     <section>
       <h2>Pernoctaciones totales – Hoteles · Apartamentos · Plataformas</h2>
       <div class="chart-wrap"><canvas id="chCompPernoc"></canvas></div>
+      <p class="legend-note">Total (línea negra) = hoteles + apartamentos + plataformas; solo se dibuja en los meses con las tres fuentes publicadas (OAT va con más retraso).</p>
     </section>
     <section>
       <h2>Viajeros totales – Hoteles vs Apartamentos <span class="pill">EOH + EOAP</span></h2>
       <div class="chart-wrap"><canvas id="chCompViaj"></canvas></div>
-      <p class="legend-note">OAT no publica viajeros, solo alojamientos ocupados y pernoctaciones.</p>
+      <p class="legend-note">Total (línea negra) = hoteles + apartamentos. OAT no publica viajeros, solo alojamientos ocupados y pernoctaciones.</p>
     </section>
     <section>
       <h2>Grado de ocupación por plazas (%) – Hoteles vs Apartamentos</h2>
       <div class="chart-wrap"><canvas id="chCompOcup"></canvas></div>
+      <p class="legend-note">Total = ocupación conjunta de hoteles y apartamentos, ponderada por las plazas de cada uno.</p>
     </section>
     <section>
       <h2>Estancia media (días) – Hoteles · Apartamentos · Plataformas</h2>
       <div class="chart-wrap"><canvas id="chCompEst"></canvas></div>
+      <p class="legend-note">Total = pernoctaciones de los tres tipos ÷ sus viajeros (en plataformas, viajeros = pernoctaciones ÷ estancia media, porque OAT no publica viajeros). Solo en meses con las tres fuentes.</p>
     </section>
     <section>
       <h2>Personal empleado – Hoteles vs Apartamentos</h2>
       <div class="chart-wrap"><canvas id="chCompPers"></canvas></div>
+      <p class="legend-note">Total (línea negra) = personal de hoteles + apartamentos.</p>
     </section>
   </div>
 
@@ -2024,11 +2028,30 @@ function renderChartsOAT() {
     ]);
 }
 
+// Combina varias series mes a mes, solo en los meses en que TODAS tienen dato
+// (así el total no cae en falso cuando una fuente aún no ha publicado).
+function combineSeries(list, fn) {
+    const maps = list.map(s => new Map((s || []).filter(p => p.valor != null).map(p => [p.fecha.getTime(), p])));
+    if (!maps.length || maps.some(m => !m.size)) return [];
+    const out = [];
+    maps[0].forEach((p0, k) => {
+        const pts = maps.map(m => m.get(k));
+        if (pts.some(p => !p)) return;
+        const v = fn(pts.map(p => p.valor));
+        if (v == null || !isFinite(v)) return;
+        out.push({ fecha: p0.fecha, valor: v, provisional: pts.some(p => p.provisional) });
+    });
+    return out.sort((a, b) => a.fecha - b.fecha);
+}
+const TOTAL_DS = (data) => ({ label: "Total", data: P(data), borderColor: "#111827", backgroundColor: "#111827", borderWidth: 2.5, pointRadius: 0, tension: .3, order: -1 });
+
 function renderChartsComp() {
+    const add = v => v.reduce((a, b) => a + b, 0);
     const eohPer = sumSeries([DATA.eoh_pernoc_esp, DATA.eoh_pernoc_ext]);
     const eoaPer = sumSeries([DATA.eoap_pernoc_esp, DATA.eoap_pernoc_ext]);
     const oatPer = DATA.oat_pernoc_tot || [];
     lineChart("chCompPernoc", [
+        TOTAL_DS(combineSeries([eohPer, eoaPer, oatPer], add)),
         { label: "Hoteles (EOH)",       data: P(eohPer), borderColor: C.cyan, backgroundColor: "rgba(6,182,212,.1)",  fill: true, tension: .3 },
         { label: "Apartamentos (EOAP)", data: P(eoaPer), borderColor: C.gold, backgroundColor: "rgba(217,119,6,.1)",  fill: true, tension: .3 },
         { label: "Plataformas (OAT)",   data: P(oatPer), borderColor: C.purple, backgroundColor: "rgba(167,139,250,.1)", fill: true, tension: .3 },
@@ -2036,19 +2059,28 @@ function renderChartsComp() {
     const eohViaj = sumSeries([DATA.eoh_viaj_esp, DATA.eoh_viaj_ext]);
     const eoaViaj = sumSeries([DATA.eoap_viaj_esp, DATA.eoap_viaj_ext]);
     lineChart("chCompViaj", [
+        TOTAL_DS(combineSeries([eohViaj, eoaViaj], add)),
         { label: "Hoteles (EOH)",       data: P(eohViaj), borderColor: C.cyan, backgroundColor: "rgba(6,182,212,.1)", fill: true, tension: .3 },
         { label: "Apartamentos (EOAP)", data: P(eoaViaj), borderColor: C.gold, backgroundColor: "rgba(217,119,6,.1)", fill: true, tension: .3 },
     ]);
+    // Ocupación conjunta: media de las dos ocupaciones ponderada por las plazas de cada tipo
     lineChart("chCompOcup", [
+        TOTAL_DS(combineSeries([DATA.eoh_ocup_plz, DATA.eoh_plazas, DATA.eoap_ocup_plz, DATA.eoap_plazas],
+            ([oh, ph, oa, pa]) => (ph + pa) ? (oh * ph + oa * pa) / (ph + pa) : null)),
         { label: "Hoteles · plazas",      data: P(DATA.eoh_ocup_plz),  borderColor: C.cyan, tension: .3 },
         { label: "Apartamentos · plazas", data: P(DATA.eoap_ocup_plz), borderColor: C.gold, tension: .3 },
     ], PCT_AXIS);
+    // Estancia conjunta: pernoctaciones totales / viajeros totales
+    // (viajeros de plataformas = pernoctaciones OAT / estancia media OAT, porque OAT no publica viajeros)
     lineChart("chCompEst", [
+        TOTAL_DS(combineSeries([eohPer, eoaPer, oatPer, eohViaj, eoaViaj, DATA.oat_estancia_tot],
+            ([ph, pa, po, vh, va, eo]) => eo ? (ph + pa + po) / (vh + va + po / eo) : null)),
         { label: "Hoteles",       data: P(DATA.eoh_estancia),      borderColor: C.cyan,   tension: .3 },
         { label: "Apartamentos",  data: P(DATA.eoap_estancia),     borderColor: C.gold,   tension: .3 },
         { label: "Plataformas",   data: P(DATA.oat_estancia_tot),  borderColor: C.purple, tension: .3 },
     ]);
     lineChart("chCompPers", [
+        TOTAL_DS(combineSeries([DATA.eoh_personal, DATA.eoap_personal], add)),
         { label: "Hoteles",       data: P(DATA.eoh_personal),  borderColor: C.cyan, tension: .3 },
         { label: "Apartamentos",  data: P(DATA.eoap_personal), borderColor: C.gold, tension: .3 },
     ]);
