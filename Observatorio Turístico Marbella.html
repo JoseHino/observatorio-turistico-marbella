@@ -1247,13 +1247,19 @@ footer a:hover { color: var(--text); }
     </section>
     <section>
       <h2>Grado de ocupación por plazas (%) – Hoteles vs Apartamentos</h2>
+      <div class="cds-seg comp-modo" data-chart="ocup" style="margin-bottom:10px">
+        <button data-v="mes" class="on">Mensual</button><button data-v="m12">Media de 12 meses</button>
+      </div>
       <div class="chart-wrap"><canvas id="chCompOcup"></canvas></div>
-      <p class="legend-note">Total = ocupación conjunta de hoteles y apartamentos, ponderada por las plazas de cada uno.</p>
+      <p class="legend-note">Línea negra = <b>media conjunta</b> de hoteles y apartamentos, ponderada por las plazas de cada uno (un porcentaje no se suma). La franja sombreada marca la distancia entre ambos. «Media de 12 meses» quita la estacionalidad para ver la tendencia.</p>
     </section>
     <section>
       <h2>Estancia media (días) – Hoteles · Apartamentos · Plataformas</h2>
+      <div class="cds-seg comp-modo" data-chart="est" style="margin-bottom:10px">
+        <button data-v="mes" class="on">Mensual</button><button data-v="m12">Media de 12 meses</button>
+      </div>
       <div class="chart-wrap"><canvas id="chCompEst"></canvas></div>
-      <p class="legend-note">Total = pernoctaciones de los tres tipos ÷ sus viajeros (en plataformas, viajeros = pernoctaciones ÷ estancia media, porque OAT no publica viajeros). Solo en meses con las tres fuentes.</p>
+      <p class="legend-note">Línea negra = <b>estancia media conjunta</b>: pernoctaciones de los tres tipos ÷ sus viajeros (en plataformas, viajeros = pernoctaciones ÷ estancia media, porque OAT no publica viajeros). Se corta donde aún no hay dato de plataformas. «Media de 12 meses» quita la estacionalidad para ver la tendencia.</p>
     </section>
     <section>
       <h2>Personal empleado – Hoteles vs Apartamentos</h2>
@@ -2045,6 +2051,69 @@ function combineSeries(list, fn) {
 }
 const TOTAL_DS = (data) => ({ label: "Total", data: P(data), borderColor: "#111827", backgroundColor: "#111827", borderWidth: 2.5, pointRadius: 0, tension: .3, order: -1 });
 
+// ─── Comparativa: ocupación y estancia (tasas → media conjunta, no suma) ───
+const COMP_MODO = { ocup: "mes", est: "mes" };
+// Media móvil de 12 meses: solo donde hay 12 meses seguidos con dato
+function rolling12(series) {
+    const s = (series || []).filter(p => p.valor != null).sort((a, b) => a.fecha - b.fecha);
+    const out = [];
+    for (let i = 11; i < s.length; i++) {
+        const w = s.slice(i - 11, i + 1);
+        const meses = (w[11].fecha.getFullYear() - w[0].fecha.getFullYear()) * 12 + w[11].fecha.getMonth() - w[0].fecha.getMonth();
+        if (meses !== 11) continue;
+        out.push({ fecha: s[i].fecha, valor: w.reduce((t, p) => t + p.valor, 0) / 12, provisional: w.some(p => p.provisional) });
+    }
+    return out;
+}
+const compSerie = (key, s) => COMP_MODO[key] === "m12" ? rolling12(s) : (s || []);
+// Línea fina sin puntos y sin rebasar los datos (monotone) para que se lean las tasas
+const RATE_LINE = { borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, cubicInterpolationMode: "monotone" };
+const CONJ_DS = (data, label) => ({ ...TOTAL_DS(data), label, cubicInterpolationMode: "monotone", borderWidth: 3 });
+
+function renderCompOcup() {
+    const conj = combineSeries([DATA.eoh_ocup_plz, DATA.eoh_plazas, DATA.eoap_ocup_plz, DATA.eoap_plazas],
+        ([oh, ph, oa, pa]) => (ph + pa) ? (oh * ph + oa * pa) / (ph + pa) : null);
+    const pct = { ...PCT_AXIS, ticks: { ...PCT_AXIS.ticks, callback: v => v + " %" } };
+    lineChart("chCompOcup", [
+        CONJ_DS(compSerie("ocup", conj), "Media conjunta"),
+        { label: "Hoteles · plazas",      data: P(compSerie("ocup", DATA.eoh_ocup_plz)),  borderColor: C.cyan, backgroundColor: "rgba(8,145,178,.10)", fill: "+1", ...RATE_LINE },
+        { label: "Apartamentos · plazas", data: P(compSerie("ocup", DATA.eoap_ocup_plz)), borderColor: C.gold, ...RATE_LINE },
+    ], pct);
+    const c = charts.chCompOcup;
+    c.options.plugins.tooltip.callbacks.label = ctx => `${ctx.dataset.label}: ${fmt1.format(ctx.parsed.y)} %`;
+    c.update("none");
+}
+
+function renderCompEst() {
+    const eohPer = sumSeries([DATA.eoh_pernoc_esp, DATA.eoh_pernoc_ext]);
+    const eoaPer = sumSeries([DATA.eoap_pernoc_esp, DATA.eoap_pernoc_ext]);
+    const eohViaj = sumSeries([DATA.eoh_viaj_esp, DATA.eoh_viaj_ext]);
+    const eoaViaj = sumSeries([DATA.eoap_viaj_esp, DATA.eoap_viaj_ext]);
+    const conj = combineSeries([eohPer, eoaPer, DATA.oat_pernoc_tot, eohViaj, eoaViaj, DATA.oat_estancia_tot],
+        ([ph, pa, po, vh, va, eo]) => eo ? (ph + pa + po) / (vh + va + po / eo) : null);
+    lineChart("chCompEst", [
+        CONJ_DS(compSerie("est", conj), "Media conjunta"),
+        { label: "Hoteles",      data: P(compSerie("est", DATA.eoh_estancia)),     borderColor: C.cyan,   ...RATE_LINE },
+        { label: "Apartamentos", data: P(compSerie("est", DATA.eoap_estancia)),    borderColor: C.gold,   ...RATE_LINE },
+        { label: "Plataformas",  data: P(compSerie("est", DATA.oat_estancia_tot)), borderColor: C.purple, ...RATE_LINE },
+    ], {
+        ticks: { color: TICKS, callback: v => fmt1.format(v) + " d", font: FONT },
+        grid:  { color: GRID },
+        beginAtZero: true,
+    });
+    const c = charts.chCompEst;
+    c.options.plugins.tooltip.callbacks.label = ctx => `${ctx.dataset.label}: ${fmt1.format(ctx.parsed.y)} días`;
+    c.update("none");
+}
+
+document.querySelectorAll(".comp-modo").forEach(seg => seg.addEventListener("click", e => {
+    const b = e.target.closest("button[data-v]"); if (!b) return;
+    const key = seg.dataset.chart;
+    COMP_MODO[key] = b.dataset.v;
+    seg.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+    key === "ocup" ? renderCompOcup() : renderCompEst();
+}));
+
 function renderChartsComp() {
     const add = v => v.reduce((a, b) => a + b, 0);
     const eohPer = sumSeries([DATA.eoh_pernoc_esp, DATA.eoh_pernoc_ext]);
@@ -2063,22 +2132,8 @@ function renderChartsComp() {
         { label: "Hoteles (EOH)",       data: P(eohViaj), borderColor: C.cyan, backgroundColor: "rgba(6,182,212,.1)", fill: true, tension: .3 },
         { label: "Apartamentos (EOAP)", data: P(eoaViaj), borderColor: C.gold, backgroundColor: "rgba(217,119,6,.1)", fill: true, tension: .3 },
     ]);
-    // Ocupación conjunta: media de las dos ocupaciones ponderada por las plazas de cada tipo
-    lineChart("chCompOcup", [
-        TOTAL_DS(combineSeries([DATA.eoh_ocup_plz, DATA.eoh_plazas, DATA.eoap_ocup_plz, DATA.eoap_plazas],
-            ([oh, ph, oa, pa]) => (ph + pa) ? (oh * ph + oa * pa) / (ph + pa) : null)),
-        { label: "Hoteles · plazas",      data: P(DATA.eoh_ocup_plz),  borderColor: C.cyan, tension: .3 },
-        { label: "Apartamentos · plazas", data: P(DATA.eoap_ocup_plz), borderColor: C.gold, tension: .3 },
-    ], PCT_AXIS);
-    // Estancia conjunta: pernoctaciones totales / viajeros totales
-    // (viajeros de plataformas = pernoctaciones OAT / estancia media OAT, porque OAT no publica viajeros)
-    lineChart("chCompEst", [
-        TOTAL_DS(combineSeries([eohPer, eoaPer, oatPer, eohViaj, eoaViaj, DATA.oat_estancia_tot],
-            ([ph, pa, po, vh, va, eo]) => eo ? (ph + pa + po) / (vh + va + po / eo) : null)),
-        { label: "Hoteles",       data: P(DATA.eoh_estancia),      borderColor: C.cyan,   tension: .3 },
-        { label: "Apartamentos",  data: P(DATA.eoap_estancia),     borderColor: C.gold,   tension: .3 },
-        { label: "Plataformas",   data: P(DATA.oat_estancia_tot),  borderColor: C.purple, tension: .3 },
-    ]);
+    renderCompOcup();
+    renderCompEst();
     lineChart("chCompPers", [
         TOTAL_DS(combineSeries([DATA.eoh_personal, DATA.eoap_personal], add)),
         { label: "Hoteles",       data: P(DATA.eoh_personal),  borderColor: C.cyan, tension: .3 },
