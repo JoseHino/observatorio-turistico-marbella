@@ -1,7 +1,7 @@
 {
- "actualizado": "2026-10-26T09:26:50+00:00",
+ "actualizado": "2026-11-12T15:04:10+00:00",
  "fuente": "AENA · Informes mensuales de tráfico y notas de prensa del Aeropuerto de Málaga-Costa del Sol",
- "ultimo_mes": "2026-09",
+ "ultimo_mes": "2026-10",
  "meses": {
   "2015-01": {
    "pax": 644750,
@@ -1646,6 +1646,18 @@
    "acum_ops": 151305,
    "acum_ops_var": 0.0492,
    "blob": "1576875161438"
+  },
+  "2026-10": {
+   "pax": 2696944,
+   "pax_var": 0.0467,
+   "ops": 18117,
+   "ops_var": 0.04,
+   "estado": "provisional",
+   "acum_pax": 24826892,
+   "acum_pax_var": 0.0643,
+   "acum_ops": 169422,
+   "acum_ops_var": 0.0482,
+   "blob": "1576875582675"
   }
  },
  "anual": {
@@ -1738,11 +1750,11 @@
    "completo": true
   },
   "2026": {
-   "pax": 22129948,
-   "pax_var": 0.0665,
-   "ops": 151305,
-   "ops_var": 0.0492,
-   "hasta": "2026-09",
+   "pax": 24826892,
+   "pax_var": 0.0643,
+   "ops": 169422,
+   "ops_var": 0.0482,
+   "hasta": "2026-10",
    "completo": false
   }
  },
@@ -2600,6 +2612,44 @@
     {
      "pais": "Bélgica",
      "pax": 103476
+    }
+   ]
+  },
+  "2026-10": {
+   "url": "https://www.aena.es/doc/detalleprensa/261112-agp-estadisticas-octubre.pdf",
+   "tipo": "mes",
+   "paises": [
+    {
+     "pais": "Reino Unido",
+     "pax": 617030
+    },
+    {
+     "pais": "Alemania",
+     "pax": 225809
+    },
+    {
+     "pais": "Países Bajos",
+     "pax": 162590
+    },
+    {
+     "pais": "Italia",
+     "pax": 145051
+    },
+    {
+     "pais": "Francia",
+     "pax": 133638
+    },
+    {
+     "pais": "Irlanda",
+     "pax": 116991
+    },
+    {
+     "pais": "Bélgica",
+     "pax": 107090
+    },
+    {
+     "pais": "Polonia",
+     "pax": 105607
     }
    ]
   }
